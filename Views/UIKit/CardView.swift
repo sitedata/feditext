@@ -73,7 +73,6 @@ extension CardView {
 }
 
 private extension CardView {
-    // swiftlint:disable:next function_body_length
     func initialSetup() {
         backgroundColor = .secondarySystemBackground
         layer.cornerRadius = .defaultCornerRadius

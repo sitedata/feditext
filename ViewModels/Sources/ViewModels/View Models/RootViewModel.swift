@@ -86,7 +86,6 @@ private extension RootViewModel {
         "com.metabolist.metatext.identity-change-notification-user-info-key"
     static let removeIdentityChangeNotificationAfter = DispatchTimeInterval.seconds(10)
 
-    // swiftlint:disable:next function_body_length
     func identitySelected(id: Identity.Id?, immediate: Bool, notify: Bool) {
         navigationViewModel?.presentingSecondaryNavigation = false
 

@@ -31,7 +31,6 @@ final class ExploreViewController: UICollectionViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // swiftlint:disable:next function_body_length
     override func viewDidLoad() {
         super.viewDidLoad()
 

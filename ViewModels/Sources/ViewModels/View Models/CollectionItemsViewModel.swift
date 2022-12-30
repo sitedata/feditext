@@ -25,7 +25,6 @@ public class CollectionItemsViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var requestCancellables = Set<AnyCancellable>()
 
-    // swiftlint:disable:next function_body_length
     public init(collectionService: CollectionService, identityContext: IdentityContext) {
         self.collectionService = collectionService
         self.identityContext = identityContext

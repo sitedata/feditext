@@ -534,7 +534,7 @@ private extension TableViewController {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
+    // swiftlint:disable:next cyclomatic_complexity
     func handle(event: CollectionItemEvent) {
         switch event {
         case .ignorableOutput:

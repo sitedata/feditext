@@ -19,7 +19,6 @@ final class PollOptionButton: UIView {
     private let image: UIImage?
     private let selectedImage: UIImage?
 
-    // swiftlint:disable:next function_body_length
     init(title: String, emojis: [Emoji], multipleSelection: Bool, identityContext: IdentityContext) {
         image = UIImage(
             systemName: multipleSelection ? "square" : "circle",
