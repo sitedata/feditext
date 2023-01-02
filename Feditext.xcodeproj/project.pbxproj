@@ -374,11 +374,11 @@
 		D036AA06254B6118009094DF /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
 		D036AA0B254B612B009094DF /* NotificationContentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationContentConfiguration.swift; sourceTree = "<group>"; };
 		D036AA16254CA823009094DF /* StatusBodyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBodyView.swift; sourceTree = "<group>"; };
-		D039410D2615A71900E6E1B3 /* Metatext.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Metatext.xctestplan; sourceTree = "<group>"; };
+		D039410D2615A71900E6E1B3 /* Feditext.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Feditext.xctestplan; sourceTree = "<group>"; };
 		D03D87F325C23C44004DCBB2 /* SecondaryNavigationTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryNavigationTitleView.swift; sourceTree = "<group>"; };
 		D0477F2B25C6EBAD005C5368 /* OpenInDefaultBrowserActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenInDefaultBrowserActivity.swift; sourceTree = "<group>"; };
 		D0477F4525C72E50005C5368 /* CapsuleLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleLabel.swift; sourceTree = "<group>"; };
-		D047FA8C24C3E21200AF17C5 /* Metatext.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Metatext.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D047FA8C24C3E21200AF17C5 /* Feditext.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Feditext.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D052DBE225EAFDE800FFB628 /* HTTPError+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPError+Extensions.swift"; sourceTree = "<group>"; };
 		D05936CE25A8D79800754FDF /* EditAttachmentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditAttachmentViewController.swift; sourceTree = "<group>"; };
 		D05936DD25A937EC00754FDF /* EditThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditThumbnailView.swift; sourceTree = "<group>"; };
@@ -792,7 +792,7 @@
 				D0C7D45624F76169001EBDBB /* Localizations */,
 				D0E0F1E424FC49FC002C04BF /* Mastodon */,
 				D0BECB9D2501CBC3002C1B13 /* MastodonAPI */,
-				D039410D2615A71900E6E1B3 /* Metatext.xctestplan */,
+				D039410D2615A71900E6E1B3 /* Feditext.xctestplan */,
 				D0E5361A24E3EB4D00FB1CE1 /* Notification Service Extension */,
 				D047FA8D24C3E21200AF17C5 /* Products */,
 				D0BECB962501BCE0002C1B13 /* Secrets */,
@@ -811,7 +811,7 @@
 		D047FA8D24C3E21200AF17C5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D047FA8C24C3E21200AF17C5 /* Metatext.app */,
+				D047FA8C24C3E21200AF17C5 /* Feditext.app */,
 				D0666A2124C677B400F3F04B /* Tests.xctest */,
 				D0E5361924E3EB4D00FB1CE1 /* Notification Service Extension.appex */,
 				D08E526C257C36CA00FA2C5F /* Share Extension.appex */,
@@ -1025,14 +1025,14 @@
 			productReference = 94B2C8BE2929617A00087955 /* Action Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		D047FA8B24C3E21200AF17C5 /* Metatext */ = {
+		D047FA8B24C3E21200AF17C5 /* Feditext */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D047FAB624C3E21200AF17C5 /* Build configuration list for PBXNativeTarget "Metatext" */;
+			buildConfigurationList = D047FAB624C3E21200AF17C5 /* Build configuration list for PBXNativeTarget "Feditext" */;
 			buildPhases = (
 				D047FA8824C3E21200AF17C5 /* Sources */,
 				D047FA8924C3E21200AF17C5 /* Frameworks */,
 				D047FA8A24C3E21200AF17C5 /* Resources */,
-				D0666A2E24C67E6700F3F04B /* ShellScript */,
+				D0666A2E24C67E6700F3F04B /* Run Script */,
 				D0E5362424E3EB4D00FB1CE1 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
@@ -1042,7 +1042,7 @@
 				D08E5275257C36CA00FA2C5F /* PBXTargetDependency */,
 				94B2C8CB2929617A00087955 /* PBXTargetDependency */,
 			);
-			name = Metatext;
+			name = Feditext;
 			packageProductDependencies = (
 				D0E2C1D024FD97F000854680 /* ViewModels */,
 				D0FE7C7F25C4C79F00203957 /* PreviewViewModels */,
@@ -1050,7 +1050,7 @@
 				D06FA32625F0659600C9639A /* BlurHash */,
 			);
 			productName = "Metatext (iOS)";
-			productReference = D047FA8C24C3E21200AF17C5 /* Metatext.app */;
+			productReference = D047FA8C24C3E21200AF17C5 /* Feditext.app */;
 			productType = "com.apple.product-type.application";
 		};
 		D0666A2024C677B400F3F04B /* Tests */ = {
@@ -1145,7 +1145,7 @@
 					};
 				};
 			};
-			buildConfigurationList = D047FA8324C3E21000AF17C5 /* Build configuration list for PBXProject "Metatext" */;
+			buildConfigurationList = D047FA8324C3E21000AF17C5 /* Build configuration list for PBXProject "Feditext" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -1181,7 +1181,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				D047FA8B24C3E21200AF17C5 /* Metatext */,
+				D047FA8B24C3E21200AF17C5 /* Feditext */,
 				D0666A2024C677B400F3F04B /* Tests */,
 				D0E5361824E3EB4D00FB1CE1 /* Notification Service Extension */,
 				D08E526B257C36CA00FA2C5F /* Share Extension */,
@@ -1247,7 +1247,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		D0666A2E24C67E6700F3F04B /* ShellScript */ = {
+		D0666A2E24C67E6700F3F04B /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -1257,6 +1257,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -1526,7 +1527,7 @@
 		};
 		D0666A2724C677B400F3F04B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = D047FA8B24C3E21200AF17C5 /* Metatext */;
+			target = D047FA8B24C3E21200AF17C5 /* Feditext */;
 			targetProxy = D0666A2624C677B400F3F04B /* PBXContainerItemProxy */;
 		};
 		D08E5275257C36CA00FA2C5F /* PBXTargetDependency */ = {
@@ -1798,21 +1799,21 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Supporting Files/Metatext.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = XW9CQ4A58Z;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Supporting Files/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Metatext;
+				INFOPLIST_KEY_CFBundleDisplayName = Feditext;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.7.1;
+				MARKETING_VERSION = 1.7.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.gotgoat.metatext;
-				PRODUCT_NAME = Metatext;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
@@ -1828,21 +1829,21 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Supporting Files/Metatext.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = XW9CQ4A58Z;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Supporting Files/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Metatext;
+				INFOPLIST_KEY_CFBundleDisplayName = Feditext;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.7.1;
+				MARKETING_VERSION = 1.7.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.gotgoat.metatext;
-				PRODUCT_NAME = Metatext;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
@@ -2017,7 +2018,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D047FA8324C3E21000AF17C5 /* Build configuration list for PBXProject "Metatext" */ = {
+		D047FA8324C3E21000AF17C5 /* Build configuration list for PBXProject "Feditext" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D047FAB424C3E21200AF17C5 /* Debug */,
@@ -2026,7 +2027,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D047FAB624C3E21200AF17C5 /* Build configuration list for PBXNativeTarget "Metatext" */ = {
+		D047FAB624C3E21200AF17C5 /* Build configuration list for PBXNativeTarget "Feditext" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D047FAB724C3E21200AF17C5 /* Debug */,

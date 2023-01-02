@@ -129,7 +129,7 @@
 			<string>com.gotgoat.metatext</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>metatext</string>
+				<string>feditext</string>
 			</array>
 		</dict>
 	</array>

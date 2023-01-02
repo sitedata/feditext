@@ -16,8 +16,8 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D047FA8B24C3E21200AF17C5"
                BuildableName = "Metatext.app"
-               BlueprintName = "Metatext"
-               ReferencedContainer = "container:Metatext.xcodeproj">
+               BlueprintName = "Feditext"
+               ReferencedContainer = "container:Feditext.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -29,23 +29,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       codeCoverageEnabled = "YES">
       <TestPlans>
-         <TestPlanReference
-            reference = "container:Metatext.xctestplan"
-            default = "YES">
-         </TestPlanReference>
       </TestPlans>
-      <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "D0666A2024C677B400F3F04B"
-               BuildableName = "Tests.xctest"
-               BlueprintName = "Tests"
-               ReferencedContainer = "container:Metatext.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -57,16 +41,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "D047FA8B24C3E21200AF17C5"
-            BuildableName = "Metatext.app"
-            BlueprintName = "Metatext"
-            ReferencedContainer = "container:Metatext.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -74,16 +48,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D047FA8B24C3E21200AF17C5"
             BuildableName = "Metatext.app"
-            BlueprintName = "Metatext"
-            ReferencedContainer = "container:Metatext.xcodeproj">
+            BlueprintName = "Feditext"
+            ReferencedContainer = "container:Feditext.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
