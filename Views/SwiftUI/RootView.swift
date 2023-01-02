@@ -36,7 +36,7 @@ struct RootView: View {
     private func openURL(_ navigationViewModel: NavigationViewModel, _ metatextUrl: URL) {
         guard
             let metatextComponents = URLComponents(url: metatextUrl, resolvingAgainstBaseURL: true),
-            metatextComponents.scheme == "metatext"
+            metatextComponents.scheme == "feditext"
         else {
             return
         }

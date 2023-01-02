@@ -44,7 +44,7 @@ class ActionExtensionViewController: UIViewController {
                         } else if let url = url {
                             // Create a `metatext:search?url=https…` URL from our web URL.
                             var urlBuilder = URLComponents()
-                            urlBuilder.scheme = "metatext"
+                            urlBuilder.scheme = "feditext"
                             urlBuilder.path = "search"
                             urlBuilder.queryItems = [.init(name: "url", value: url.absoluteString)]
                             let metatextURL = urlBuilder.url!
