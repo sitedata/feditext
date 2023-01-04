@@ -29,6 +29,10 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       codeCoverageEnabled = "YES">
       <TestPlans>
+         <TestPlanReference
+            reference = "container:Feditext.xcodeproj/Feditext.xctestplan"
+            default = "YES">
+         </TestPlanReference>
       </TestPlans>
    </TestAction>
    <LaunchAction

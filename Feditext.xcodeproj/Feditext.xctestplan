@@ -1,0 +1,31 @@
+{
+  "configurations" : [
+    {
+      "id" : "DFF4ADCE-52A8-4C6D-8F7E-70F0064F6D7C",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:ServiceLayer",
+        "identifier" : "ServiceLayerTests",
+        "name" : "ServiceLayerTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:ViewModels",
+        "identifier" : "ViewModelsTests",
+        "name" : "ViewModelsTests"
+      }
+    }
+  ],
+  "version" : 1
+}
