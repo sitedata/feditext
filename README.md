@@ -1,16 +1,25 @@
-# Metatext
+# Metatext / Feditext<sup>*</sup>
 
 A free, open-source iOS Mastodon client.
 
-[![Download on the App Store](https://metabolist.org/assets/images/download_on_the_app_store.svg)](https://apps.apple.com/us/app/metatext/id1523996615?mt=8)
+<sup>*</sup>Feditext: this name is a placeholder. Suggestions are welcome. I don't know if it's an option to keep the Metatext name.
 
-## Seeking Maintainers
+## Seeking Contributors
 
-Development of this project is currently paused. Email info@metabolist.org if you or your organization are interested in taking ownership of the project.
+The upstream project [Metatext](https://github.com/metabolist/metatext) is seeking maintainers.
+This fork is an attempt to build community to continue development.
+
+If you are interested in joining the TestFlight group,
+reach out to
+[@bdube](https://gotgoat.com/@bdube)
+or
+[@vyr](https://demon.social/@vyr).
 
 ## Contributing Bug Reports
 
-GitHub is used for bug tracking. Please search [existing issues](https://github.com/metabolist/metatext/issues) and create a new one if the issue is not yet tracked.
+GitHub is used for bug tracking.
+Search [existing issues](https://github.com/bdube/metatext) and create a new one if the issue is not yet tracked.
+Upstream issues can be referenced in the [archived project](https://github.com/metabolist/metatext/issues).
 
 ## Contributing Translations
 
@@ -20,21 +29,21 @@ You can help translate Metatext on [CrowdIn](https://crowdin.com/project/metatex
 
 See the [contribution guidelines](https://github.com/metabolist/metatext/blob/main/CONTRIBUTING.md).
 
-Note that capacity for reviewing pull requests is currently very limited. For now, please limit the scope of proposed changes to fixing bugs and not added features, settings, or behavior, thanks. If you are interested in doing a larger scope change, please propose it via email at info@metabolist.org first.
-
 ## Building
 
 To build Metatext:
 
-- Clone the repository (`git clone https://github.com/metabolist/metatext.git`)
-- Open `Metatext.xcodeproj` in Xcode
-- Select the top-level "Metatext" item in Xcode and change the team in each target's "Signing & Capabilities" settings to your own
+- Clone the repository (`git clone https://github.com/bdube/metatext.git`)
+- Open `Feditext.xcodeproj` in Xcode
+- Select the top-level "Feditext" item in Xcode and change the team in each target's "Signing & Capabilities" settings to your own
 
 All dependencies are managed using [Swift Package Manager](https://swift.org/package-manager) and will automatically be installed by Xcode.
 
 ### Push Notifications
 
 Push notifications will not work in development builds of Metatext unless you host your own instance of [metatext-apns](https://github.com/metabolist/metatext-apns) and change the `pushSubscriptionEndpointURL` constants in [IdentityService.swift](https://github.com/metabolist/metatext/blob/main/ServiceLayer/Sources/ServiceLayer/Services/IdentityService.swift) to its URL.
+
+There is an issue to track this bdube/metatext#15.
 
 ## Architecture
 
