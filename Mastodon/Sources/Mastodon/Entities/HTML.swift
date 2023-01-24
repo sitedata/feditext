@@ -61,7 +61,7 @@ private extension HTML {
                 .basic()
                     .addTags("h1", "h2", "h3", "h4", "h5", "h6")
                     .addTags("kbd", "samp", "tt")
-                    .addTags("s")
+                    .addTags("s", "ins", "del")
                     .removeProtocols("a", "href", "ftp", "mailto")
                     .addAttributes("span", "class")
             ),
