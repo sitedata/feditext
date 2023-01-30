@@ -232,6 +232,18 @@ public extension ContentDatabase {
         }
     }
 
+    func update(id: Status.Id, source: StatusSource) -> AnyPublisher<Never, Error> {
+        databaseWriter.mutatingPublisher {
+            try StatusRecord
+                .filter(StatusRecord.Columns.id == id)
+                .updateAll(
+                    $0,
+                    StatusRecord.Columns.text.set(to: source.text),
+                    StatusRecord.Columns.spoilerText.set(to: source.spoilerText)
+                )
+        }
+    }
+
     func delete(id: Status.Id) -> AnyPublisher<Never, Error> {
         databaseWriter.mutatingPublisher(updates: StatusRecord.filter(StatusRecord.Columns.id == id).deleteAll)
     }
