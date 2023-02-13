@@ -155,6 +155,7 @@
 "explore.profile-directory" = "Profile Directory";
 "error" = "Error";
 "favorites" = "Favorites";
+"followed-tags.new-tag-title" = "Hashtag (without #)";
 "follow-requests" = "Follow Requests";
 "registration.review-terms-of-use-and-privacy-policy-%@" = "Please review %@'s Terms of Use and Privacy Policy to continue";
 "registration.username" = "Username";
@@ -170,6 +171,7 @@
 "secondary-navigation.account-settings" = "Account Settings";
 "secondary-navigation.accounts" = "Accounts";
 "secondary-navigation.edit-profile" = "Edit Profile";
+"secondary-navigation.followed-tags" = "Followed Tags";
 "secondary-navigation.lists" = "Lists";
 "secondary-navigation.my-profile" = "My Profile";
 "secondary-navigation.preferences" = "Preferences";
@@ -395,6 +397,8 @@
 "tag.accessibility-recent-uses-%ld" = "%ld recent uses";
 "tag.accessibility-hint.post" = "View posts associated with trend";
 "tag.accessibility-hint.toot" = "View toots associated with trend";
+"tag.followed.add" = "Follow tag";
+"tag.followed.remove" = "Unfollow tag";
 "tag.per-week-%ld" = "%ld per week";
 "timelines.home" = "Home";
 "timelines.local" = "Local";

@@ -186,6 +186,8 @@ class TableViewController: UITableViewController {
         sizeTableHeaderFooterViews()
     }
 
+    // TODO: (Vyr) can we subsume this into timeline actions?
+    /// Not used if `viewModel.timelineActionViewModel` exists because that takes precedence.
     func configureRightBarButtonItem(expandAllState: ExpandAllState) {
         switch expandAllState {
         case .hidden:
@@ -415,9 +417,13 @@ private extension TableViewController {
             .sink { [weak self] in self?.handle(event: $0) }
             .store(in: &cancellables)
 
-        viewModel.expandAll.receive(on: DispatchQueue.main)
-            .sink { [weak self] in self?.configureRightBarButtonItem(expandAllState: $0) }
-            .store(in: &cancellables)
+        if let timelineActionViewModel = viewModel.timelineActionViewModel {
+            setupTimelineActionBarButtonItem(timelineActionViewModel)
+        } else {
+            viewModel.expandAll.receive(on: DispatchQueue.main)
+                .sink { [weak self] in self?.configureRightBarButtonItem(expandAllState: $0) }
+                .store(in: &cancellables)
+        }
 
         viewModel.loading.receive(on: DispatchQueue.main).assign(to: &$loading)
 
@@ -915,6 +921,43 @@ private extension TableViewController {
 
         snapshot.reloadItems(visibleItems)
         dataSource.apply(snapshot, animatingDifferences: false)
+    }
+
+    func setupTimelineActionBarButtonItem(_ timelineActionViewModel: TimelineActionViewModel) {
+        switch timelineActionViewModel {
+        case let .tag(tagTimelineActionViewModel):
+            tagTimelineActionViewModel.tag
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] tag in
+                    switch tag?.following {
+                    case nil:
+                        self?.navigationItem.rightBarButtonItem = nil
+                    case .some(false):
+                        self?.navigationItem.rightBarButtonItem = .init(
+                            title: NSLocalizedString(
+                                "tag.followed.add",
+                                comment: ""
+                            ),
+                            image: UIImage(named: "tag.followed.add"),
+                            primaryAction: .init { [weak tagTimelineActionViewModel] _ in
+                                tagTimelineActionViewModel?.follow()
+                            }
+                        )
+                    case .some(true):
+                        self?.navigationItem.rightBarButtonItem = .init(
+                            title: NSLocalizedString(
+                                "tag.followed.remove",
+                                comment: ""
+                            ),
+                            image: UIImage(named: "tag.followed.remove"),
+                            primaryAction: .init { [weak tagTimelineActionViewModel] _ in
+                                tagTimelineActionViewModel?.unfollow()
+                            }
+                        )
+                    }
+                }
+                .store(in: &cancellables)
+        }
     }
 }
 // swiftlint:enable file_length
