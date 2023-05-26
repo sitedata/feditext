@@ -65,6 +65,15 @@ extension AccountRecord {
         StatusRecord.self,
         through: pinnedStatusJoins,
         using: AccountPinnedStatusJoin.status)
+    static let familiarFollowersJoins = hasMany(
+        FamiliarFollowersJoin.self,
+        using: ForeignKey([FamiliarFollowersJoin.Columns.followedAccountId])
+    )
+    static let familiarFollowers = hasMany(
+        AccountRecord.self,
+        through: familiarFollowersJoins,
+        using: FamiliarFollowersJoin.followingAccount
+    )
 
     var pinnedStatuses: QueryInterfaceRequest<StatusInfo> {
         StatusInfo.request(request(for: Self.pinnedStatuses))

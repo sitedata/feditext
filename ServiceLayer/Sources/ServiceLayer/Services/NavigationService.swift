@@ -71,9 +71,10 @@ public extension NavigationService {
                        contentDatabase: contentDatabase)
     }
 
-    func profileService(account: Account, relationship: Relationship? = nil) -> ProfileService {
+    func profileService(account: Account, relationship: Relationship? = nil, familiarFollowers: [Account] = []) -> ProfileService {
         ProfileService(account: account,
                        relationship: relationship,
+                       familiarFollowers: familiarFollowers,
                        environment: environment,
                        mastodonAPIClient: mastodonAPIClient,
                        contentDatabase: contentDatabase)
@@ -91,6 +92,17 @@ public extension NavigationService {
                        environment: environment,
                        mastodonAPIClient: mastodonAPIClient,
                        contentDatabase: contentDatabase)
+    }
+
+    func familiarFollowersService(familiarFollowers: [Account]) -> FixedAccountListService {
+        FixedAccountListService(
+            accounts: familiarFollowers,
+            accountConfiguration: .withNote,
+            environment: environment,
+            mastodonAPIClient: mastodonAPIClient,
+            contentDatabase: contentDatabase,
+            titleComponents: ["account-list.title.familiar-followers"]
+        )
     }
 
     func loadMoreService(loadMore: LoadMore) -> LoadMoreService {

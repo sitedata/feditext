@@ -343,6 +343,31 @@ public extension ContentDatabase {
         }
     }
 
+    func insert(familiarFollowers: [FamiliarFollowers]) -> AnyPublisher<Never, Error> {
+        databaseWriter.mutatingPublisher {
+            $0.trace { x in print(x) }
+
+            for followedAccount in familiarFollowers {
+                var followingAccountIds: [Account.Id] = []
+
+                for followingAccount in followedAccount.accounts {
+                    followingAccountIds.append(followingAccount.id)
+                    try followingAccount.save($0)
+
+                    try FamiliarFollowersJoin(
+                        followedAccountId: followedAccount.id,
+                        followingAccountId: followingAccount.id
+                    ).save($0)
+                }
+
+                try FamiliarFollowersJoin
+                    .filter(FamiliarFollowersJoin.Columns.followedAccountId == followedAccount.id
+                            && !followingAccountIds.contains(FamiliarFollowersJoin.Columns.followingAccountId))
+                    .deleteAll($0)
+            }
+        }
+    }
+
     func setLists(_ lists: [List]) -> AnyPublisher<Never, Error> {
         databaseWriter.mutatingPublisher {
             for list in lists {
@@ -519,7 +544,12 @@ public extension ContentDatabase {
             .publisher(in: databaseWriter)
             .map {
                 $0?.accountAndRelationshipInfos.map {
-                    CollectionItem.account(.init(info: $0.accountInfo), configuration, $0.relationship)
+                    CollectionItem.account(
+                        .init(info: $0.accountInfo),
+                        configuration,
+                        $0.relationship,
+                        $0.familiarFollowers.map { followingAccountInfo in .init(info: followingAccountInfo) }
+                    )
                 }
             }
             .replaceNil(with: [])
@@ -586,7 +616,12 @@ public extension ContentDatabase {
                 accountIds.firstIndex(of: $0.accountInfo.record.id) ?? 0
                     < accountIds.firstIndex(of: $1.accountInfo.record.id) ?? 0
             }
-            .map { CollectionItem.account(.init(info: $0.accountInfo), .withoutNote, $0.relationship) }
+            .map { CollectionItem.account(
+                .init(info: $0.accountInfo),
+                .withoutNote,
+                $0.relationship,
+                $0.familiarFollowers.map { followingAccountInfo in .init(info: followingAccountInfo) }
+            ) }
 
             if let limit = limit, accounts.count >= limit {
                 accounts.append(.moreResults(.init(scope: .accounts)))

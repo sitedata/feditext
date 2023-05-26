@@ -19,6 +19,9 @@ final class AccountHeaderView: UIView {
     let notifyButton = UIButton()
     let unnotifyButton = UIButton()
     let displayNameLabel = AnimatedAttachmentLabel()
+    /// Displays first few display names of your follows who also follow this account.
+    let familiarFollowersLabel = FamiliarFollowersLabel()
+    let familiarFollowersButton = UIButton()
     let accountStackView = UIStackView()
     let accountLabel = CopyableLabel()
     let lockedImageView = UIImageView()
@@ -63,6 +66,7 @@ final class AccountHeaderView: UIView {
                     NSLocalizedString("account.avatar.accessibility-label-%@", comment: ""),
                     accountViewModel.displayName)
 
+                let followRelationshipShown: Bool
                 if !accountViewModel.isSelf, let relationship = accountViewModel.relationship {
                     followsYouLabel.isHidden = !relationship.followedBy
                     mutedLabel.isHidden = !relationship.muting
@@ -95,9 +99,11 @@ final class AccountHeaderView: UIView {
 
                     relationshipButtonsStackView.isHidden = false
                     unavailableLabel.isHidden = !relationship.blockedBy
+                    followRelationshipShown = relationship.following || relationship.followedBy
                 } else {
                     relationshipButtonsStackView.isHidden = true
                     unavailableLabel.isHidden = true
+                    followRelationshipShown = false
                 }
 
                 if accountViewModel.displayName.isEmpty {
@@ -110,6 +116,14 @@ final class AccountHeaderView: UIView {
                                               identityContext: viewModel.identityContext)
                     mutableDisplayName.resizeAttachments(toLineHeight: displayNameLabel.font.lineHeight)
                     displayNameLabel.attributedText = mutableDisplayName
+                }
+
+                familiarFollowersLabel.identityContext = viewModel.identityContext
+                if !accountViewModel.isSelf, !followRelationshipShown, !accountViewModel.familiarFollowers.isEmpty {
+                    familiarFollowersLabel.isHidden = false
+                    familiarFollowersLabel.accounts = accountViewModel.familiarFollowers
+                } else {
+                    familiarFollowersLabel.isHidden = true
                 }
 
                 accountLabel.text = accountViewModel.accountName
@@ -507,6 +521,21 @@ private extension AccountHeaderView {
 
         accountTypeStatusCountJoinedStackView.addArrangedSubview(UIView())
 
+        baseStackView.addArrangedSubview(familiarFollowersLabel)
+        familiarFollowersLabel.numberOfLines = 0
+        familiarFollowersLabel.font = .preferredFont(forTextStyle: .footnote)
+        familiarFollowersLabel.adjustsFontForContentSizeCategory = true
+        familiarFollowersLabel.textColor = .tertiaryLabel
+        familiarFollowersLabel.isUserInteractionEnabled = true
+
+        familiarFollowersLabel.addSubview(familiarFollowersButton)
+        familiarFollowersButton.translatesAutoresizingMaskIntoConstraints = false
+        familiarFollowersButton.setBackgroundImage(.highlightedButtonBackground, for: .highlighted)
+        familiarFollowersButton.addAction(
+            UIAction { [weak self] _ in self?.viewModel.accountViewModel?.familiarFollowersSelected() },
+            for: .touchUpInside
+        )
+
         baseStackView.addArrangedSubview(relationshipNoteStack)
         relationshipNoteStack.axis = .horizontal
         // .firstBaseline makes the view infinitely large vertically for some reason.
@@ -617,6 +646,10 @@ private extension AccountHeaderView {
             directMessageButton.widthAnchor.constraint(equalTo: directMessageButton.heightAnchor),
             notifyButton.widthAnchor.constraint(equalTo: notifyButton.heightAnchor),
             unnotifyButton.widthAnchor.constraint(equalTo: unnotifyButton.heightAnchor),
+            familiarFollowersButton.leadingAnchor.constraint(equalTo: familiarFollowersLabel.leadingAnchor),
+            familiarFollowersButton.topAnchor.constraint(equalTo: familiarFollowersLabel.topAnchor),
+            familiarFollowersButton.bottomAnchor.constraint(equalTo: familiarFollowersLabel.bottomAnchor),
+            familiarFollowersButton.trailingAnchor.constraint(equalTo: familiarFollowersLabel.trailingAnchor),
             baseStackView.topAnchor.constraint(equalTo: avatarBackgroundView.bottomAnchor, constant: .defaultSpacing),
             baseStackView.leadingAnchor.constraint(equalTo: readableContentGuide.leadingAnchor),
             baseStackView.trailingAnchor.constraint(equalTo: readableContentGuide.trailingAnchor),

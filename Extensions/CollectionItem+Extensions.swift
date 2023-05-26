@@ -47,12 +47,13 @@ extension CollectionItem {
                 identityContext: identityContext,
                 status: status,
                 configuration: configuration)
-        case let .account(account, configuration, relationship):
+        case let .account(account, configuration, relationship, familiarFollowers):
             return AccountView.estimatedHeight(
                 width: width,
                 account: account,
                 configuration: configuration,
-                relationship: relationship
+                relationship: relationship,
+                familiarFollowers: familiarFollowers
             )
         case .loadMore:
             return LoadMoreView.estimatedHeight
@@ -86,7 +87,7 @@ extension CollectionItem {
         switch self {
         case let .status(status, _, _):
             return status.mediaPrefetchURLs(identityContext: identityContext)
-        case let .account(account, _, _):
+        case let .account(account, _, _, _):
             return account.mediaPrefetchURLs(identityContext: identityContext)
         case let .notification(notification, _):
             var urls = notification.account.mediaPrefetchURLs(identityContext: identityContext)

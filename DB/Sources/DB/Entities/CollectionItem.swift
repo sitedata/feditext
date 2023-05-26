@@ -6,7 +6,7 @@ import Mastodon
 public enum CollectionItem: Hashable {
     case status(Status, StatusConfiguration, Relationship?)
     case loadMore(LoadMore)
-    case account(Account, AccountConfiguration, Relationship?)
+    case account(Account, AccountConfiguration, Relationship?, [Account])
     case notification(MastodonNotification, StatusConfiguration?)
     case multiNotification([MastodonNotification], MastodonNotification.NotificationType, Date, Status?)
     case conversation(Conversation)
@@ -58,7 +58,7 @@ public extension CollectionItem {
             return status.id
         case .loadMore:
             return nil
-        case let .account(account, _, _):
+        case let .account(account, _, _, _):
             return account.id
         case let .notification(notification, _):
             return notification.id

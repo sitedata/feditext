@@ -15,6 +15,7 @@
 		943141D7299AADD900D90FC4 /* AboutInstanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943141D6299AADD900D90FC4 /* AboutInstanceView.swift */; };
 		947E728F29A9618900155DD2 /* EditNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947E728E29A9618900155DD2 /* EditNoteView.swift */; };
 		94B0BCD329859B750075E234 /* StatusEditHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B0BCD229859B750075E234 /* StatusEditHistoryView.swift */; };
+		94B22F342A2A6787008C3044 /* FamiliarFollowersLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B22F332A2A6787008C3044 /* FamiliarFollowersLabel.swift */; };
 		94B2C8C02929617A00087955 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94B2C8BF2929617A00087955 /* UniformTypeIdentifiers.framework */; };
 		94B2C8C52929617A00087955 /* ActionExtensionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B2C8C42929617A00087955 /* ActionExtensionViewController.swift */; };
 		94B2C8CC2929617A00087955 /* Action Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 94B2C8BE2929617A00087955 /* Action Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -352,6 +353,7 @@
 		9432DE2929A1587C0007C2BF /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		947E728E29A9618900155DD2 /* EditNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditNoteView.swift; sourceTree = "<group>"; };
 		94B0BCD229859B750075E234 /* StatusEditHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEditHistoryView.swift; sourceTree = "<group>"; };
+		94B22F332A2A6787008C3044 /* FamiliarFollowersLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamiliarFollowersLabel.swift; sourceTree = "<group>"; };
 		94B2C8BE2929617A00087955 /* Action Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Action Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		94B2C8BF2929617A00087955 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
 		94B2C8C42929617A00087955 /* ActionExtensionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionExtensionViewController.swift; sourceTree = "<group>"; };
@@ -706,6 +708,7 @@
 				D021A66E25C3E1E4008A0C0D /* Table View Cells */,
 				D01F41D624F880C400D55A2D /* TouchFallthroughTextView.swift */,
 				D0E1F582251F13EC00D45315 /* WebfingerIndicatorView.swift */,
+				94B22F332A2A6787008C3044 /* FamiliarFollowersLabel.swift */,
 			);
 			path = UIKit;
 			sourceTree = "<group>";
@@ -1475,6 +1478,7 @@
 				D0BE97A325CF44310057E161 /* CGRect+Extensions.swift in Sources */,
 				D00CB2ED2533ACC00080096B /* StatusView.swift in Sources */,
 				D0BE980425D229D50057E161 /* SeparatorConfiguredTableViewCell.swift in Sources */,
+				94B22F342A2A6787008C3044 /* FamiliarFollowersLabel.swift in Sources */,
 				D0A1F4F7252E7D4B004435BF /* TableViewDataSource.swift in Sources */,
 				D025B17E25C500BC001C69A8 /* CapsuleButton.swift in Sources */,
 				D0D93EBA25D9C70400C622ED /* AutocompleteItemView.swift in Sources */,

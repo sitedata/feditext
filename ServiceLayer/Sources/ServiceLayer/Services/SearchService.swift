@@ -48,6 +48,13 @@ extension SearchService: CollectionService {
                     .collect()
                     .map { _ in results }
             }
+            .flatMap { results in
+                mastodonAPIClient
+                    .request(FamiliarFollowersEndpoint.familiarFollowers(ids: results.accounts.map { $0.id }))
+                    .flatMap(contentDatabase.insert(familiarFollowers:))
+                    .collect()
+                    .map { _ in results }
+            }
             .handleEvents(receiveOutput: { resultsSubject.send(($0, search)) })
             .ignoreOutput()
             .eraseToAnyPublisher()

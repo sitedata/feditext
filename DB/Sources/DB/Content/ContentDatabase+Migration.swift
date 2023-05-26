@@ -332,6 +332,16 @@ extension ContentDatabase {
             }
         }
 
+        migrator.registerMigration("1.7.4-familiar-followers") { db in
+            try db.create(table: "familiarFollowersJoin") { t in
+                t.column("followedAccountId", .text).indexed().notNull()
+                    .references("accountRecord", onDelete: .cascade)
+                t.column("followingAccountId", .text).indexed().notNull()
+                    .references("accountRecord", onDelete: .cascade)
+                t.primaryKey(["followedAccountId", "followingAccountId"], onConflict: .replace)
+            }
+        }
+
         return migrator
     }
 }

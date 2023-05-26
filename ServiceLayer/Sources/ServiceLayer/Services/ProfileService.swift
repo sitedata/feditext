@@ -16,6 +16,7 @@ public struct ProfileService {
 
     init(account: Account,
          relationship: Relationship?,
+         familiarFollowers: [Account],
          environment: AppEnvironment,
          mastodonAPIClient: MastodonAPIClient,
          contentDatabase: ContentDatabase) {
@@ -23,6 +24,7 @@ public struct ProfileService {
             id: account.id,
             account: account,
             relationship: relationship,
+            familiarFollowers: familiarFollowers,
             environment: environment,
             mastodonAPIClient: mastodonAPIClient,
             contentDatabase: contentDatabase)
@@ -35,6 +37,7 @@ public struct ProfileService {
         self.init(id: id,
                   account: nil,
                   relationship: nil,
+                  familiarFollowers: [],
                   environment: environment,
                   mastodonAPIClient: mastodonAPIClient,
                   contentDatabase: contentDatabase)
@@ -44,6 +47,7 @@ public struct ProfileService {
         id: Account.Id,
         account: Account?,
         relationship: Relationship?,
+        familiarFollowers: [Account],
         environment: AppEnvironment,
         mastodonAPIClient: MastodonAPIClient,
         contentDatabase: ContentDatabase) {
@@ -56,7 +60,14 @@ public struct ProfileService {
 
         if let account = account {
             profilePublisher = profilePublisher
-                .merge(with: Just(Profile(account: account, relationship: relationship)).setFailureType(to: Error.self))
+                .merge(
+                    with: Just(Profile(
+                        account: account,
+                        relationship: relationship,
+                        familiarFollowers: familiarFollowers
+                    ))
+                    .setFailureType(to: Error.self)
+                )
                 .removeDuplicates()
                 .eraseToAnyPublisher()
         }
@@ -75,11 +86,13 @@ public extension ProfileService {
     }
 
     func fetchProfile() -> AnyPublisher<Never, Error> {
-        Publishers.Merge4(
+        Publishers.Merge5(
             mastodonAPIClient.request(AccountEndpoint.accounts(id: id))
                 .flatMap { contentDatabase.insert(accounts: [$0]) },
             mastodonAPIClient.request(RelationshipsEndpoint.relationships(ids: [id]))
                 .flatMap { contentDatabase.insert(relationships: $0) },
+            mastodonAPIClient.request(FamiliarFollowersEndpoint.familiarFollowers(ids: [id]))
+                .flatMap { contentDatabase.insert(familiarFollowers: $0) },
             mastodonAPIClient.request(IdentityProofsEndpoint.identityProofs(id: id))
                 .catch { _ in Empty() }
                 .flatMap { contentDatabase.insert(identityProofs: $0, id: id) },

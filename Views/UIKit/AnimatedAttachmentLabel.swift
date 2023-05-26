@@ -3,7 +3,7 @@
 import SDWebImage
 import UIKit
 
-final class AnimatedAttachmentLabel: UILabel, EmojiInsertable {
+class AnimatedAttachmentLabel: UILabel, EmojiInsertable {
     override init(frame: CGRect) {
         super.init(frame: frame)
     }

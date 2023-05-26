@@ -58,6 +58,13 @@ public class CollectionItemsViewModel: ObservableObject {
             .sink { _ in }
             .store(in: &cancellables)
 
+        collectionService.accountIdsForRelationships
+            .filter { !$0.isEmpty }
+            .flatMap(identityContext.service.requestFamiliarFollowers(ids:))
+            .catch { _ in Empty().setFailureType(to: Never.self) }
+            .sink { _ in }
+            .store(in: &cancellables)
+
         let debouncedLastReadId = lastReadId
             .compactMap { $0 }
             .removeDuplicates()
@@ -143,7 +150,7 @@ public class CollectionItemsViewModel: ObservableObject {
             viewModelCache[item] = viewModel
 
             return viewModel
-        case let .account(account, configuration, relationship):
+        case let .account(account, configuration, relationship, familiarFollowers):
             let viewModel: AccountViewModel
 
             if let cachedViewModel = cachedViewModel as? AccountViewModel {
@@ -158,6 +165,7 @@ public class CollectionItemsViewModel: ObservableObject {
 
             viewModel.configuration = configuration
             viewModel.relationship = relationship
+            viewModel.familiarFollowers = familiarFollowers
 
             return viewModel
         case let .notification(notification, statusConfiguration):
@@ -316,10 +324,20 @@ extension CollectionItemsViewModel: CollectionViewModel {
         case let .loadMore(loadMore):
             lastSelectedLoadMore = loadMore
             (viewModel(indexPath: indexPath) as? LoadMoreViewModel)?.loadMore()
-        case let .account(account, _, relationship):
-            send(event: .navigation(.profile(collectionService
-                                                .navigationService
-                                                .profileService(account: account, relationship: relationship))))
+        case let .account(account, _, relationship, familiarFollowers):
+            send(
+                event: .navigation(
+                    .profile(
+                        collectionService
+                            .navigationService
+                            .profileService(
+                                account: account,
+                                relationship: relationship,
+                                familiarFollowers: familiarFollowers
+                            )
+                    )
+                )
+            )
         case let .notification(notification, _):
             if let report = notification.report {
                 send(event: .navigation(collectionService.navigationService.report(id: report.id)))

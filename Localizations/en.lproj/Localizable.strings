@@ -21,10 +21,15 @@
 "account.block.confirm-%@" = "Block %@?";
 "account.blocked" = "Blocked";
 "account.direct-message" = "Direct message";
+"account.domain-blocked" = "Domain blocked";
 "account.domain-block-%@" = "Block domain %@";
 "account.domain-block.confirm-%@" = "Block domain %@?";
 "account.domain-unblock-%@" = "Unblock domain %@";
 "account.domain-unblock.confirm-%@" = "Unblock domain %@?";
+"account.familiar-followers.1-%@" = "Followed by %@";
+"account.familiar-followers.2-%@-%@" = "Followed by %@ and %@";
+"account.familiar-followers.3-%@-%@-%@" = "Followed by %@, %@, and %@";
+"account.familiar-followers.more-%@-%@-%@-%ld" = "Followed by %@, %@, %@, and %ld others you follow";
 "account.field.verified-%@" = "Verified %@";
 "account.follow" = "Follow";
 "account.following" = "Following";
@@ -51,6 +56,9 @@
 "account.note.for-%@" = "Note for %@";
 "account.note.save" = "Save";
 "account.reject-follow-request-button.accessibility-label" = "Reject follow request";
+"account.relationship.following" = "Follows you";
+"account.relationship.followed" = "You follow them";
+"account.relationship.mutuals" = "You are mutuals";
 "account.request" = "Request";
 "account.request.cancel" = "Cancel follow request";
 "account.statuses.post" = "Posts";
@@ -74,9 +82,11 @@
 "account.unmute" = "Unmute";
 "account.unmute.confirm-%@" = "Unmute %@?";
 "account.unnotify" = "Turn off notifications";
+"account-list.title.familiar-followers" = "Followers you follow";
 "account-list.title.followed-by" = "Followed by";
 "account-list.title.favourited-by" = "Favourited by";
 "account-list.title.reblogged-by" = "Boosted by";
+"account.verified" = "Verified";
 "activity.open-in-default-browser" = "Open in default browser";
 "add" = "Add";
 "announcement.insert-emoji" = "Insert emoji";

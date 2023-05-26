@@ -126,6 +126,12 @@ public extension IdentityService {
             .eraseToAnyPublisher()
     }
 
+    func requestFamiliarFollowers(ids: Set<Account.Id>) -> AnyPublisher<Never, Error> {
+        mastodonAPIClient.request(FamiliarFollowersEndpoint.familiarFollowers(ids: Array(ids)))
+            .flatMap(contentDatabase.insert(familiarFollowers:))
+            .eraseToAnyPublisher()
+    }
+
     func getLocalLastReadId(timeline: Timeline) -> String? {
         contentDatabase.lastReadId(timelineId: timeline.id)
     }

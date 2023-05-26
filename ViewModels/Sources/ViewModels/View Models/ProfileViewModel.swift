@@ -1,6 +1,7 @@
 // Copyright © 2020 Metabolist. All rights reserved.
 
 import Combine
+import DB
 import Foundation
 import Mastodon
 import ServiceLayer
@@ -39,6 +40,7 @@ final public class ProfileViewModel {
                                  eventsSubject: accountEventsSubject)
 
                 vm.relationship = $0.relationship
+                vm.familiarFollowers = $0.familiarFollowers
                 vm.identityProofs = $0.identityProofs
                 vm.featuredTags = $0.featuredTags
 

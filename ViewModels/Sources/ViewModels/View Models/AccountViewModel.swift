@@ -9,6 +9,7 @@ public final class AccountViewModel: ObservableObject {
     public let identityContext: IdentityContext
     public internal(set) var configuration = CollectionItem.AccountConfiguration.withNote
     public internal(set) var relationship: Relationship?
+    public internal(set) var familiarFollowers = [Account]()
     public internal(set) var identityProofs = [IdentityProof]()
     public internal(set) var featuredTags = [FeaturedTag]()
 
@@ -108,6 +109,25 @@ public extension AccountViewModel {
             Just(.navigation(.collection(accountService.followersService())))
                 .setFailureType(to: Error.self)
                 .eraseToAnyPublisher())
+    }
+
+    func familiarFollowersSelected() {
+        eventsSubject.send(
+            Just(
+                .navigation(
+                    .collection(
+                        identityContext
+                            .service
+                            .navigationService
+                            .familiarFollowersService(
+                                familiarFollowers: familiarFollowers
+                            )
+                    )
+                )
+            )
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+        )
     }
 
     func reportViewModel() -> ReportViewModel {
