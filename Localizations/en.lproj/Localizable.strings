@@ -61,6 +61,9 @@
 "account.statuses-and-boosts.post" = "Posts & Boosts";
 "account.statuses-and-boosts.toot" = "Toots & Boosts";
 "account.statuses-and-boosts.short" = "& Boosts";
+"account.type.bot" = "Automated account";
+"account.type.bot-group" = "Automated group";
+"account.type.group" = "Group";
 "account.media" = "Media";
 "account.show-reblogs" = "Show boosts";
 "account.show-reblogs.confirm-%@" = "Show boosts from %@?";

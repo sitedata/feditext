@@ -25,7 +25,11 @@ final class AccountHeaderView: UIView {
     let followsYouLabel = CapsuleLabel()
     let mutedLabel = CapsuleLabel()
     let blockedLabel = CapsuleLabel()
-    let statusCountJoinedStackView = UIStackView()
+    let accountTypeStatusCountJoinedStackView = UIStackView()
+    let accountTypeBotImageView = UIImageView()
+    let accountTypeGroupImageView = UIImageView()
+    let accountTypeLabel = UILabel()
+    let accountTypeStatusCountSeparatorLabel = UILabel()
     let statusCountLabel = UILabel()
     let statusCountJoinedSeparatorLabel = UILabel()
     let joinedLabel = UILabel()
@@ -204,6 +208,14 @@ final class AccountHeaderView: UIView {
                     localizationKey: "account.followers-count-%ld",
                     count: accountViewModel.followersCount)
                 followStackView.isHidden = false
+
+                let hideAccountTypeLabels = !(accountViewModel.isBot || accountViewModel.isGroup)
+                accountTypeBotImageView.isHidden = !accountViewModel.isBot
+                accountTypeGroupImageView.isHidden = !accountViewModel.isGroup
+                accountTypeLabel.text = accountViewModel.accountTypeText
+                accountTypeLabel.isHidden = hideAccountTypeLabels
+                accountTypeStatusCountSeparatorLabel.isHidden = hideAccountTypeLabels
+
             } else {
                 relationshipNoteStack.isHidden = true
                 noteTextView.isHidden = true
@@ -435,17 +447,49 @@ private extension AccountHeaderView {
 
         accountStackView.addArrangedSubview(UIView())
 
-        baseStackView.addArrangedSubview(statusCountJoinedStackView)
-        statusCountJoinedStackView.spacing = .compactSpacing
+        baseStackView.addArrangedSubview(accountTypeStatusCountJoinedStackView)
+        accountTypeStatusCountJoinedStackView.spacing = .compactSpacing
 
-        statusCountJoinedStackView.addArrangedSubview(statusCountLabel)
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(accountTypeBotImageView)
+        accountTypeBotImageView.image = UIImage(
+            systemName: "cpu.fill",
+            withConfiguration: UIImage.SymbolConfiguration(scale: .small))
+        accountTypeBotImageView.tintColor = .tertiaryLabel
+        accountTypeBotImageView.contentMode = .scaleAspectFit
+        accountTypeBotImageView.setContentHuggingPriority(.required, for: .horizontal)
+        accountTypeBotImageView.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(accountTypeGroupImageView)
+        accountTypeGroupImageView.image = UIImage(
+            systemName: "person.3.fill",
+            withConfiguration: UIImage.SymbolConfiguration(scale: .small))
+        accountTypeGroupImageView.tintColor = .tertiaryLabel
+        accountTypeGroupImageView.contentMode = .scaleAspectFit
+        accountTypeGroupImageView.setContentHuggingPriority(.required, for: .horizontal)
+        accountTypeGroupImageView.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(accountTypeLabel)
+        accountTypeLabel.font = .preferredFont(forTextStyle: .footnote)
+        accountTypeLabel.adjustsFontForContentSizeCategory = true
+        accountTypeLabel.textColor = .tertiaryLabel
+
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(accountTypeStatusCountSeparatorLabel)
+        accountTypeStatusCountSeparatorLabel.font = .preferredFont(forTextStyle: .footnote)
+        accountTypeStatusCountSeparatorLabel.adjustsFontForContentSizeCategory = true
+        accountTypeStatusCountSeparatorLabel.textColor = .tertiaryLabel
+        accountTypeStatusCountSeparatorLabel.setContentHuggingPriority(.required, for: .horizontal)
+        accountTypeStatusCountSeparatorLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        accountTypeStatusCountSeparatorLabel.text = "•"
+        accountTypeStatusCountSeparatorLabel.isAccessibilityElement = false
+
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(statusCountLabel)
         statusCountLabel.font = .preferredFont(forTextStyle: .footnote)
         statusCountLabel.adjustsFontForContentSizeCategory = true
         statusCountLabel.textColor = .tertiaryLabel
         statusCountLabel.setContentHuggingPriority(.required, for: .horizontal)
         statusCountLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
 
-        statusCountJoinedStackView.addArrangedSubview(statusCountJoinedSeparatorLabel)
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(statusCountJoinedSeparatorLabel)
         statusCountJoinedSeparatorLabel.font = .preferredFont(forTextStyle: .footnote)
         statusCountJoinedSeparatorLabel.adjustsFontForContentSizeCategory = true
         statusCountJoinedSeparatorLabel.textColor = .tertiaryLabel
@@ -454,14 +498,14 @@ private extension AccountHeaderView {
         statusCountJoinedSeparatorLabel.text = "•"
         statusCountJoinedSeparatorLabel.isAccessibilityElement = false
 
-        statusCountJoinedStackView.addArrangedSubview(joinedLabel)
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(joinedLabel)
         joinedLabel.font = .preferredFont(forTextStyle: .footnote)
         joinedLabel.adjustsFontForContentSizeCategory = true
         joinedLabel.textColor = .tertiaryLabel
         joinedLabel.setContentHuggingPriority(.required, for: .horizontal)
         joinedLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
 
-        statusCountJoinedStackView.addArrangedSubview(UIView())
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(UIView())
 
         baseStackView.addArrangedSubview(relationshipNoteStack)
         relationshipNoteStack.axis = .horizontal

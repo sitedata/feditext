@@ -9,6 +9,10 @@ final class AccountView: UIView {
     let avatarImageView = SDAnimatedImageView()
     let displayNameLabel = AnimatedAttachmentLabel()
     let accountLabel = UILabel()
+    let accountTypeStack = UIStackView()
+    let accountTypeBotImageView = UIImageView()
+    let accountTypeGroupImageView = UIImageView()
+    let accountTypeLabel = UILabel()
     let relationshipNoteStack = UIStackView()
     /// Displays the current user's note for this account.
     let relationshipNotes = UILabel()
@@ -108,6 +112,32 @@ private extension AccountView {
         avatarImageView.layer.cornerRadius = .avatarDimension / 2
         avatarImageView.clipsToBounds = true
 
+        accountTypeStack.axis = .horizontal
+        accountTypeStack.spacing = .ultraCompactSpacing
+
+        accountTypeStack.addArrangedSubview(accountTypeBotImageView)
+        accountTypeBotImageView.image = UIImage(
+            systemName: "cpu.fill",
+            withConfiguration: UIImage.SymbolConfiguration(scale: .small))
+        accountTypeBotImageView.tintColor = .tertiaryLabel
+        accountTypeBotImageView.contentMode = .scaleAspectFit
+        accountTypeBotImageView.setContentHuggingPriority(.required, for: .horizontal)
+        accountTypeBotImageView.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        accountTypeStack.addArrangedSubview(accountTypeGroupImageView)
+        accountTypeGroupImageView.image = UIImage(
+            systemName: "person.3.fill",
+            withConfiguration: UIImage.SymbolConfiguration(scale: .small))
+        accountTypeGroupImageView.tintColor = .tertiaryLabel
+        accountTypeGroupImageView.contentMode = .scaleAspectFit
+        accountTypeGroupImageView.setContentHuggingPriority(.required, for: .horizontal)
+        accountTypeGroupImageView.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        accountTypeStack.addArrangedSubview(accountTypeLabel)
+        accountTypeLabel.font = .preferredFont(forTextStyle: .footnote)
+        accountTypeLabel.adjustsFontForContentSizeCategory = true
+        accountTypeLabel.textColor = .tertiaryLabel
+
         relationshipNoteStack.axis = .horizontal
         // .firstBaseline makes the view infinitely large vertically for some reason.
         relationshipNoteStack.alignment = .center
@@ -147,6 +177,7 @@ private extension AccountView {
         verticalStackView.spacing = .compactSpacing
         verticalStackView.addArrangedSubview(displayNameLabel)
         verticalStackView.addArrangedSubview(accountLabel)
+        verticalStackView.addArrangedSubview(accountTypeStack)
         verticalStackView.addArrangedSubview(relationshipNoteStack)
         verticalStackView.addArrangedSubview(noteTextView)
         displayNameLabel.numberOfLines = 0
@@ -255,6 +286,11 @@ private extension AccountView {
         displayNameLabel.isHidden = viewModel.displayName.isEmpty
 
         accountLabel.text = viewModel.accountName
+
+        accountTypeStack.isHidden = !(viewModel.isBot || viewModel.isGroup)
+        accountTypeBotImageView.isHidden = !viewModel.isBot
+        accountTypeGroupImageView.isHidden = !viewModel.isGroup
+        accountTypeLabel.text = viewModel.accountTypeText
 
         if let relationshipNote = viewModel.relationship?.note, !relationshipNote.isEmpty {
             relationshipNoteStack.isHidden = false

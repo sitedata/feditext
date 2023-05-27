@@ -63,6 +63,22 @@ public extension AccountViewModel {
 
     var isSelf: Bool { accountService.account.id == identityContext.identity.account?.id }
 
+    var isBot: Bool { accountService.account.bot }
+
+    var isGroup: Bool { accountService.account.group }
+
+    var accountTypeText: String {
+        if isBot && isGroup {
+            return NSLocalizedString("account.type.bot-group", comment: "")
+        } else if isBot {
+            return NSLocalizedString("account.type.bot", comment: "")
+        } else if isGroup {
+            return NSLocalizedString("account.type.group", comment: "")
+        } else {
+            return ""
+        }
+    }
+
     func avatarURL(profile: Bool = false) -> URL {
         if identityContext.appPreferences.animateAvatars == .everywhere
             || (identityContext.appPreferences.animateAvatars == .profiles && profile) {

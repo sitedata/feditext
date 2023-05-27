@@ -326,6 +326,12 @@ extension ContentDatabase {
             }
         }
 
+        migrator.registerMigration("1.7.4-account-group-flag") { db in
+            try db.alter(table: "accountRecord") { t in
+                t.add(column: "group", .boolean).notNull().defaults(to: false)
+            }
+        }
+
         return migrator
     }
 }
