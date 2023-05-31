@@ -10,6 +10,7 @@ extension CollectionItem {
         AccountTableViewCell.self,
         LoadMoreTableViewCell.self,
         NotificationTableViewCell.self,
+        MultiNotificationTableViewCell.self,
         ConversationTableViewCell.self,
         TagTableViewCell.self,
         AnnouncementTableViewCell.self,
@@ -25,6 +26,8 @@ extension CollectionItem {
             return LoadMoreTableViewCell.self
         case let .notification(_, statusConfiguration):
             return statusConfiguration == nil ? NotificationTableViewCell.self : StatusTableViewCell.self
+        case .multiNotification:
+            return MultiNotificationTableViewCell.self
         case .conversation:
             return ConversationTableViewCell.self
         case .tag:
@@ -59,6 +62,12 @@ extension CollectionItem {
                 identityContext: identityContext,
                 notification: notification,
                 configuration: configuration)
+        case let .multiNotification(notifications, _, _, status):
+            return MultiNotificationView.estimatedHeight(
+                width: width,
+                identityContext: identityContext,
+                notifications: notifications,
+                status: status)
         case let .conversation(conversation):
             return ConversationView.estimatedHeight(
                 width: width,

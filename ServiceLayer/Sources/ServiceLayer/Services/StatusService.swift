@@ -148,7 +148,9 @@ public extension StatusService {
             endpoint: .rebloggedBy(id: status.id),
             environment: environment,
             mastodonAPIClient: mastodonAPIClient,
-            contentDatabase: contentDatabase)
+            contentDatabase: contentDatabase,
+            titleComponents: ["account-list.title.reblogged-by"]
+        )
     }
 
     func favoritedByService() -> AccountListService {
@@ -156,7 +158,9 @@ public extension StatusService {
             endpoint: .favouritedBy(id: status.id),
             environment: environment,
             mastodonAPIClient: mastodonAPIClient,
-            contentDatabase: contentDatabase)
+            contentDatabase: contentDatabase,
+            titleComponents: ["account-list.title.favourited-by"]
+        )
     }
 
     func vote(selectedOptions: Set<Int>) -> AnyPublisher<Never, Error> {

@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		14FC7D32292A556E00567DBC /* UIFont+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FC7D31292A556E00567DBC /* UIFont+Extensions.swift */; };
 		75F7B3CC291F51D300FDE7C7 /* SwipeableNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F7B3CB291F51D300FDE7C7 /* SwipeableNavigationController.swift */; };
+		941F79CC2A243418007FCC65 /* MultiNotificationContentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941F79CB2A243418007FCC65 /* MultiNotificationContentConfiguration.swift */; };
+		941F79CE2A243446007FCC65 /* MultiNotificationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941F79CD2A243446007FCC65 /* MultiNotificationTableViewCell.swift */; };
+		941F79D02A243499007FCC65 /* MultiNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941F79CF2A243499007FCC65 /* MultiNotificationView.swift */; };
 		943141D7299AADD900D90FC4 /* AboutInstanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943141D6299AADD900D90FC4 /* AboutInstanceView.swift */; };
 		947E728F29A9618900155DD2 /* EditNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947E728E29A9618900155DD2 /* EditNoteView.swift */; };
 		94B0BCD329859B750075E234 /* StatusEditHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B0BCD229859B750075E234 /* StatusEditHistoryView.swift */; };
@@ -338,6 +341,9 @@
 		68B039892934360A003570DD /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
 		68B0398A2934360A003570DD /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = uk; path = uk.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		75F7B3CB291F51D300FDE7C7 /* SwipeableNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeableNavigationController.swift; sourceTree = "<group>"; };
+		941F79CB2A243418007FCC65 /* MultiNotificationContentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiNotificationContentConfiguration.swift; sourceTree = "<group>"; };
+		941F79CD2A243446007FCC65 /* MultiNotificationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiNotificationTableViewCell.swift; sourceTree = "<group>"; };
+		941F79CF2A243499007FCC65 /* MultiNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiNotificationView.swift; sourceTree = "<group>"; };
 		943141D6299AADD900D90FC4 /* AboutInstanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutInstanceView.swift; sourceTree = "<group>"; };
 		9432DE2529A1587C0007C2BF /* SECURITY.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = SECURITY.md; sourceTree = "<group>"; };
 		9432DE2629A1587C0007C2BF /* CONTRIBUTING.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
@@ -752,6 +758,7 @@
 				D00702282555E51200F38136 /* ConversationTableViewCell.swift */,
 				D021A60925C36B32008A0C0D /* IdentityTableViewCell.swift */,
 				D0B8510B25259E56004E0744 /* LoadMoreTableViewCell.swift */,
+				941F79CD2A243446007FCC65 /* MultiNotificationTableViewCell.swift */,
 				D036AA01254B6101009094DF /* NotificationTableViewCell.swift */,
 				D0BE980325D229D50057E161 /* SeparatorConfiguredTableViewCell.swift */,
 				D0625E58250F092900502611 /* StatusTableViewCell.swift */,
@@ -789,6 +796,7 @@
 				D036AA0B254B612B009094DF /* NotificationContentConfiguration.swift */,
 				D0625E5C250F0B5C00502611 /* StatusContentConfiguration.swift */,
 				D0D2AC5225BCD2BA003D5DF2 /* TagContentConfiguration.swift */,
+				941F79CB2A243418007FCC65 /* MultiNotificationContentConfiguration.swift */,
 			);
 			path = "Content Configurations";
 			sourceTree = "<group>";
@@ -804,6 +812,7 @@
 				D021A61325C36BFB008A0C0D /* IdentityView.swift */,
 				D09D970725C64522007E6394 /* InstanceView.swift */,
 				D0E569DA2529319100FA1D72 /* LoadMoreView.swift */,
+				941F79CF2A243499007FCC65 /* MultiNotificationView.swift */,
 				D036AA06254B6118009094DF /* NotificationView.swift */,
 				D00CB2EC2533ACC00080096B /* StatusView.swift */,
 				D0D2AC4625BCD289003D5DF2 /* TagView.swift */,
@@ -1382,6 +1391,7 @@
 				D0E9F9AA258450B300EF503D /* CompositionInputAccessoryView.swift in Sources */,
 				D021A60A25C36B32008A0C0D /* IdentityTableViewCell.swift in Sources */,
 				D0849C7F25903C4900A5EBCC /* Status+Extensions.swift in Sources */,
+				941F79CE2A243446007FCC65 /* MultiNotificationTableViewCell.swift in Sources */,
 				D005A20025EF574F008B2E63 /* NavigationHandling.swift in Sources */,
 				D0F4362D25C10B9600E4F896 /* AddIdentityViewController.swift in Sources */,
 				D035D8F925E4338D00E597C9 /* ImageDiskCache.swift in Sources */,
@@ -1418,6 +1428,7 @@
 				D0BEB1F724F9A84B001B0F04 /* LoadingTableFooterView.swift in Sources */,
 				D052DBE325EAFDE800FFB628 /* HTTPError+Extensions.swift in Sources */,
 				D021A61425C36BFB008A0C0D /* IdentityView.swift in Sources */,
+				941F79D02A243499007FCC65 /* MultiNotificationView.swift in Sources */,
 				D06BC5E625202AD90079541D /* ProfileViewController.swift in Sources */,
 				D0D2AC4D25BCD2A9003D5DF2 /* TagTableViewCell.swift in Sources */,
 				D0D93ED025D9C9ED00C622ED /* AutocompleteItemCollectionViewCell.swift in Sources */,
@@ -1435,6 +1446,7 @@
 				D025B14D25C4E482001C69A8 /* ImageCacheConfiguration.swift in Sources */,
 				D01EF22425182B1F00650C6B /* AccountHeaderView.swift in Sources */,
 				D0D8B0312622398F00A874A4 /* AnnouncementTableViewCell.swift in Sources */,
+				941F79CC2A243418007FCC65 /* MultiNotificationContentConfiguration.swift in Sources */,
 				D059373E25AB8D5200754FDF /* CompositionPollOptionView.swift in Sources */,
 				D036AA17254CA824009094DF /* StatusBodyView.swift in Sources */,
 				D035F86F25B7F30E00DC75ED /* MainNavigationView.swift in Sources */,

@@ -20,6 +20,8 @@ struct NotificationPreferencesView: View {
                        isOn: $identityContext.appPreferences.notificationPictures)
                 Toggle("preferences.notifications.include-account-name",
                        isOn: $identityContext.appPreferences.notificationAccountName)
+                Toggle("preferences.notifications.grouping",
+                       isOn: $identityContext.appPreferences.notificationGrouping)
             }
             Section(header: Text("preferences.notifications.sounds")) {
                 ForEach(MastodonNotification.NotificationType.allCasesExceptUnknown) { type in

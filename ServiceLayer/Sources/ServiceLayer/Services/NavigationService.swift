@@ -105,6 +105,23 @@ public extension NavigationService {
             contentDatabase: contentDatabase)
     }
 
+    func multiNotificationService(
+        notifications: [MastodonNotification],
+        notificationType: MastodonNotification.NotificationType,
+        date: Date
+    ) -> MultiNotificationService {
+        MultiNotificationService(
+            notificationServices: notifications.map { notification in
+                notificationService(notification: notification)
+            },
+            notificationType: notificationType,
+            date: date,
+            environment: environment,
+            mastodonAPIClient: mastodonAPIClient,
+            contentDatabase: contentDatabase
+        )
+    }
+
     func conversationService(conversation: Conversation) -> ConversationService {
         ConversationService(
             conversation: conversation,

@@ -74,6 +74,9 @@
 "account.unmute" = "Unmute";
 "account.unmute.confirm-%@" = "Unmute %@?";
 "account.unnotify" = "Turn off notifications";
+"account-list.title.followed-by" = "Followed by";
+"account-list.title.favourited-by" = "Favourited by";
+"account-list.title.reblogged-by" = "Boosted by";
 "activity.open-in-default-browser" = "Open in default browser";
 "add" = "Add";
 "announcement.insert-emoji" = "Insert emoji";
@@ -227,6 +230,7 @@
 "main-navigation.conversations" = "Messages";
 "metatext" = "Metatext";
 "notification.accessibility.view-profile" = "View profile";
+"notification.accessibility.view-profiles" = "View profiles";
 "notification.signed-in-as-%@" = "Logged in as %@";
 "notification.new-items" = "New notifications";
 "notification.poll" = "A poll you have voted in has ended";
@@ -291,6 +295,7 @@
 "preferences.notifications" = "Notifications";
 "preferences.notifications.include-account-name" = "Include account name";
 "preferences.notifications.include-pictures" = "Include pictures";
+"preferences.notifications.grouping" = "Group follow, favourite, and boost notifications";
 "preferences.notifications.sounds" = "Sounds";
 "preferences.muted-users" = "Muted Users";
 "preferences.home-timeline-position-on-startup" = "Home timeline position on startup";
@@ -336,8 +341,10 @@
 "more-results.statuses.toot" = "More toots";
 "more-results.tags" = "More hashtags";
 "notifications" = "Notifications";
-"notifications.reblogged-your-status-%@" = "%@ boosted your status";
-"notifications.favourited-your-status-%@" = "%@ favorited your status";
+"notifications.reblogged-your-status-%@.post" = "%@ boosted your post";
+"notifications.reblogged-your-status-%@.toot" = "%@ boosted your toot";
+"notifications.favourited-your-status-%@.post" = "%@ favorited your post";
+"notifications.favourited-your-status-%@.toot" = "%@ favorited your toot";
 "notifications.followed-you-%@" = "%@ followed you";
 "notifications.poll-ended" = "A poll you have voted in has ended";
 "notifications.your-poll-ended" = "Your poll has ended";

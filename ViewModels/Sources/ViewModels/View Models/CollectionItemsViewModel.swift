@@ -183,6 +183,25 @@ public class CollectionItemsViewModel: ObservableObject {
             }
 
             return viewModel
+        case let .multiNotification(notifications, notificationType, date, status):
+            if let cachedViewModel = cachedViewModel {
+                return cachedViewModel
+            }
+
+            let viewModel = MultiNotificationViewModel(
+                multiNotificationService: collectionService.navigationService.multiNotificationService(
+                    notifications: notifications,
+                    notificationType: notificationType,
+                    date: date
+                ),
+                statusService: status.map { collectionService.navigationService.statusService(status: $0) },
+                identityContext: identityContext,
+                eventsSubject: eventsSubject
+            )
+
+            viewModelCache[item] = viewModel
+
+            return viewModel
         case let .conversation(conversation):
             if let cachedViewModel = cachedViewModel {
                 return cachedViewModel
@@ -312,6 +331,35 @@ extension CollectionItemsViewModel: CollectionViewModel {
                 send(event: .navigation(.profile(collectionService
                                                     .navigationService
                                                     .profileService(account: notification.account))))
+            }
+        case let .multiNotification(notifications, notificationType, date, status):
+            if let status = status {
+                send(
+                    event: .navigation(
+                        .collection(
+                            collectionService
+                                .navigationService
+                                .contextService(
+                                    id: status.displayStatus.id
+                                )
+                        )
+                    )
+                )
+            } else {
+                send(
+                    event: .navigation(
+                        .collection(
+                            collectionService
+                                .navigationService
+                                .multiNotificationService(
+                                    notifications: notifications,
+                                    notificationType: notificationType,
+                                    date: date
+                                )
+                                .accountListService()
+                        )
+                    )
+                )
             }
         case let .conversation(conversation):
             guard let status = conversation.lastStatus else { break }

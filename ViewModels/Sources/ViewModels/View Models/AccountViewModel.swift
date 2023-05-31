@@ -12,7 +12,7 @@ public final class AccountViewModel: ObservableObject {
     public internal(set) var identityProofs = [IdentityProof]()
     public internal(set) var featuredTags = [FeaturedTag]()
 
-    private let accountService: AccountService
+    internal let accountService: AccountService
     private let eventsSubject: PassthroughSubject<AnyPublisher<CollectionItemEvent, Error>, Never>
 
     init(accountService: AccountService,

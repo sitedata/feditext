@@ -211,6 +211,11 @@ public extension AppPreferences {
         set { self[.notificationAccountName] = newValue }
     }
 
+    var notificationGrouping: Bool {
+        get { self[.notificationGrouping] ?? true }
+        set { self[.notificationGrouping] = newValue }
+    }
+
     var openLinksInDefaultBrowser: Bool {
         get { self[.openLinksInDefaultBrowser] ?? false }
         set { self[.openLinksInDefaultBrowser] = newValue }
@@ -258,6 +263,7 @@ private extension AppPreferences {
         case showReblogAndFavoriteCounts
         case notificationPictures
         case notificationAccountName
+        case notificationGrouping
         case notificationSounds
         case openLinksInDefaultBrowser
         case useUniversalLinks

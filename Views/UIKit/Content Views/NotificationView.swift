@@ -179,14 +179,28 @@ private extension NotificationView {
                 identityContext: viewModel.identityContext)
             iconImageView.tintColor = nil
         case .reblog:
-            typeLabel.attributedText = "notifications.reblogged-your-status-%@".localizedBolding(
+            let stringName: String
+            switch viewModel.identityContext.appPreferences.statusWord {
+            case .post:
+                stringName = "notifications.reblogged-your-status-%@.post"
+            case .toot:
+                stringName = "notifications.reblogged-your-status-%@.toot"
+            }
+            typeLabel.attributedText = stringName.localizedBolding(
                 displayName: viewModel.accountViewModel.displayName,
                 emojis: viewModel.accountViewModel.emojis,
                 label: typeLabel,
                 identityContext: viewModel.identityContext)
             iconImageView.tintColor = .systemGreen
         case .favourite:
-            typeLabel.attributedText = "notifications.favourited-your-status-%@".localizedBolding(
+            let stringName: String
+            switch viewModel.identityContext.appPreferences.statusWord {
+            case .post:
+                stringName = "notifications.favourited-your-status-%@.post"
+            case .toot:
+                stringName = "notifications.favourited-your-status-%@.toot"
+            }
+            typeLabel.attributedText = stringName.localizedBolding(
                 displayName: viewModel.accountViewModel.displayName,
                 emojis: viewModel.accountViewModel.emojis,
                 label: typeLabel,
