@@ -481,7 +481,7 @@ private extension AccountView {
                 followRelationshipShown = true
             } else if relationship.following {
                 followRelationshipIcon.image = .init(
-                    systemName: "arrow.right.square.fill",
+                    systemName: "arrow.left.square.fill",
                     withConfiguration: UIImage.SymbolConfiguration(scale: .small)
                 )
                 followRelationshipLabel.text = NSLocalizedString("account.relationship.following", comment: "")
@@ -489,10 +489,10 @@ private extension AccountView {
                 followRelationshipShown = true
             } else if relationship.followedBy {
                 followRelationshipIcon.image = .init(
-                    systemName: "arrow.left.square.fill",
+                    systemName: "arrow.right.square.fill",
                     withConfiguration: UIImage.SymbolConfiguration(scale: .small)
                 )
-                followRelationshipLabel.text = NSLocalizedString("account.relationship.followed", comment: "")
+                followRelationshipLabel.text = NSLocalizedString("account.relationship.followed-by", comment: "")
                 followRelationshipStack.isHidden = false
                 followRelationshipShown = true
             } else {
