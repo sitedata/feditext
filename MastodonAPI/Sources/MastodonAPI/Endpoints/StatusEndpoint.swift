@@ -18,6 +18,7 @@ public enum StatusEndpoint {
     case unmute(id: Status.Id)
     case delete(id: Status.Id)
     case post(Components)
+    case put(id: Status.Id, Components)
 }
 
 public extension StatusEndpoint {
@@ -26,7 +27,8 @@ public extension StatusEndpoint {
         public let text: String
         public let spoilerText: String
         public let mediaIds: [Attachment.Id]
-        public let visibility: Status.Visibility
+        public let visibility: Status.Visibility?
+        public let language: String?
         public let sensitive: Bool
         public let pollOptions: [String]
         public let pollExpiresIn: Int
@@ -37,16 +39,19 @@ public extension StatusEndpoint {
             text: String,
             spoilerText: String,
             mediaIds: [Attachment.Id],
-            visibility: Status.Visibility,
+            visibility: Status.Visibility?,
+            language: String?,
             sensitive: Bool,
             pollOptions: [String],
             pollExpiresIn: Int,
-            pollMultipleChoice: Bool) {
+            pollMultipleChoice: Bool
+        ) {
             self.inReplyToId = inReplyToId
             self.text = text
             self.spoilerText = spoilerText
             self.mediaIds = mediaIds
             self.visibility = visibility
+            self.language = language
             self.sensitive = sensitive
             self.pollOptions = pollOptions
             self.pollExpiresIn = pollExpiresIn
@@ -72,7 +77,8 @@ extension StatusEndpoint.Components {
         }
 
         params["in_reply_to_id"] = inReplyToId
-        params["visibility"] = visibility.rawValue
+        params["visibility"] = visibility?.rawValue
+        params["language"] = language
 
         if sensitive {
             params["sensitive"] = true
@@ -101,7 +107,7 @@ extension StatusEndpoint: Endpoint {
 
     public var pathComponentsInContext: [String] {
         switch self {
-        case let .status(id), let .delete(id):
+        case let .status(id), let .delete(id), let .put(id, _):
             return [id]
         case let .reblog(id):
             return [id, "reblog"]
@@ -130,7 +136,7 @@ extension StatusEndpoint: Endpoint {
 
     public var jsonBody: [String: Any]? {
         switch self {
-        case let .post(components):
+        case let .post(components), let .put(_, components):
             return components.jsonBody
         default:
             return nil
@@ -143,6 +149,8 @@ extension StatusEndpoint: Endpoint {
             return .get
         case .delete:
             return .delete
+        case .put:
+            return .put
         default:
             return .post
         }

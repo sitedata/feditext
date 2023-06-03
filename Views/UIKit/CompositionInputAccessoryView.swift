@@ -3,6 +3,7 @@
 import AVFoundation
 import Combine
 import Mastodon
+import ServiceLayer
 import UIKit
 import ViewModels
 
@@ -11,8 +12,9 @@ final class CompositionInputAccessoryView: UIView {
     let autocompleteSelections: AnyPublisher<String, Never>
 
     private let viewModel: CompositionViewModel
-    private let parentViewModel: NewStatusViewModel
+    private let parentViewModel: ComposeStatusViewModel
     private let toolbar = UIToolbar()
+    private let charactersBarItem = UIBarButtonItem()
     private let autocompleteCollectionView = UICollectionView(
         frame: .zero,
         collectionViewLayout: CompositionInputAccessoryView.autocompleteLayout())
@@ -22,7 +24,7 @@ final class CompositionInputAccessoryView: UIView {
     private var cancellables = Set<AnyCancellable>()
 
     init(viewModel: CompositionViewModel,
-         parentViewModel: NewStatusViewModel,
+         parentViewModel: ComposeStatusViewModel,
          autocompleteQueryPublisher: AnyPublisher<String?, Never>) {
         self.viewModel = viewModel
         self.parentViewModel = parentViewModel
@@ -138,6 +140,7 @@ private extension CompositionInputAccessoryView {
         let visibilityButton = UIBarButtonItem(
             image: UIImage(systemName: parentViewModel.visibility.systemImageName),
             menu: visibilityMenu(selectedVisibility: parentViewModel.visibility))
+        visibilityButton.isEnabled = parentViewModel.canChangeVisibility
 
         let contentWarningButton = UIBarButtonItem(
             title: NSLocalizedString("status.content-warning-abbreviation", comment: ""),
@@ -150,6 +153,26 @@ private extension CompositionInputAccessoryView {
             } else {
                 contentWarningButton.accessibilityHint =
                     NSLocalizedString("compose.content-warning-button.add", comment: "")
+            }
+        }
+        .store(in: &cancellables)
+
+        let languageButton = UIBarButtonItem(
+            menu: languageMenu(selectedTag: parentViewModel.defaultLanguageTag)
+        )
+
+        viewModel.$language.sink {
+            if let tag = $0 {
+                languageButton.title = tag
+                languageButton.accessibilityHint = String.localizedStringWithFormat(
+                    NSLocalizedString("compose.language-button.accessibility-label-%@", comment: ""),
+                    PrefsLanguage(tag: tag).localized
+                )
+            } else {
+                languageButton.title =
+                    NSLocalizedString("compose.language-button.not-selected", comment: "")
+                languageButton.accessibilityHint =
+                    NSLocalizedString("compose.language-button.accessibility-label-not-selected", comment: "")
             }
         }
         .store(in: &cancellables)
@@ -184,6 +207,9 @@ private extension CompositionInputAccessoryView {
         let charactersBarItem = UIBarButtonItem()
 
         charactersBarItem.isEnabled = false
+        // We need this to use a monospaced-digits font so it doesn't wiggle.
+        // See `charactersBarItem.setTitleTextAttributes` calls elsewhere;
+        // all text attributes have to be set every time we change any of them.
 
         toolbar.items = [
             attachmentButton,
@@ -193,6 +219,8 @@ private extension CompositionInputAccessoryView {
             visibilityButton,
             UIBarButtonItem.fixedSpace(.defaultSpacing),
             contentWarningButton,
+            UIBarButtonItem.fixedSpace(.defaultSpacing),
+            languageButton,
             UIBarButtonItem.fixedSpace(.defaultSpacing),
             emojiButton,
             UIBarButtonItem.flexibleSpace(),
@@ -212,7 +240,10 @@ private extension CompositionInputAccessoryView {
         viewModel.$remainingCharacters.sink {
             charactersBarItem.title = String($0)
             charactersBarItem.setTitleTextAttributes(
-                [.foregroundColor: $0 < 0 ? UIColor.systemRed : UIColor.label],
+                [
+                    .foregroundColor: $0 < 0 ? UIColor.systemRed : UIColor.label,
+                    .font: UIFont.monospacedDigitSystemFont(ofSize: UIFont.labelFontSize, weight: .regular)
+                ],
                 for: .disabled)
             charactersBarItem.accessibilityHint = String.localizedStringWithFormat(
                 NSLocalizedString("compose.characters-remaining-accessibility-label-%ld", comment: ""),
@@ -244,6 +275,18 @@ private extension CompositionInputAccessoryView {
                     $0.title ?? "")
             }
             .store(in: &cancellables)
+    }
+}
+
+extension CompositionInputAccessoryView {
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        charactersBarItem.setTitleTextAttributes(
+            [
+                .foregroundColor: viewModel.remainingCharacters < 0 ? UIColor.systemRed : UIColor.label,
+                .font: UIFont.monospacedDigitSystemFont(ofSize: UIFont.labelFontSize, weight: .regular)
+            ],
+            for: .disabled
+        )
     }
 }
 
@@ -337,6 +380,18 @@ private extension CompositionInputAccessoryView {
                 discoverabilityTitle: visibility.description,
                 state: visibility == selectedVisibility ? .on : .off) { [weak self] _ in
                 self?.parentViewModel.visibility = visibility
+            }
+        })
+    }
+
+    func languageMenu(selectedTag: PrefsLanguage.Tag?) -> UIMenu {
+        UIMenu(children: parentViewModel.postingLanguages.reversed().map { prefsLanguage in
+            UIAction(
+                title: prefsLanguage.localized,
+                discoverabilityTitle: prefsLanguage.localized,
+                state: prefsLanguage.tag == selectedTag ? .on : .off
+            ) { [weak self] _ in
+                self?.viewModel.language = prefsLanguage.tag
             }
         })
     }

@@ -211,6 +211,11 @@ public extension AppPreferences {
         set { self[.notificationAccountName] = newValue }
     }
 
+    var notificationGrouping: Bool {
+        get { self[.notificationGrouping] ?? true }
+        set { self[.notificationGrouping] = newValue }
+    }
+
     var openLinksInDefaultBrowser: Bool {
         get { self[.openLinksInDefaultBrowser] ?? false }
         set { self[.openLinksInDefaultBrowser] = newValue }
@@ -224,6 +229,19 @@ public extension AppPreferences {
     var hideContentWarningButton: Bool {
         get { self[.hideContentWarningButton] ?? false }
         set { self[.hideContentWarningButton] = newValue }
+    }
+
+    var foldLongPosts: Bool {
+        get { self[.foldLongPosts] ?? true }
+        set { self[.foldLongPosts] = newValue }
+    }
+
+    var postingLanguages: [PrefsLanguage.Tag] {
+        get {
+            self[.postingLanguages]
+            ?? PrefsLanguage.preferredLanguageTagsAndNames(prefsLanguageTag: nil).map { $0.tag }
+        }
+        set { self[.postingLanguages] = newValue }
     }
 }
 
@@ -245,10 +263,13 @@ private extension AppPreferences {
         case showReblogAndFavoriteCounts
         case notificationPictures
         case notificationAccountName
+        case notificationGrouping
         case notificationSounds
         case openLinksInDefaultBrowser
         case useUniversalLinks
         case hideContentWarningButton
+        case foldLongPosts
+        case postingLanguages
     }
 
     subscript<T>(index: Item) -> T? {

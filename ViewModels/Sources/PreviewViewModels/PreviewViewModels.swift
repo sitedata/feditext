@@ -52,7 +52,7 @@ extension ContentDatabase {
         id: identityId,
         useHomeTimelineLastReadId: false,
         inMemory: true,
-        appGroup: "group.metabolist.metatext",
+        appGroup: "group.com.gotgoat.metatext",
         keychain: MockKeychain.self)
 }
 
@@ -103,6 +103,56 @@ public extension MuteViewModel {
 
 public extension DomainBlocksViewModel {
     static let preview = DomainBlocksViewModel(service: .init(mastodonAPIClient: .preview))
+}
+
+public extension StatusHistoryViewModel {
+    static let preview = StatusHistoryViewModel(
+        identityContext: .preview,
+        navigationService: .init(
+            environment: .preview,
+            mastodonAPIClient: .preview,
+            contentDatabase: .preview
+        ),
+        eventsSubject: .init(),
+        history: [
+            .init(
+                createdAt: .init(timeIntervalSince1970: 1676058147),
+                account: .preview,
+                content: .init(raw: "<p>first verse</p>"),
+                sensitive: false,
+                spoilerText: "",
+                mediaAttachments: [],
+                emojis: [],
+                poll: nil
+            ),
+            .init(
+                createdAt: .init(timeIntervalSince1970: 1676058194),
+                account: .preview,
+                content: .init(raw: "<p>first verse</p>\n<p>second verse</p>"),
+                sensitive: false,
+                spoilerText: "",
+                mediaAttachments: [],
+                emojis: [],
+                poll: nil
+            )
+        ]
+    )
+}
+
+public extension InstanceViewModel {
+    static let preview = InstanceViewModel(
+        instanceService: .init(
+            instance: .preview,
+            mastodonAPIClient: .preview
+        )
+    )
+}
+
+public extension NavigationViewModel {
+    static let preview = NavigationViewModel(
+        identityContext: .preview,
+        environment: .preview
+    )
 }
 
 // swiftlint:enable force_try

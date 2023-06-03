@@ -1,5 +1,6 @@
 // Copyright © 2020 Metabolist. All rights reserved.
 
+import Foundation
 import SDWebImage
 import UIKit
 import ViewModels
@@ -18,17 +19,28 @@ final class AccountHeaderView: UIView {
     let notifyButton = UIButton()
     let unnotifyButton = UIButton()
     let displayNameLabel = AnimatedAttachmentLabel()
+    /// Displays first few display names of your follows who also follow this account.
+    let familiarFollowersLabel = FamiliarFollowersLabel()
+    let familiarFollowersButton = UIButton()
     let accountStackView = UIStackView()
     let accountLabel = CopyableLabel()
     let lockedImageView = UIImageView()
     let followsYouLabel = CapsuleLabel()
     let mutedLabel = CapsuleLabel()
     let blockedLabel = CapsuleLabel()
-    let statusCountJoinedStackView = UIStackView()
+    let accountTypeStatusCountJoinedStackView = UIStackView()
+    let accountTypeBotImageView = UIImageView()
+    let accountTypeGroupImageView = UIImageView()
+    let accountTypeLabel = UILabel()
+    let accountTypeStatusCountSeparatorLabel = UILabel()
     let statusCountLabel = UILabel()
     let statusCountJoinedSeparatorLabel = UILabel()
     let joinedLabel = UILabel()
     let fieldsStackView = UIStackView()
+    let relationshipNoteStack = UIStackView()
+    /// Displays the current user's note for this account.
+    let relationshipNotes = UILabel()
+    /// Displays the account's bio.
     let noteTextView = TouchFallthroughTextView()
     let followStackView = UIStackView()
     let followingButton = UIButton()
@@ -54,6 +66,7 @@ final class AccountHeaderView: UIView {
                     NSLocalizedString("account.avatar.accessibility-label-%@", comment: ""),
                     accountViewModel.displayName)
 
+                let followRelationshipShown: Bool
                 if !accountViewModel.isSelf, let relationship = accountViewModel.relationship {
                     followsYouLabel.isHidden = !relationship.followedBy
                     mutedLabel.isHidden = !relationship.muting
@@ -86,9 +99,11 @@ final class AccountHeaderView: UIView {
 
                     relationshipButtonsStackView.isHidden = false
                     unavailableLabel.isHidden = !relationship.blockedBy
+                    followRelationshipShown = relationship.following || relationship.followedBy
                 } else {
                     relationshipButtonsStackView.isHidden = true
                     unavailableLabel.isHidden = true
+                    followRelationshipShown = false
                 }
 
                 if accountViewModel.displayName.isEmpty {
@@ -101,6 +116,14 @@ final class AccountHeaderView: UIView {
                                               identityContext: viewModel.identityContext)
                     mutableDisplayName.resizeAttachments(toLineHeight: displayNameLabel.font.lineHeight)
                     displayNameLabel.attributedText = mutableDisplayName
+                }
+
+                familiarFollowersLabel.identityContext = viewModel.identityContext
+                if !accountViewModel.isSelf, !followRelationshipShown, !accountViewModel.familiarFollowers.isEmpty {
+                    familiarFollowersLabel.isHidden = false
+                    familiarFollowersLabel.accounts = accountViewModel.familiarFollowers
+                } else {
+                    familiarFollowersLabel.isHidden = true
                 }
 
                 accountLabel.text = accountViewModel.accountName
@@ -170,6 +193,13 @@ final class AccountHeaderView: UIView {
 
                 fieldsStackView.isHidden = accountViewModel.fields.isEmpty && accountViewModel.identityProofs.isEmpty
 
+                if let relationshipNote = accountViewModel.relationship?.note, !relationshipNote.isEmpty {
+                    relationshipNoteStack.isHidden = false
+                    relationshipNotes.text = relationshipNote
+                } else {
+                    relationshipNoteStack.isHidden = true
+                }
+
                 let noteFont = UIFont.preferredFont(forTextStyle: .callout)
                 let mutableNote = NSMutableAttributedString(attributedString: accountViewModel.note)
                 let noteRange = NSRange(location: 0, length: mutableNote.length)
@@ -192,7 +222,16 @@ final class AccountHeaderView: UIView {
                     localizationKey: "account.followers-count-%ld",
                     count: accountViewModel.followersCount)
                 followStackView.isHidden = false
+
+                let hideAccountTypeLabels = !(accountViewModel.isBot || accountViewModel.isGroup)
+                accountTypeBotImageView.isHidden = !accountViewModel.isBot
+                accountTypeGroupImageView.isHidden = !accountViewModel.isGroup
+                accountTypeLabel.text = accountViewModel.accountTypeText
+                accountTypeLabel.isHidden = hideAccountTypeLabels
+                accountTypeStatusCountSeparatorLabel.isHidden = hideAccountTypeLabels
+
             } else {
+                relationshipNoteStack.isHidden = true
                 noteTextView.isHidden = true
                 followStackView.isHidden = true
             }
@@ -230,6 +269,12 @@ final class AccountHeaderView: UIView {
         for button in [directMessageButton, followButton, unfollowButton, notifyButton, unnotifyButton] {
             button.layer.cornerRadius = button.bounds.height / 2
         }
+
+        setupSegmentedControl()
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        setupSegmentedControl()
     }
 }
 
@@ -238,7 +283,11 @@ extension AccountHeaderView: UITextViewDelegate {
         _ textView: UITextView,
         shouldInteractWith URL: URL,
         in characterRange: NSRange,
-        interaction: UITextItemInteraction) -> Bool {
+        interaction: UITextItemInteraction
+    ) -> Bool {
+        guard textView == noteTextView else {
+            return false
+        }
         switch interaction {
         case .invokeDefaultAction:
             viewModel.accountViewModel?.urlSelected(URL)
@@ -412,17 +461,49 @@ private extension AccountHeaderView {
 
         accountStackView.addArrangedSubview(UIView())
 
-        baseStackView.addArrangedSubview(statusCountJoinedStackView)
-        statusCountJoinedStackView.spacing = .compactSpacing
+        baseStackView.addArrangedSubview(accountTypeStatusCountJoinedStackView)
+        accountTypeStatusCountJoinedStackView.spacing = .compactSpacing
 
-        statusCountJoinedStackView.addArrangedSubview(statusCountLabel)
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(accountTypeBotImageView)
+        accountTypeBotImageView.image = UIImage(
+            systemName: "cpu.fill",
+            withConfiguration: UIImage.SymbolConfiguration(scale: .small))
+        accountTypeBotImageView.tintColor = .tertiaryLabel
+        accountTypeBotImageView.contentMode = .scaleAspectFit
+        accountTypeBotImageView.setContentHuggingPriority(.required, for: .horizontal)
+        accountTypeBotImageView.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(accountTypeGroupImageView)
+        accountTypeGroupImageView.image = UIImage(
+            systemName: "person.3.fill",
+            withConfiguration: UIImage.SymbolConfiguration(scale: .small))
+        accountTypeGroupImageView.tintColor = .tertiaryLabel
+        accountTypeGroupImageView.contentMode = .scaleAspectFit
+        accountTypeGroupImageView.setContentHuggingPriority(.required, for: .horizontal)
+        accountTypeGroupImageView.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(accountTypeLabel)
+        accountTypeLabel.font = .preferredFont(forTextStyle: .footnote)
+        accountTypeLabel.adjustsFontForContentSizeCategory = true
+        accountTypeLabel.textColor = .tertiaryLabel
+
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(accountTypeStatusCountSeparatorLabel)
+        accountTypeStatusCountSeparatorLabel.font = .preferredFont(forTextStyle: .footnote)
+        accountTypeStatusCountSeparatorLabel.adjustsFontForContentSizeCategory = true
+        accountTypeStatusCountSeparatorLabel.textColor = .tertiaryLabel
+        accountTypeStatusCountSeparatorLabel.setContentHuggingPriority(.required, for: .horizontal)
+        accountTypeStatusCountSeparatorLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        accountTypeStatusCountSeparatorLabel.text = "•"
+        accountTypeStatusCountSeparatorLabel.isAccessibilityElement = false
+
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(statusCountLabel)
         statusCountLabel.font = .preferredFont(forTextStyle: .footnote)
         statusCountLabel.adjustsFontForContentSizeCategory = true
         statusCountLabel.textColor = .tertiaryLabel
         statusCountLabel.setContentHuggingPriority(.required, for: .horizontal)
         statusCountLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
 
-        statusCountJoinedStackView.addArrangedSubview(statusCountJoinedSeparatorLabel)
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(statusCountJoinedSeparatorLabel)
         statusCountJoinedSeparatorLabel.font = .preferredFont(forTextStyle: .footnote)
         statusCountJoinedSeparatorLabel.adjustsFontForContentSizeCategory = true
         statusCountJoinedSeparatorLabel.textColor = .tertiaryLabel
@@ -431,14 +512,61 @@ private extension AccountHeaderView {
         statusCountJoinedSeparatorLabel.text = "•"
         statusCountJoinedSeparatorLabel.isAccessibilityElement = false
 
-        statusCountJoinedStackView.addArrangedSubview(joinedLabel)
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(joinedLabel)
         joinedLabel.font = .preferredFont(forTextStyle: .footnote)
         joinedLabel.adjustsFontForContentSizeCategory = true
         joinedLabel.textColor = .tertiaryLabel
         joinedLabel.setContentHuggingPriority(.required, for: .horizontal)
         joinedLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
 
-        statusCountJoinedStackView.addArrangedSubview(UIView())
+        accountTypeStatusCountJoinedStackView.addArrangedSubview(UIView())
+
+        baseStackView.addArrangedSubview(familiarFollowersLabel)
+        familiarFollowersLabel.numberOfLines = 0
+        familiarFollowersLabel.font = .preferredFont(forTextStyle: .footnote)
+        familiarFollowersLabel.adjustsFontForContentSizeCategory = true
+        familiarFollowersLabel.textColor = .tertiaryLabel
+        familiarFollowersLabel.isUserInteractionEnabled = true
+
+        familiarFollowersLabel.addSubview(familiarFollowersButton)
+        familiarFollowersButton.translatesAutoresizingMaskIntoConstraints = false
+        familiarFollowersButton.setBackgroundImage(.highlightedButtonBackground, for: .highlighted)
+        familiarFollowersButton.addAction(
+            UIAction { [weak self] _ in self?.viewModel.accountViewModel?.familiarFollowersSelected() },
+            for: .touchUpInside
+        )
+
+        baseStackView.addArrangedSubview(relationshipNoteStack)
+        relationshipNoteStack.axis = .horizontal
+        // .firstBaseline makes the view infinitely large vertically for some reason.
+        relationshipNoteStack.alignment = .center
+        relationshipNoteStack.spacing = .defaultSpacing
+        relationshipNoteStack.layer.borderColor = UIColor.separator.cgColor
+        relationshipNoteStack.layer.borderWidth = .hairline
+        relationshipNoteStack.layer.cornerRadius = .defaultCornerRadius
+        relationshipNoteStack.isLayoutMarginsRelativeArrangement = true
+        relationshipNoteStack.directionalLayoutMargins = .init(
+            top: .defaultSpacing,
+            leading: .defaultSpacing,
+            bottom: .defaultSpacing,
+            trailing: .defaultSpacing
+        )
+
+        let relationshipNoteIcon = UIImageView()
+        relationshipNoteStack.addArrangedSubview(relationshipNoteIcon)
+        relationshipNoteIcon.image = .init(systemName: "note.text")
+        relationshipNoteIcon.tintColor = .secondaryLabel
+        relationshipNoteIcon.accessibilityLabel = NSLocalizedString("account.note", comment: "")
+        relationshipNoteIcon.setContentHuggingPriority(.required, for: .horizontal)
+        relationshipNoteIcon.setContentHuggingPriority(.required, for: .vertical)
+        relationshipNoteIcon.adjustsImageSizeForAccessibilityContentSizeCategory = true
+
+        relationshipNoteStack.addArrangedSubview(relationshipNotes)
+        relationshipNotes.backgroundColor = .clear
+        relationshipNotes.font = .preferredFont(forTextStyle: .subheadline)
+        relationshipNotes.textColor = .secondaryLabel
+        relationshipNotes.adjustsFontForContentSizeCategory = true
+        relationshipNotes.numberOfLines = 0
 
         baseStackView.addArrangedSubview(fieldsStackView)
         fieldsStackView.axis = .vertical
@@ -466,18 +594,7 @@ private extension AccountHeaderView {
             for: .touchUpInside)
         followStackView.addArrangedSubview(followersButton)
 
-        let statusWord = viewModel.identityContext.appPreferences.statusWord
-
-        for (index, collection) in ProfileCollection.allCases.enumerated() {
-            segmentedControl.insertSegment(
-                action: UIAction(title: collection.title(statusWord: statusWord)) { [weak self] _ in
-                    self?.viewModel.collection = collection
-                    self?.viewModel.request(maxId: nil, minId: nil, search: nil)
-                },
-                at: index,
-                animated: false)
-        }
-
+        setupSegmentedControl()
         segmentedControl.selectedSegmentIndex = 0
 
         baseStackView.addArrangedSubview(segmentedControl)
@@ -529,10 +646,49 @@ private extension AccountHeaderView {
             directMessageButton.widthAnchor.constraint(equalTo: directMessageButton.heightAnchor),
             notifyButton.widthAnchor.constraint(equalTo: notifyButton.heightAnchor),
             unnotifyButton.widthAnchor.constraint(equalTo: unnotifyButton.heightAnchor),
+            familiarFollowersButton.leadingAnchor.constraint(equalTo: familiarFollowersLabel.leadingAnchor),
+            familiarFollowersButton.topAnchor.constraint(equalTo: familiarFollowersLabel.topAnchor),
+            familiarFollowersButton.bottomAnchor.constraint(equalTo: familiarFollowersLabel.bottomAnchor),
+            familiarFollowersButton.trailingAnchor.constraint(equalTo: familiarFollowersLabel.trailingAnchor),
             baseStackView.topAnchor.constraint(equalTo: avatarBackgroundView.bottomAnchor, constant: .defaultSpacing),
             baseStackView.leadingAnchor.constraint(equalTo: readableContentGuide.leadingAnchor),
             baseStackView.trailingAnchor.constraint(equalTo: readableContentGuide.trailingAnchor),
             baseStackView.bottomAnchor.constraint(equalTo: readableContentGuide.bottomAnchor)
         ])
+    }
+
+    // TODO: (Vyr) consider applying font size stuff to all tab bars in app
+    /// Change the font size when system font sizes change, since `UISegmentedControl` doesn't do that by itself.
+    /// Switch to the smaller versions of tab labels when the view is narrow.
+    /// Switch to proportional tabs if we go to large font sizes.
+    func setupSegmentedControl() {
+        let statusWord = viewModel.identityContext.appPreferences.statusWord
+        let narrowView = traitCollection.horizontalSizeClass == .compact
+        let accessibilityFontSize = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+
+        segmentedControl.setTitleTextAttributes(
+            [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .footnote).bold()],
+            for: .normal
+        )
+
+        let index = segmentedControl.selectedSegmentIndex
+        segmentedControl.removeAllSegments()
+
+        for (index, collection) in ProfileCollection.allCases.enumerated() {
+            segmentedControl.insertSegment(
+                action: UIAction(
+                    title: collection.title(statusWord: statusWord, shorten: narrowView),
+                    discoverabilityTitle: collection.title(statusWord: statusWord, shorten: false)
+                ) { [weak self] _ in
+                    self?.viewModel.collection = collection
+                    self?.viewModel.request(maxId: nil, minId: nil, search: nil)
+                },
+                at: index,
+                animated: false)
+        }
+
+        segmentedControl.selectedSegmentIndex = index
+
+        segmentedControl.apportionsSegmentWidthsByContent = narrowView && accessibilityFontSize
     }
 }

@@ -232,6 +232,18 @@ public extension ContentDatabase {
         }
     }
 
+    func update(id: Status.Id, source: StatusSource) -> AnyPublisher<Never, Error> {
+        databaseWriter.mutatingPublisher {
+            try StatusRecord
+                .filter(StatusRecord.Columns.id == id)
+                .updateAll(
+                    $0,
+                    StatusRecord.Columns.text.set(to: source.text),
+                    StatusRecord.Columns.spoilerText.set(to: source.spoilerText)
+                )
+        }
+    }
+
     func delete(id: Status.Id) -> AnyPublisher<Never, Error> {
         databaseWriter.mutatingPublisher(updates: StatusRecord.filter(StatusRecord.Columns.id == id).deleteAll)
     }
@@ -331,6 +343,31 @@ public extension ContentDatabase {
         }
     }
 
+    func insert(familiarFollowers: [FamiliarFollowers]) -> AnyPublisher<Never, Error> {
+        databaseWriter.mutatingPublisher {
+            $0.trace { x in print(x) }
+
+            for followedAccount in familiarFollowers {
+                var followingAccountIds: [Account.Id] = []
+
+                for followingAccount in followedAccount.accounts {
+                    followingAccountIds.append(followingAccount.id)
+                    try followingAccount.save($0)
+
+                    try FamiliarFollowersJoin(
+                        followedAccountId: followedAccount.id,
+                        followingAccountId: followingAccount.id
+                    ).save($0)
+                }
+
+                try FamiliarFollowersJoin
+                    .filter(FamiliarFollowersJoin.Columns.followedAccountId == followedAccount.id
+                            && !followingAccountIds.contains(FamiliarFollowersJoin.Columns.followingAccountId))
+                    .deleteAll($0)
+            }
+        }
+    }
+
     func setLists(_ lists: [List]) -> AnyPublisher<Never, Error> {
         databaseWriter.mutatingPublisher {
             for list in lists {
@@ -368,6 +405,30 @@ public extension ContentDatabase {
 
     func deleteFilter(id: Filter.Id) -> AnyPublisher<Never, Error> {
         databaseWriter.mutatingPublisher(updates: Filter.filter(Filter.Columns.id == id).deleteAll)
+    }
+
+    func setFollowedTags(_ tags: [FollowedTag]) -> AnyPublisher<Never, Error> {
+        return databaseWriter.mutatingPublisher {
+            for tag in tags {
+                try tag.save($0)
+            }
+
+            try FollowedTag
+                .filter(!tags.map(\.name).contains(FollowedTag.Columns.name))
+                .deleteAll($0)
+        }
+    }
+
+    func createFollowedTag(_ tag: FollowedTag) -> AnyPublisher<Never, Error> {
+        return databaseWriter.mutatingPublisher { try tag.save($0) }
+    }
+
+    func deleteFollowedTag(_ tag: FollowedTag) -> AnyPublisher<Never, Error> {
+        return databaseWriter.mutatingPublisher(
+            updates: FollowedTag
+                .filter(FollowedTag.Columns.name == tag.name)
+                .deleteAll
+        )
     }
 
     func setLastReadId(_ id: String, timelineId: Timeline.Id) -> AnyPublisher<Never, Error> {
@@ -483,7 +544,12 @@ public extension ContentDatabase {
             .publisher(in: databaseWriter)
             .map {
                 $0?.accountAndRelationshipInfos.map {
-                    CollectionItem.account(.init(info: $0.accountInfo), configuration, $0.relationship)
+                    CollectionItem.account(
+                        .init(info: $0.accountInfo),
+                        configuration,
+                        $0.relationship,
+                        $0.familiarFollowers.map { followingAccountInfo in .init(info: followingAccountInfo) }
+                    )
                 }
             }
             .replaceNil(with: [])
@@ -503,6 +569,13 @@ public extension ContentDatabase {
 
     func expiredFiltersPublisher() -> AnyPublisher<[Filter], Error> {
         ValueObservation.tracking { try Filter.filter(Filter.Columns.expiresAt < Date()).fetchAll($0) }
+            .removeDuplicates()
+            .publisher(in: databaseWriter)
+            .eraseToAnyPublisher()
+    }
+
+    func followedTagsPublisher() -> AnyPublisher<[FollowedTag], Error> {
+        ValueObservation.tracking { try FollowedTag.fetchAll($0) }
             .removeDuplicates()
             .publisher(in: databaseWriter)
             .eraseToAnyPublisher()
@@ -543,7 +616,12 @@ public extension ContentDatabase {
                 accountIds.firstIndex(of: $0.accountInfo.record.id) ?? 0
                     < accountIds.firstIndex(of: $1.accountInfo.record.id) ?? 0
             }
-            .map { CollectionItem.account(.init(info: $0.accountInfo), .withoutNote, $0.relationship) }
+            .map { CollectionItem.account(
+                .init(info: $0.accountInfo),
+                .withoutNote,
+                $0.relationship,
+                $0.familiarFollowers.map { followingAccountInfo in .init(info: followingAccountInfo) }
+            ) }
 
             if let limit = limit, accounts.count >= limit {
                 accounts.append(.moreResults(.init(scope: .accounts)))

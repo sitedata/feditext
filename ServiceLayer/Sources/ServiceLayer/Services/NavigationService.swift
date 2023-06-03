@@ -14,6 +14,7 @@ public enum Navigation {
     case searchScope(SearchScope)
     case webfingerStart
     case webfingerEnd
+    case authenticatedWebView(AuthenticatedWebViewService, URL)
 }
 
 public struct NavigationService {
@@ -22,7 +23,7 @@ public struct NavigationService {
     private let contentDatabase: ContentDatabase
     private let status: Status?
 
-    init(environment: AppEnvironment,
+    public init(environment: AppEnvironment,
          mastodonAPIClient: MastodonAPIClient,
          contentDatabase: ContentDatabase,
          status: Status? = nil) {
@@ -70,9 +71,10 @@ public extension NavigationService {
                        contentDatabase: contentDatabase)
     }
 
-    func profileService(account: Account, relationship: Relationship? = nil) -> ProfileService {
+    func profileService(account: Account, relationship: Relationship? = nil, familiarFollowers: [Account] = []) -> ProfileService {
         ProfileService(account: account,
                        relationship: relationship,
+                       familiarFollowers: familiarFollowers,
                        environment: environment,
                        mastodonAPIClient: mastodonAPIClient,
                        contentDatabase: contentDatabase)
@@ -92,6 +94,17 @@ public extension NavigationService {
                        contentDatabase: contentDatabase)
     }
 
+    func familiarFollowersService(familiarFollowers: [Account]) -> FixedAccountListService {
+        FixedAccountListService(
+            accounts: familiarFollowers,
+            accountConfiguration: .withNote,
+            environment: environment,
+            mastodonAPIClient: mastodonAPIClient,
+            contentDatabase: contentDatabase,
+            titleComponents: ["account-list.title.familiar-followers"]
+        )
+    }
+
     func loadMoreService(loadMore: LoadMore) -> LoadMoreService {
         LoadMoreService(loadMore: loadMore, mastodonAPIClient: mastodonAPIClient, contentDatabase: contentDatabase)
     }
@@ -102,6 +115,23 @@ public extension NavigationService {
             environment: environment,
             mastodonAPIClient: mastodonAPIClient,
             contentDatabase: contentDatabase)
+    }
+
+    func multiNotificationService(
+        notifications: [MastodonNotification],
+        notificationType: MastodonNotification.NotificationType,
+        date: Date
+    ) -> MultiNotificationService {
+        MultiNotificationService(
+            notificationServices: notifications.map { notification in
+                notificationService(notification: notification)
+            },
+            notificationType: notificationType,
+            date: date,
+            environment: environment,
+            mastodonAPIClient: mastodonAPIClient,
+            contentDatabase: contentDatabase
+        )
     }
 
     func conversationService(conversation: Conversation) -> ConversationService {
@@ -124,6 +154,23 @@ public extension NavigationService {
                         environment: environment,
                         mastodonAPIClient: mastodonAPIClient,
                         contentDatabase: contentDatabase)
+    }
+
+    /// Open a report in the web interface.
+    func report(id: Report.Id) -> Navigation {
+        let reportURL: URL
+        if #available(iOS 16.0, *) {
+            reportURL = mastodonAPIClient.instanceURL.appending(components: "admin", "reports", id)
+        } else {
+            reportURL = mastodonAPIClient.instanceURL
+                .appendingPathComponent("admin")
+                .appendingPathComponent("reports")
+                .appendingPathComponent(id)
+        }
+        return .authenticatedWebView(
+            AuthenticatedWebViewService(environment: environment),
+            reportURL
+        )
     }
 }
 

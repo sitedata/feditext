@@ -14,6 +14,7 @@ public final class CompositionViewModel: AttachmentsRenderingViewModel, Observab
     @Published public var contentWarning = ""
     @Published public var contentWarningTextToSelectedRange = ""
     @Published public var displayContentWarning = false
+    @Published public var language: PrefsLanguage.Tag?
     @Published public var sensitive = false
     @Published public var displayPoll = false
     @Published public var pollMultipleChoice = false
@@ -33,9 +34,14 @@ public final class CompositionViewModel: AttachmentsRenderingViewModel, Observab
     @Published private var maxCharacters: Int
     private var cancellables = Set<AnyCancellable>()
 
-    init(eventsSubject: PassthroughSubject<Event, Never>, maxCharacters: Int?) {
+    init(
+        eventsSubject: PassthroughSubject<Event, Never>,
+        maxCharacters: Int?,
+        language: PrefsLanguage.Tag?
+    ) {
         self.eventsSubject = eventsSubject
         self.maxCharacters = maxCharacters ?? Self.defaultMaxCharacters
+        self.language = language
 
         $text.map { !$0.isEmpty }
             .removeDuplicates()
@@ -136,7 +142,8 @@ public extension CompositionViewModel {
                      redraft: Status,
                      identityContext: IdentityContext) {
         self.init(eventsSubject: eventsSubject,
-                  maxCharacters: identityContext.identity.instance?.maxTootChars)
+                  maxCharacters: identityContext.identity.instance?.maxTootChars,
+                  language: identityContext.identity.preferences.postingDefaultLanguage)
 
         if let text = redraft.text {
             self.text = text
@@ -158,9 +165,10 @@ public extension CompositionViewModel {
 
     convenience init(eventsSubject: PassthroughSubject<Event, Never>,
                      extensionContext: NSExtensionContext,
-                     parentViewModel: NewStatusViewModel) {
+                     parentViewModel: ComposeStatusViewModel) {
         self.init(eventsSubject: eventsSubject,
-                  maxCharacters: parentViewModel.identityContext.identity.instance?.maxTootChars)
+                  maxCharacters: parentViewModel.identityContext.identity.instance?.maxTootChars,
+                  language: parentViewModel.identityContext.identity.preferences.postingDefaultLanguage)
 
         guard let inputItem = extensionContext.inputItems.first as? NSExtensionItem else { return }
 
@@ -190,13 +198,14 @@ public extension CompositionViewModel {
         }
     }
 
-    func components(inReplyToId: Status.Id?, visibility: Status.Visibility) -> StatusComponents {
+    func components(inReplyToId: Status.Id?, visibility: Status.Visibility?) -> StatusComponents {
         StatusComponents(
             inReplyToId: inReplyToId,
             text: text,
             spoilerText: displayContentWarning ? contentWarning : "",
             mediaIds: attachmentViewModels.map(\.attachment.id),
             visibility: visibility,
+            language: language,
             sensitive: sensitive,
             pollOptions: displayPoll ? pollOptions.map(\.text) : [],
             pollExpiresIn: pollExpiresIn.rawValue,
@@ -211,7 +220,7 @@ public extension CompositionViewModel {
         pollOptions.removeAll { $0 === pollOption }
     }
 
-    func attach(itemProviders: [NSItemProvider], parentViewModel: NewStatusViewModel) {
+    func attach(itemProviders: [NSItemProvider], parentViewModel: ComposeStatusViewModel) {
         Publishers.MergeMany(itemProviders.map {
             MediaProcessingService.dataAndMimeType(itemProvider: $0)
                 .receive(on: DispatchQueue.main)

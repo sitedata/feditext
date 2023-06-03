@@ -31,7 +31,6 @@ final class ExploreViewController: UICollectionViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // swiftlint:disable:next function_body_length
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -60,6 +59,11 @@ final class ExploreViewController: UICollectionViewController {
 
         searchController.searchResultsUpdater = self
         searchController.searchBar.keyboardType = .twitter
+        searchController.searchBar.autocapitalizationType = .none
+        searchController.searchBar.autocorrectionType = .no
+        searchController.searchBar.smartDashesType = .no
+        searchController.searchBar.smartInsertDeleteType = .no
+        searchController.searchBar.smartQuotesType = .no
         navigationItem.searchController = searchController
 
         view.addSubview(webfingerIndicatorView)

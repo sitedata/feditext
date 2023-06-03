@@ -8,6 +8,7 @@ struct StatusRecord: ContentDatabaseRecord, Hashable {
     let id: Status.Id
     let uri: String
     let createdAt: Date
+    let editedAt: Date?
     let accountId: Account.Id
     let content: HTML
     let visibility: Status.Visibility
@@ -41,6 +42,7 @@ extension StatusRecord {
         static let id = Column(CodingKeys.id)
         static let uri = Column(CodingKeys.uri)
         static let createdAt = Column(CodingKeys.createdAt)
+        static let editedAt = Column(CodingKeys.editedAt)
         static let accountId = Column(CodingKeys.accountId)
         static let content = Column(CodingKeys.content)
         static let visibility = Column(CodingKeys.visibility)
@@ -130,6 +132,7 @@ extension StatusRecord {
         id = status.id
         uri = status.uri
         createdAt = status.createdAt
+        editedAt = status.editedAt
         accountId = status.account.id
         content = status.content
         visibility = status.visibility

@@ -67,11 +67,12 @@ extension LiveKeychain: Keychain {
         var error: Unmanaged<CFError>?
 
         guard let accessControl = SecAccessControlCreateWithFlags(
-                kCFAllocatorDefault,
-                kSecAttrAccessibleAfterFirstUnlock,
-                [],
-                &error)
-        else { throw error?.takeRetainedValue() ?? NSError() }
+            kCFAllocatorDefault,
+            kSecAttrAccessibleAfterFirstUnlock,
+            [],
+            &error) else {
+            throw error!.takeRetainedValue() as Error
+        }
 
         attributes[kSecPrivateKeyAttrs as String] = [
             kSecAttrIsPermanent as String: true,
@@ -81,8 +82,9 @@ extension LiveKeychain: Keychain {
         guard
             let key = SecKeyCreateRandomKey(attributes as CFDictionary, &error),
             let publicKey = SecKeyCopyPublicKey(key),
-            let publicKeyData = SecKeyCopyExternalRepresentation(publicKey, &error) as Data?
-            else { throw error?.takeRetainedValue() ?? NSError() }
+            let publicKeyData = SecKeyCopyExternalRepresentation(publicKey, &error) as Data? else {
+            throw error!.takeRetainedValue() as Error
+        }
 
         return publicKeyData
     }
@@ -104,7 +106,7 @@ extension LiveKeychain: Keychain {
             let secKey = result as! SecKey
             // swiftlint:enable force_cast
             guard let data = SecKeyCopyExternalRepresentation(secKey, &error) else {
-                throw error?.takeRetainedValue() ?? NSError()
+                throw error!.takeRetainedValue() as Error
             }
 
             return data as Data

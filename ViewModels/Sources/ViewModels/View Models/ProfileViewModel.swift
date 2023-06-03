@@ -1,6 +1,7 @@
 // Copyright © 2020 Metabolist. All rights reserved.
 
 import Combine
+import DB
 import Foundation
 import Mastodon
 import ServiceLayer
@@ -39,6 +40,7 @@ final public class ProfileViewModel {
                                  eventsSubject: accountEventsSubject)
 
                 vm.relationship = $0.relationship
+                vm.familiarFollowers = $0.familiarFollowers
                 vm.identityProofs = $0.identityProofs
                 vm.featuredTags = $0.featuredTags
 
@@ -146,6 +148,8 @@ extension ProfileViewModel: CollectionViewModel {
     public var canRefresh: Bool { collectionViewModel.value.canRefresh }
 
     public var announcesNewItems: Bool { collectionViewModel.value.canRefresh }
+
+    public var timelineActionViewModel: TimelineActionViewModel? { collectionViewModel.value.timelineActionViewModel }
 
     public func request(maxId: String?, minId: String?, search: Search?) {
         if case .statuses = collection, maxId == nil {

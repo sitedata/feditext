@@ -126,6 +126,12 @@ public extension IdentityService {
             .eraseToAnyPublisher()
     }
 
+    func requestFamiliarFollowers(ids: Set<Account.Id>) -> AnyPublisher<Never, Error> {
+        mastodonAPIClient.request(FamiliarFollowersEndpoint.familiarFollowers(ids: Array(ids)))
+            .flatMap(contentDatabase.insert(familiarFollowers:))
+            .eraseToAnyPublisher()
+    }
+
     func getLocalLastReadId(timeline: Timeline) -> String? {
         contentDatabase.lastReadId(timelineId: timeline.id)
     }
@@ -181,6 +187,31 @@ public extension IdentityService {
 
     func expiredFiltersPublisher() -> AnyPublisher<[Filter], Error> {
         contentDatabase.expiredFiltersPublisher()
+    }
+
+    func refreshFollowedTags() -> AnyPublisher<Never, Error> {
+        mastodonAPIClient.request(TagsEndpoint.followed)
+            .map { $0.map(FollowedTag.init(_:)) }
+            .flatMap(contentDatabase.setFollowedTags(_:))
+            .eraseToAnyPublisher()
+    }
+
+    func followTag(name: Tag.Name) -> AnyPublisher<Tag, Error> {
+        mastodonAPIClient.request(TagEndpoint.follow(name: name))
+            .andAlso { contentDatabase.createFollowedTag(FollowedTag($0)) }
+    }
+
+    func unfollowTag(name: Tag.Name) -> AnyPublisher<Tag, Error> {
+        mastodonAPIClient.request(TagEndpoint.unfollow(name: name))
+            .andAlso { contentDatabase.deleteFollowedTag(FollowedTag($0)) }
+    }
+
+    func followedTagsPublisher() -> AnyPublisher<[FollowedTag], Error> {
+        contentDatabase.followedTagsPublisher()
+    }
+
+    func getTag(name: Tag.Name) -> AnyPublisher<Tag, Error> {
+        mastodonAPIClient.request(TagEndpoint.get(name: name))
     }
 
     func announcementCountPublisher() -> AnyPublisher<(total: Int, unread: Int), Error> {
@@ -248,6 +279,10 @@ public extension IdentityService {
         mastodonAPIClient.request(StatusEndpoint.post(statusComponents)).map(\.id).eraseToAnyPublisher()
     }
 
+    func put(id: Status.ID, statusComponents: StatusComponents) -> AnyPublisher<Status.Id, Error> {
+        mastodonAPIClient.request(StatusEndpoint.put(id: id, statusComponents)).map(\.id).eraseToAnyPublisher()
+    }
+
     func notificationService(pushNotification: PushNotification) -> AnyPublisher<NotificationService, Error> {
         mastodonAPIClient.request(NotificationEndpoint.notification(id: .init(pushNotification.notificationId)))
             .flatMap { notification in
@@ -311,8 +346,8 @@ public extension IdentityService {
 
 private extension IdentityService {
     #if DEBUG
-    static let pushSubscriptionEndpointURL = URL(string: "https://metatext-apns.metabolist.org/push?sandbox=true")!
+    static let pushSubscriptionEndpointURL = URL(string: "https://feditext-apns.gotgoat.com/push?sandbox=true")!
     #else
-    static let pushSubscriptionEndpointURL = URL(string: "https://metatext-apns.metabolist.org/push")!
+    static let pushSubscriptionEndpointURL = URL(string: "https://feditext-apns.gotgoat.com/push")!
     #endif
 }

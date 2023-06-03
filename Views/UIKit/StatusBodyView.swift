@@ -12,23 +12,23 @@ final class StatusBodyView: UIView {
     let pollView = PollView()
     let cardView = CardView()
 
+    /// Show this many lines of a folded post as a preview.
+    static let numLinesFoldedPreview: Int = 2
+
     var viewModel: StatusViewModel? {
         didSet {
             guard let viewModel = viewModel else { return }
 
-            let isContextParent = viewModel.configuration.isContextParent
             let mutableContent = NSMutableAttributedString(attributedString: viewModel.content)
+            mutableContent.adaptHtmlAttributes(style: contentTextStyle)
             let mutableSpoilerText = NSMutableAttributedString(string: viewModel.spoilerText)
-            let mutableSpoilerFont = UIFont.preferredFont(forTextStyle: isContextParent ? .title3 : .callout).bold()
+            let mutableSpoilerFont = UIFont.preferredFont(forTextStyle: contentTextStyle).bold()
             let contentFont = UIFont.preferredFont(forTextStyle: isContextParent ? .title3 : .callout)
             let contentRange = NSRange(location: 0, length: mutableContent.length)
 
             contentTextView.shouldFallthrough = !isContextParent
 
-            mutableContent.removeAttribute(.font, range: contentRange)
-            mutableContent.addAttributes(
-                [.font: contentFont, .foregroundColor: UIColor.label],
-                range: contentRange)
+            mutableContent.addAttribute(.foregroundColor, value: UIColor.label, range: contentRange)
             mutableContent.insert(emojis: viewModel.contentEmojis,
                                   view: contentTextView,
                                   identityContext: viewModel.identityContext)
@@ -36,22 +36,33 @@ final class StatusBodyView: UIView {
             contentTextView.attributedText = mutableContent
             contentTextView.isHidden = contentTextView.text.isEmpty
 
-            mutableSpoilerText.insert(emojis: viewModel.contentEmojis,
-                                      view: spoilerTextLabel,
-                                      identityContext: viewModel.identityContext)
-            mutableSpoilerText.resizeAttachments(toLineHeight: spoilerTextLabel.font.lineHeight)
+            if viewModel.hasSpoiler {
+                mutableSpoilerText.insert(emojis: viewModel.contentEmojis,
+                                          view: spoilerTextLabel,
+                                          identityContext: viewModel.identityContext)
+                mutableSpoilerText.resizeAttachments(toLineHeight: spoilerTextLabel.font.lineHeight)
+            }
             spoilerTextLabel.font = mutableSpoilerFont
             spoilerTextLabel.attributedText = mutableSpoilerText
-            spoilerTextLabel.isHidden = spoilerTextLabel.text == ""
+            spoilerTextLabel.isHidden = !viewModel.hasSpoiler
+
             toggleShowContentButton.setTitle(
                 viewModel.shouldShowContent
                     ? NSLocalizedString("status.show-less", comment: "")
                     : NSLocalizedString("status.show-more", comment: ""),
                 for: .normal)
-            toggleShowContentButton.isHidden = viewModel.spoilerText.isEmpty
-                    || !viewModel.shouldShowContentWarningButton
+            toggleShowContentButton.isHidden = (!viewModel.hasSpoiler
+                    || viewModel.alwaysExpandSpoilers
+                    || !viewModel.shouldShowContentWarningButton)
+                && !viewModel.shouldHideDueToLongContent
+            toggleShowContentButton.setContentCompressionResistancePriority(.required, for: .vertical)
+            toggleShowContentButton.setContentHuggingPriority(.required, for: .vertical)
 
-            contentTextView.isHidden = !viewModel.shouldShowContent
+            contentTextView.isHidden = viewModel.shouldHideDueToSpoiler && !viewModel.shouldShowContent
+            contentTextView.textContainer.lineBreakMode = .byTruncatingTail
+            contentTextView.textContainer.maximumNumberOfLines = viewModel.shouldShowContentPreview
+                ? Self.numLinesFoldedPreview
+                : 0
 
             attachmentsView.isHidden = viewModel.attachmentViewModels.isEmpty
             attachmentsView.viewModel = viewModel
@@ -137,19 +148,45 @@ extension StatusBodyView {
                 configuration: configuration)
         }
 
-        if status.displayStatus.spoilerText.isEmpty {
-            height += contentHeight
+        //  This would be so much more convenient if it took a StatusViewModel…
+        //  For now, it duplicates a lot of code from non-static contexts in this class and from StatusViewModel.
+        let hasSpoiler = !status.displayStatus.spoilerText.isEmpty
+        let alwaysExpandSpoilers = identityContext.identity.preferences.readingExpandSpoilers
+        let shouldHideDueToSpoiler = hasSpoiler && !alwaysExpandSpoilers
+
+        let hasLongContent: Bool
+        let plainTextContent = status.displayStatus.content.attributed.string
+        if plainTextContent.count > StatusViewModel.foldCharacterLimit {
+            hasLongContent = true
         } else {
+            let newlineCount = plainTextContent.prefix(StatusViewModel.foldCharacterLimit).filter { $0.isNewline }.count
+            hasLongContent = newlineCount > StatusViewModel.foldNewlineLimit
+        }
+        let shouldHideDueToLongContent = hasLongContent && identityContext.appPreferences.foldLongPosts
+
+        let shouldShowContent = configuration.showContentToggled
+            || !(shouldHideDueToSpoiler || shouldHideDueToLongContent)
+
+        if hasSpoiler {
+            // Include spoiler text height.
             height += status.displayStatus.spoilerText.height(width: width, font: contentFont)
             height += .compactSpacing
+        }
+
+        if shouldHideDueToSpoiler || shouldHideDueToLongContent {
+            // Include Show More button height.
             height += NSLocalizedString("status.show-more", comment: "").height(
                 width: width,
                 font: .preferredFont(forTextStyle: .headline))
+            height += .compactSpacing
+        }
 
-            if configuration.showContentToggled && !identityContext.identity.preferences.readingExpandSpoilers {
-                height += .compactSpacing
-                height += contentHeight
-            }
+        if shouldShowContent {
+            // Include full height of content.
+            height += contentHeight
+        } else if !configuration.showContentToggled && !hasSpoiler && shouldHideDueToLongContent {
+            // Include first few lines of content.
+            height += contentFont.lineHeight * CGFloat(Self.numLinesFoldedPreview)
         }
 
         if !status.displayStatus.mediaAttachments.isEmpty {
@@ -252,5 +289,13 @@ private extension StatusBodyView {
             stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
             stackView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+
+    private var isContextParent: Bool {
+        viewModel?.configuration.isContextParent ?? false
+    }
+
+    private var contentTextStyle: UIFont.TextStyle {
+        isContextParent ? .title3 : .callout
     }
 }

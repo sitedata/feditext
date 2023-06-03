@@ -9,6 +9,7 @@ public class CollectionItemsViewModel: ObservableObject {
     public let identityContext: IdentityContext
     @Published public var alertItem: AlertItem?
     public private(set) var nextPageMaxId: String?
+    public let timelineActionViewModel: TimelineActionViewModel?
 
     @Published private var lastUpdate = CollectionUpdate.empty
     private let collectionService: CollectionService
@@ -25,10 +26,16 @@ public class CollectionItemsViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var requestCancellables = Set<AnyCancellable>()
 
-    // swiftlint:disable:next function_body_length
     public init(collectionService: CollectionService, identityContext: IdentityContext) {
         self.collectionService = collectionService
         self.identityContext = identityContext
+        self.timelineActionViewModel = collectionService.positionTimeline.flatMap {
+            TimelineActionViewModel.from(
+                timeline: $0,
+                identityContext: identityContext
+            )
+        }
+
         expandAllSubject = CurrentValueSubject(
             collectionService is ContextService && !identityContext.identity.preferences.readingExpandSpoilers
                 ? .expand : .hidden)
@@ -47,6 +54,13 @@ public class CollectionItemsViewModel: ObservableObject {
         collectionService.accountIdsForRelationships
             .filter { !$0.isEmpty }
             .flatMap(identityContext.service.requestRelationships(ids:))
+            .catch { _ in Empty().setFailureType(to: Never.self) }
+            .sink { _ in }
+            .store(in: &cancellables)
+
+        collectionService.accountIdsForRelationships
+            .filter { !$0.isEmpty }
+            .flatMap(identityContext.service.requestFamiliarFollowers(ids:))
             .catch { _ in Empty().setFailureType(to: Never.self) }
             .sink { _ in }
             .store(in: &cancellables)
@@ -136,7 +150,7 @@ public class CollectionItemsViewModel: ObservableObject {
             viewModelCache[item] = viewModel
 
             return viewModel
-        case let .account(account, configuration, relationship):
+        case let .account(account, configuration, relationship, familiarFollowers):
             let viewModel: AccountViewModel
 
             if let cachedViewModel = cachedViewModel as? AccountViewModel {
@@ -151,6 +165,7 @@ public class CollectionItemsViewModel: ObservableObject {
 
             viewModel.configuration = configuration
             viewModel.relationship = relationship
+            viewModel.familiarFollowers = familiarFollowers
 
             return viewModel
         case let .notification(notification, statusConfiguration):
@@ -174,6 +189,25 @@ public class CollectionItemsViewModel: ObservableObject {
                     eventsSubject: eventsSubject)
                 viewModelCache[item] = viewModel
             }
+
+            return viewModel
+        case let .multiNotification(notifications, notificationType, date, status):
+            if let cachedViewModel = cachedViewModel {
+                return cachedViewModel
+            }
+
+            let viewModel = MultiNotificationViewModel(
+                multiNotificationService: collectionService.navigationService.multiNotificationService(
+                    notifications: notifications,
+                    notificationType: notificationType,
+                    date: date
+                ),
+                statusService: status.map { collectionService.navigationService.statusService(status: $0) },
+                identityContext: identityContext,
+                eventsSubject: eventsSubject
+            )
+
+            viewModelCache[item] = viewModel
 
             return viewModel
         case let .conversation(conversation):
@@ -290,12 +324,24 @@ extension CollectionItemsViewModel: CollectionViewModel {
         case let .loadMore(loadMore):
             lastSelectedLoadMore = loadMore
             (viewModel(indexPath: indexPath) as? LoadMoreViewModel)?.loadMore()
-        case let .account(account, _, relationship):
-            send(event: .navigation(.profile(collectionService
-                                                .navigationService
-                                                .profileService(account: account, relationship: relationship))))
+        case let .account(account, _, relationship, familiarFollowers):
+            send(
+                event: .navigation(
+                    .profile(
+                        collectionService
+                            .navigationService
+                            .profileService(
+                                account: account,
+                                relationship: relationship,
+                                familiarFollowers: familiarFollowers
+                            )
+                    )
+                )
+            )
         case let .notification(notification, _):
-            if let status = notification.status {
+            if let report = notification.report {
+                send(event: .navigation(collectionService.navigationService.report(id: report.id)))
+            } else if let status = notification.status {
                 send(event: .navigation(.collection(collectionService
                                                         .navigationService
                                                         .contextService(id: status.displayStatus.id))))
@@ -303,6 +349,35 @@ extension CollectionItemsViewModel: CollectionViewModel {
                 send(event: .navigation(.profile(collectionService
                                                     .navigationService
                                                     .profileService(account: notification.account))))
+            }
+        case let .multiNotification(notifications, notificationType, date, status):
+            if let status = status {
+                send(
+                    event: .navigation(
+                        .collection(
+                            collectionService
+                                .navigationService
+                                .contextService(
+                                    id: status.displayStatus.id
+                                )
+                        )
+                    )
+                )
+            } else {
+                send(
+                    event: .navigation(
+                        .collection(
+                            collectionService
+                                .navigationService
+                                .multiNotificationService(
+                                    notifications: notifications,
+                                    notificationType: notificationType,
+                                    date: date
+                                )
+                                .accountListService()
+                        )
+                    )
+                )
             }
         case let .conversation(conversation):
             guard let status = conversation.lastStatus else { break }

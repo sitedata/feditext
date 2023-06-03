@@ -44,7 +44,6 @@ final class NewItemsView: UIView {
 }
 
 private extension NewItemsView {
-    // swiftlint:disable:next function_body_length
     func initialSetup() {
         backgroundColor = .clear
         layer.shadowOffset = .zero

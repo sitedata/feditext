@@ -9,7 +9,37 @@ final class AccountView: UIView {
     let avatarImageView = SDAnimatedImageView()
     let displayNameLabel = AnimatedAttachmentLabel()
     let accountLabel = UILabel()
+
+    let accountTypeStack = UIStackView()
+    let accountTypeBotImageView = UIImageView()
+    let accountTypeGroupImageView = UIImageView()
+    /// Displays text explanation of account type.
+    let accountTypeLabel = UILabel()
+
+    let verifiedStack = UIStackView()
+    /// Displays first verified link in profile, if there is one.
+    let verifiedLabel = UILabel()
+
+    let visibilityRelationshipStack = UIStackView()
+    let visibilityRelationshipIcon = UIImageView()
+    /// Displays text explanation of whether current user has blocked or muted this account.
+    let visibilityRelationshipLabel = UILabel()
+
+    let followRelationshipStack = UIStackView()
+    let followRelationshipIcon = UIImageView()
+    /// Displays text explanation of current user's relationship with this account.
+    let followRelationshipLabel = UILabel()
+
+    /// Displays first few display names of current user's follows who also follow this account.
+    let familiarFollowersLabel = FamiliarFollowersLabel()
+
+    let relationshipNoteStack = UIStackView()
+    /// Displays the current user's note for this account.
+    let relationshipNotes = UILabel()
+
+    /// Displays the account's bio.
     let noteTextView = TouchFallthroughTextView()
+
     let acceptFollowRequestButton = UIButton()
     let rejectFollowRequestButton = UIButton()
     let muteButton = UIButton(type: .system)
@@ -35,13 +65,32 @@ final class AccountView: UIView {
 }
 
 extension AccountView {
-    static func estimatedHeight(width: CGFloat,
-                                account: Account,
-                                configuration: CollectionItem.AccountConfiguration) -> CGFloat {
+    static func estimatedHeight(
+        width: CGFloat,
+        account: Account,
+        configuration: CollectionItem.AccountConfiguration,
+        relationship: Relationship?,
+        familiarFollowers: [Account]
+    ) -> CGFloat {
         var height = CGFloat.defaultSpacing * 2
             + .compactSpacing
             + account.displayName.height(width: width, font: .preferredFont(forTextStyle: .headline))
             + account.acct.height(width: width, font: .preferredFont(forTextStyle: .subheadline))
+
+        if let relationshipNote = relationship?.note, !relationshipNote.isEmpty {
+            height += relationshipNote.height(width: width, font: .preferredFont(forTextStyle: .subheadline))
+        }
+
+        if !familiarFollowers.isEmpty {
+            height += familiarFollowers
+                .prefix(4)
+                .map { $0.displayName }
+                .joined(separator: ", ")
+                .height(
+                    width: width,
+                    font: .preferredFont(forTextStyle: .subheadline)
+                )
+        }
 
         if configuration == .withNote {
             height += .compactSpacing + account.note.attributed.string.height(
@@ -97,6 +146,51 @@ private extension AccountView {
         avatarImageView.layer.cornerRadius = .avatarDimension / 2
         avatarImageView.clipsToBounds = true
 
+        accountTypeStack.axis = .horizontal
+        accountTypeStack.spacing = .ultraCompactSpacing
+
+        accountTypeStack.addArrangedSubview(accountTypeBotImageView)
+        accountTypeBotImageView.image = .init(
+            systemName: "cpu.fill",
+            withConfiguration: UIImage.SymbolConfiguration(scale: .small)
+        )
+        accountTypeBotImageView.tintColor = .secondaryLabel
+        accountTypeBotImageView.contentMode = .scaleAspectFit
+        accountTypeBotImageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
+        accountTypeBotImageView.setContentHuggingPriority(.required, for: .horizontal)
+        accountTypeBotImageView.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        accountTypeStack.addArrangedSubview(accountTypeGroupImageView)
+        accountTypeGroupImageView.image = .init(
+            systemName: "person.3.fill",
+            withConfiguration: UIImage.SymbolConfiguration(scale: .small)
+        )
+        accountTypeGroupImageView.tintColor = .secondaryLabel
+        accountTypeGroupImageView.contentMode = .scaleAspectFit
+        accountTypeGroupImageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
+        accountTypeGroupImageView.setContentHuggingPriority(.required, for: .horizontal)
+        accountTypeGroupImageView.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        accountTypeStack.addArrangedSubview(accountTypeLabel)
+        accountTypeLabel.font = .preferredFont(forTextStyle: .footnote)
+        accountTypeLabel.adjustsFontForContentSizeCategory = true
+        accountTypeLabel.textColor = .secondaryLabel
+
+        relationshipNoteStack.axis = .horizontal
+        // .firstBaseline makes the view infinitely large vertically for some reason.
+        relationshipNoteStack.alignment = .center
+        relationshipNoteStack.spacing = .defaultSpacing
+        relationshipNoteStack.layer.borderColor = UIColor.separator.cgColor
+        relationshipNoteStack.layer.borderWidth = .hairline
+        relationshipNoteStack.layer.cornerRadius = .defaultCornerRadius
+        relationshipNoteStack.isLayoutMarginsRelativeArrangement = true
+        relationshipNoteStack.directionalLayoutMargins = .init(
+            top: .defaultSpacing,
+            leading: .defaultSpacing,
+            bottom: .defaultSpacing,
+            trailing: .defaultSpacing
+        )
+
         let verticalStackView = UIStackView()
 
         stackView.addArrangedSubview(verticalStackView)
@@ -105,14 +199,95 @@ private extension AccountView {
         verticalStackView.spacing = .compactSpacing
         verticalStackView.addArrangedSubview(displayNameLabel)
         verticalStackView.addArrangedSubview(accountLabel)
+        verticalStackView.addArrangedSubview(verifiedStack)
+        verticalStackView.addArrangedSubview(accountTypeStack)
+        verticalStackView.addArrangedSubview(visibilityRelationshipStack)
+        verticalStackView.addArrangedSubview(followRelationshipStack)
+        verticalStackView.addArrangedSubview(familiarFollowersLabel)
+        verticalStackView.addArrangedSubview(relationshipNoteStack)
         verticalStackView.addArrangedSubview(noteTextView)
+
         displayNameLabel.numberOfLines = 0
         displayNameLabel.font = .preferredFont(forTextStyle: .headline)
         displayNameLabel.adjustsFontForContentSizeCategory = true
+
         accountLabel.numberOfLines = 0
         accountLabel.font = .preferredFont(forTextStyle: .subheadline)
         accountLabel.adjustsFontForContentSizeCategory = true
         accountLabel.textColor = .secondaryLabel
+
+        verifiedStack.axis = .horizontal
+        verifiedStack.alignment = .center
+        verifiedStack.spacing = .ultraCompactSpacing
+
+        let verifiedIcon = UIImageView()
+        verifiedStack.addArrangedSubview(verifiedIcon)
+        verifiedIcon.image = .init(
+            systemName: "checkmark",
+            withConfiguration: UIImage.SymbolConfiguration(scale: .small)
+        )
+        verifiedIcon.tintColor = .systemGreen
+        verifiedIcon.accessibilityLabel = NSLocalizedString("account.verified", comment: "")
+        verifiedIcon.setContentHuggingPriority(.required, for: .horizontal)
+        verifiedIcon.setContentHuggingPriority(.required, for: .vertical)
+        verifiedIcon.adjustsImageSizeForAccessibilityContentSizeCategory = true
+
+        verifiedStack.addArrangedSubview(verifiedLabel)
+        verifiedLabel.font = .preferredFont(forTextStyle: .footnote)
+        verifiedLabel.adjustsFontForContentSizeCategory = true
+        verifiedLabel.textColor = .systemGreen
+
+        visibilityRelationshipStack.axis = .horizontal
+        visibilityRelationshipStack.alignment = .center
+        visibilityRelationshipStack.spacing = .ultraCompactSpacing
+
+        visibilityRelationshipStack.addArrangedSubview(visibilityRelationshipIcon)
+        visibilityRelationshipIcon.tintColor = .secondaryLabel
+        visibilityRelationshipIcon.setContentHuggingPriority(.required, for: .horizontal)
+        visibilityRelationshipIcon.setContentHuggingPriority(.required, for: .vertical)
+        visibilityRelationshipIcon.adjustsImageSizeForAccessibilityContentSizeCategory = true
+
+        visibilityRelationshipStack.addArrangedSubview(visibilityRelationshipLabel)
+        visibilityRelationshipLabel.font = .preferredFont(forTextStyle: .footnote)
+        visibilityRelationshipLabel.adjustsFontForContentSizeCategory = true
+        visibilityRelationshipLabel.textColor = .secondaryLabel
+
+        followRelationshipStack.axis = .horizontal
+        followRelationshipStack.alignment = .center
+        followRelationshipStack.spacing = .ultraCompactSpacing
+
+        followRelationshipStack.addArrangedSubview(followRelationshipIcon)
+        followRelationshipIcon.tintColor = .secondaryLabel
+        followRelationshipIcon.setContentHuggingPriority(.required, for: .horizontal)
+        followRelationshipIcon.setContentHuggingPriority(.required, for: .vertical)
+        followRelationshipIcon.adjustsImageSizeForAccessibilityContentSizeCategory = true
+
+        followRelationshipStack.addArrangedSubview(followRelationshipLabel)
+        followRelationshipLabel.font = .preferredFont(forTextStyle: .footnote)
+        followRelationshipLabel.adjustsFontForContentSizeCategory = true
+        followRelationshipLabel.textColor = .secondaryLabel
+
+        familiarFollowersLabel.numberOfLines = 0
+        familiarFollowersLabel.font = .preferredFont(forTextStyle: .footnote)
+        familiarFollowersLabel.adjustsFontForContentSizeCategory = true
+        familiarFollowersLabel.textColor = .secondaryLabel
+
+        let relationshipNoteIcon = UIImageView()
+        relationshipNoteStack.addArrangedSubview(relationshipNoteIcon)
+        relationshipNoteIcon.image = .init(systemName: "note.text")
+        relationshipNoteIcon.tintColor = .secondaryLabel
+        relationshipNoteIcon.accessibilityLabel = NSLocalizedString("account.note", comment: "")
+        relationshipNoteIcon.setContentHuggingPriority(.required, for: .horizontal)
+        relationshipNoteIcon.setContentHuggingPriority(.required, for: .vertical)
+        relationshipNoteIcon.adjustsImageSizeForAccessibilityContentSizeCategory = true
+
+        relationshipNoteStack.addArrangedSubview(relationshipNotes)
+        relationshipNotes.backgroundColor = .clear
+        relationshipNotes.font = .preferredFont(forTextStyle: .subheadline)
+        relationshipNotes.textColor = .secondaryLabel
+        relationshipNotes.adjustsFontForContentSizeCategory = true
+        relationshipNotes.numberOfLines = 0
+
         noteTextView.backgroundColor = .clear
         noteTextView.delegate = self
 
@@ -213,6 +388,26 @@ private extension AccountView {
 
         accountLabel.text = viewModel.accountName
 
+        accountTypeStack.isHidden = !(viewModel.isBot || viewModel.isGroup)
+        accountTypeBotImageView.isHidden = !viewModel.isBot
+        accountTypeGroupImageView.isHidden = !viewModel.isGroup
+        accountTypeLabel.text = viewModel.accountTypeText
+
+        if let firstVerifiedField = viewModel.fields.first(where: { $0.verifiedAt != nil }) {
+            verifiedStack.isHidden = false
+            // Full HTML display and tap support not necessary: we're just showing a URL in this case.
+            verifiedLabel.text = firstVerifiedField.value.attributed.string
+        } else {
+            verifiedStack.isHidden = true
+        }
+
+        if let relationshipNote = viewModel.relationship?.note, !relationshipNote.isEmpty {
+            relationshipNoteStack.isHidden = false
+            relationshipNotes.text = relationshipNote
+        } else {
+            relationshipNoteStack.isHidden = true
+        }
+
         if viewModel.configuration == .withNote {
             let noteFont = UIFont.preferredFont(forTextStyle: .callout)
             let mutableNote = NSMutableAttributedString(attributedString: viewModel.note)
@@ -237,7 +432,8 @@ private extension AccountView {
         acceptFollowRequestButton.isHidden = !isFollowRequest
         rejectFollowRequestButton.isHidden = !isFollowRequest
 
-        if let relationship = viewModel.relationship {
+        let followRelationshipShown: Bool
+        if !viewModel.isSelf, let relationship = viewModel.relationship {
             if viewModel.configuration == .mute {
                 muteButton.isHidden = relationship.muting
                 unmuteButton.isHidden = !relationship.muting
@@ -248,12 +444,76 @@ private extension AccountView {
                 unmuteButton.isHidden = true
                 blockButton.isHidden = relationship.blocking
                 unblockButton.isHidden = !relationship.blocking
+            } else {
+                if relationship.blocking {
+                    visibilityRelationshipIcon.image = .init(
+                        systemName: "slash.circle",
+                        withConfiguration: UIImage.SymbolConfiguration(scale: .small)
+                    )
+                    visibilityRelationshipLabel.text = NSLocalizedString("account.blocked", comment: "")
+                    visibilityRelationshipStack.isHidden = false
+                } else if relationship.domainBlocking {
+                    visibilityRelationshipIcon.image = .init(
+                        systemName: "slash.circle",
+                        withConfiguration: UIImage.SymbolConfiguration(scale: .small)
+                    )
+                    visibilityRelationshipLabel.text = NSLocalizedString("account.domain-blocked", comment: "")
+                    visibilityRelationshipStack.isHidden = false
+                } else if relationship.muting {
+                    visibilityRelationshipIcon.image = .init(
+                        systemName: "speaker.slash",
+                        withConfiguration: UIImage.SymbolConfiguration(scale: .small)
+                    )
+                    visibilityRelationshipLabel.text = NSLocalizedString("account.muted", comment: "")
+                    visibilityRelationshipStack.isHidden = false
+                } else {
+                    visibilityRelationshipStack.isHidden = true
+                }
+            }
+
+            if relationship.following && relationship.followedBy {
+                followRelationshipIcon.image = .init(
+                    systemName: "arrow.left.arrow.right.square.fill",
+                    withConfiguration: UIImage.SymbolConfiguration(scale: .small)
+                )
+                followRelationshipLabel.text = NSLocalizedString("account.relationship.mutuals", comment: "")
+                followRelationshipStack.isHidden = false
+                followRelationshipShown = true
+            } else if relationship.following {
+                followRelationshipIcon.image = .init(
+                    systemName: "arrow.left.square.fill",
+                    withConfiguration: UIImage.SymbolConfiguration(scale: .small)
+                )
+                followRelationshipLabel.text = NSLocalizedString("account.relationship.following", comment: "")
+                followRelationshipStack.isHidden = false
+                followRelationshipShown = true
+            } else if relationship.followedBy {
+                followRelationshipIcon.image = .init(
+                    systemName: "arrow.right.square.fill",
+                    withConfiguration: UIImage.SymbolConfiguration(scale: .small)
+                )
+                followRelationshipLabel.text = NSLocalizedString("account.relationship.followed-by", comment: "")
+                followRelationshipStack.isHidden = false
+                followRelationshipShown = true
+            } else {
+                followRelationshipStack.isHidden = true
+                followRelationshipShown = false
             }
         } else {
             muteButton.isHidden = true
             unmuteButton.isHidden = true
             blockButton.isHidden = true
             unblockButton.isHidden = true
+            followRelationshipStack.isHidden = true
+            followRelationshipShown = false
+        }
+
+        familiarFollowersLabel.identityContext = viewModel.identityContext
+        if !viewModel.isSelf, !followRelationshipShown, !viewModel.familiarFollowers.isEmpty {
+            familiarFollowersLabel.isHidden = false
+            familiarFollowersLabel.accounts = viewModel.familiarFollowers
+        } else {
+            familiarFollowersLabel.isHidden = true
         }
 
         let accessibilityAttributedLabel = NSMutableAttributedString(string: "")
@@ -263,6 +523,27 @@ private extension AccountView {
             accessibilityAttributedLabel.appendWithSeparator(viewModel.accountName)
         } else {
             accessibilityAttributedLabel.appendWithSeparator(viewModel.accountName)
+        }
+
+        if !visibilityRelationshipStack.isHidden, let visibility = visibilityRelationshipLabel.attributedText {
+            accessibilityAttributedLabel.appendWithSeparator(visibility)
+        }
+
+        if !followRelationshipStack.isHidden, let relationship = followRelationshipLabel.attributedText {
+            accessibilityAttributedLabel.appendWithSeparator(relationship)
+        }
+
+        if !familiarFollowersLabel.isHidden, let familiarFollowers = familiarFollowersLabel.attributedText {
+            accessibilityAttributedLabel.appendWithSeparator(familiarFollowers)
+        }
+
+        if !verifiedStack.isHidden, let verifiedValue = verifiedLabel.attributedText {
+            accessibilityAttributedLabel.appendWithSeparator(NSLocalizedString("account.verified", comment: ""))
+            accessibilityAttributedLabel.appendWithSeparator(verifiedValue)
+        }
+
+        if !relationshipNoteStack.isHidden, let relationshipNote = relationshipNotes.attributedText {
+            accessibilityAttributedLabel.appendWithSeparator(relationshipNote)
         }
 
         if !noteTextView.isHidden, let note = noteTextView.attributedText {

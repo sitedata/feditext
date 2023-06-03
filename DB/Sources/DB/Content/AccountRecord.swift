@@ -23,6 +23,7 @@ struct AccountRecord: ContentDatabaseRecord, Hashable {
     let fields: [Account.Field]
     let emojis: [Emoji]
     let bot: Bool
+    let group: Bool
     let discoverable: Bool
     let movedId: Account.Id?
 }
@@ -47,6 +48,7 @@ extension AccountRecord {
         static let fields = Column(CodingKeys.fields)
         static let emojis = Column(CodingKeys.emojis)
         static let bot = Column(CodingKeys.bot)
+        static let group = Column(CodingKeys.group)
         static let discoverable = Column(CodingKeys.discoverable)
         static let movedId = Column(CodingKeys.movedId)
     }
@@ -63,6 +65,15 @@ extension AccountRecord {
         StatusRecord.self,
         through: pinnedStatusJoins,
         using: AccountPinnedStatusJoin.status)
+    static let familiarFollowersJoins = hasMany(
+        FamiliarFollowersJoin.self,
+        using: ForeignKey([FamiliarFollowersJoin.Columns.followedAccountId])
+    )
+    static let familiarFollowers = hasMany(
+        AccountRecord.self,
+        through: familiarFollowersJoins,
+        using: FamiliarFollowersJoin.followingAccount
+    )
 
     var pinnedStatuses: QueryInterfaceRequest<StatusInfo> {
         StatusInfo.request(request(for: Self.pinnedStatuses))
@@ -87,6 +98,7 @@ extension AccountRecord {
         fields = account.fields
         emojis = account.emojis
         bot = account.bot
+        group = account.group
         discoverable = account.discoverable
         movedId = account.moved?.id
     }

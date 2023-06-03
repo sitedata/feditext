@@ -194,5 +194,85 @@
 			<string>%ld attachments</string>
 		</dict>
 	</dict>
+	<key>notifications.accounts-followed-you-%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@accounts@</string>
+		<key>accounts</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%ld person followed you</string>
+			<key>other</key>
+			<string>%ld people followed you</string>
+		</dict>
+	</dict>
+	<key>notifications.accounts-reblogged-your-status-%ld.post</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@accounts@</string>
+		<key>accounts</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%ld person boosted your post</string>
+			<key>other</key>
+			<string>%ld people boosted your post</string>
+		</dict>
+	</dict>
+	<key>notifications.accounts-reblogged-your-status-%ld.toot</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@accounts@</string>
+		<key>accounts</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%ld person boosted your toot</string>
+			<key>other</key>
+			<string>%ld people boosted your toot</string>
+		</dict>
+	</dict>
+	<key>notifications.accounts-favourited-your-status-%ld.post</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@accounts@</string>
+		<key>accounts</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%ld person favourited your post</string>
+			<key>other</key>
+			<string>%ld people favourited your post</string>
+		</dict>
+	</dict>
+	<key>notifications.accounts-favourited-your-status-%ld.toot</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@accounts@</string>
+		<key>accounts</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%ld person favourited your toot</string>
+			<key>other</key>
+			<string>%ld people favourited your toot</string>
+		</dict>
+	</dict>
 </dict>
 </plist>

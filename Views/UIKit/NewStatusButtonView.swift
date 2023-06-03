@@ -20,7 +20,6 @@ final class NewStatusButtonView: UIView {
 }
 
 private extension NewStatusButtonView {
-    // swiftlint:disable:next function_body_length
     func initialSetup() {
         let blurEffect = UIBlurEffect(style: .systemChromeMaterial)
         let blurView = UIVisualEffectView(effect: blurEffect)

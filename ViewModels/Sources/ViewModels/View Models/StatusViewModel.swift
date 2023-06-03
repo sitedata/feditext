@@ -47,27 +47,76 @@ public final class StatusViewModel: AttachmentsRenderingViewModel, ObservableObj
             .map { AttachmentViewModel(attachment: $0, identityContext: identityContext, status: statusService.status) }
         pollEmojis = statusService.status.displayStatus.poll?.emojis ?? []
     }
+
+    /// Fold statuses more than this many characters long.
+    /// Based on character count in parsed plain text of status.
+    public static let foldCharacterLimit: Int = 1000
+
+    /// Fold statuses with more than this many lines in the first `foldCharacterLimit` characters.
+    /// Based on newline count in parsed plain text of status.
+    public static let foldNewlineLimit: Int = 10
 }
 
 public extension StatusViewModel {
     var isMine: Bool { statusService.status.displayStatus.account.id == identityContext.identity.account?.id }
 
-    var shouldShowContent: Bool {
-        guard spoilerText != "" else { return true }
+    var showContentToggled: Bool {
+        configuration.showContentToggled
+    }
 
-        if identityContext.identity.preferences.readingExpandSpoilers {
-            return !configuration.showContentToggled
-        } else {
-            return configuration.showContentToggled
+    var hasSpoiler: Bool {
+        !spoilerText.isEmpty
+    }
+
+    var alwaysExpandSpoilers: Bool {
+        identityContext.identity.preferences.readingExpandSpoilers
+    }
+
+    var shouldHideDueToSpoiler: Bool {
+        guard !alwaysExpandSpoilers else {
+            return false
         }
+
+        return hasSpoiler
+    }
+
+    var foldLongContent: Bool {
+        identityContext.appPreferences.foldLongPosts
+    }
+
+    var hasLongContent: Bool {
+        let plainTextContent = statusService.status.displayStatus.content.attributed.string
+        if plainTextContent.count > Self.foldCharacterLimit {
+            return true
+        }
+        let newlineCount = plainTextContent.prefix(Self.foldCharacterLimit).filter { $0.isNewline }.count
+        return newlineCount > Self.foldNewlineLimit
+    }
+
+    var shouldHideDueToLongContent: Bool {
+        foldLongContent && hasLongContent
     }
 
     var shouldShowContentWarningButton: Bool {
-        if self.shouldShowContent {
+        if self.showContentToggled {
             return !identityContext.appPreferences.hideContentWarningButton
         } else {
             return true
         }
+    }
+
+    var shouldShowContent: Bool {
+        guard shouldHideDueToSpoiler || shouldHideDueToLongContent else {
+            return true
+        }
+
+        return showContentToggled
+    }
+
+    var shouldShowContentPreview: Bool {
+        shouldHideDueToLongContent
+            && !shouldHideDueToSpoiler
+            && !shouldShowContent
     }
 
     var shouldShowAttachments: Bool {
@@ -105,16 +154,27 @@ public extension StatusViewModel {
         }
     }
 
-    var time: String? { statusService.status.displayStatus.createdAt.timeAgo }
+    var time: String? { statusService.status.displayStatus.lastModified.timeAgo }
 
-    var accessibilityTime: String? { statusService.status.displayStatus.createdAt.accessibilityTimeAgo }
+    var accessibilityTime: String? { statusService.status.displayStatus.lastModified.accessibilityTimeAgo }
+
+    var edited: Bool { statusService.status.displayStatus.edited }
 
     var contextParentTime: String {
         Self.contextParentDateFormatter.string(from: statusService.status.displayStatus.createdAt)
     }
 
+    var contextParentEditedTime: String? {
+        statusService.status.displayStatus.editedAt.map { Self.contextParentDateFormatter.string(from: $0) }
+    }
+
     var accessibilityContextParentTime: String {
         Self.contextParentAccessibilityDateFormatter.string(from: statusService.status.displayStatus.createdAt)
+    }
+
+    var accessibilityContextParentEditedTime: String? {
+        statusService.status.displayStatus.editedAt
+            .map { Self.contextParentAccessibilityDateFormatter.string(from: $0) }
     }
 
     var applicationName: String? { statusService.status.displayStatus.application?.name }
@@ -187,8 +247,10 @@ public extension StatusViewModel {
 
     var canBeReblogged: Bool {
         switch statusService.status.displayStatus.visibility {
-        case .direct, .private:
+        case .direct:
             return false
+        case .private:
+            return isMine
         default:
             return true
         }
@@ -332,29 +394,19 @@ public extension StatusViewModel {
     }
 
     func deleteAndRedraft() {
-        let identityContext = self.identityContext
-        let isContextParent = configuration.isContextParent
-
-        eventsSubject.send(
+        compose(
             statusService.deleteAndRedraft()
-                .map { redraft, inReplyToStatusService in
-                    let inReplyToViewModel: StatusViewModel?
+                .map { status in ComposeOperation.redraft(status) }
+                .eraseToAnyPublisher()
+        )
+    }
 
-                    if let inReplyToStatusService = inReplyToStatusService {
-                        inReplyToViewModel = Self(
-                            statusService: inReplyToStatusService,
-                            identityContext: identityContext,
-                            eventsSubject: .init())
-                        inReplyToViewModel?.configuration = CollectionItem.StatusConfiguration.default.reply()
-                    } else {
-                        inReplyToViewModel = nil
-                    }
-
-                    return .compose(inReplyTo: inReplyToViewModel,
-                                    redraft: redraft,
-                                    redraftWasContextParent: isContextParent)
-                }
-                .eraseToAnyPublisher())
+    func edit() {
+        compose(
+            statusService.withSource()
+                .map { status in ComposeOperation.edit(status) }
+                .eraseToAnyPublisher()
+        )
     }
 
     func attachmentSelected(viewModel: AttachmentViewModel) {
@@ -397,6 +449,25 @@ public extension StatusViewModel {
                 .map { _ in .ignorableOutput }
                 .eraseToAnyPublisher())
     }
+
+    func presentHistory() {
+        let identityContext = identityContext
+        let navigationService = statusService.navigationService
+        let eventsSubject = eventsSubject
+        eventsSubject.send(
+            statusService.history()
+                .map { history in .presentHistory(
+                        StatusHistoryViewModel(
+                            identityContext: identityContext,
+                            navigationService: navigationService,
+                            eventsSubject: eventsSubject,
+                            history: history
+                        )
+                    )
+                }
+                .eraseToAnyPublisher()
+        )
+    }
 }
 
 private extension StatusViewModel {
@@ -417,4 +488,57 @@ private extension StatusViewModel {
 
         return dateFormatter
     }()
+
+    enum ComposeOperation {
+        case redraft(Status)
+        case edit(Status)
+
+        var redraft: Status? {
+            switch self {
+            case let .redraft(status):
+                return status
+            case .edit:
+                return nil
+            }
+        }
+
+        var edit: Status? {
+            switch self {
+            case .redraft:
+                return nil
+            case let .edit(status):
+                return status
+            }
+        }
+    }
+
+    /// Common across delete-redraft and edit actions.
+    func compose(_ operationPublisher: AnyPublisher<ComposeOperation, Error>) {
+        let identityContext = identityContext
+        let isContextParent = configuration.isContextParent
+
+        let eventPublisher = operationPublisher
+            .zip(statusService.inReplyTo())
+            .map { operation, inReplyToStatusService in
+                let inReplyToViewModel = inReplyToStatusService.map { statusService in
+                    let viewModel = Self(
+                        statusService: statusService,
+                        identityContext: identityContext,
+                        eventsSubject: .init()
+                    )
+                    viewModel.configuration = CollectionItem.StatusConfiguration.default.reply()
+                    return viewModel
+                }
+
+                return CollectionItemEvent.compose(
+                    inReplyTo: inReplyToViewModel,
+                    redraft: operation.redraft,
+                    edit: operation.edit,
+                    wasContextParent: isContextParent
+                )
+            }
+            .eraseToAnyPublisher()
+
+        eventsSubject.send(eventPublisher)
+    }
 }

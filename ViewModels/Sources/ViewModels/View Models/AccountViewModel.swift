@@ -9,10 +9,11 @@ public final class AccountViewModel: ObservableObject {
     public let identityContext: IdentityContext
     public internal(set) var configuration = CollectionItem.AccountConfiguration.withNote
     public internal(set) var relationship: Relationship?
+    public internal(set) var familiarFollowers = [Account]()
     public internal(set) var identityProofs = [IdentityProof]()
     public internal(set) var featuredTags = [FeaturedTag]()
 
-    private let accountService: AccountService
+    internal let accountService: AccountService
     private let eventsSubject: PassthroughSubject<AnyPublisher<CollectionItemEvent, Error>, Never>
 
     init(accountService: AccountService,
@@ -63,6 +64,22 @@ public extension AccountViewModel {
 
     var isSelf: Bool { accountService.account.id == identityContext.identity.account?.id }
 
+    var isBot: Bool { accountService.account.bot }
+
+    var isGroup: Bool { accountService.account.group }
+
+    var accountTypeText: String {
+        if isBot && isGroup {
+            return NSLocalizedString("account.type.bot-group", comment: "")
+        } else if isBot {
+            return NSLocalizedString("account.type.bot", comment: "")
+        } else if isGroup {
+            return NSLocalizedString("account.type.group", comment: "")
+        } else {
+            return ""
+        }
+    }
+
     func avatarURL(profile: Bool = false) -> URL {
         if identityContext.appPreferences.animateAvatars == .everywhere
             || (identityContext.appPreferences.animateAvatars == .profiles && profile) {
@@ -92,6 +109,25 @@ public extension AccountViewModel {
             Just(.navigation(.collection(accountService.followersService())))
                 .setFailureType(to: Error.self)
                 .eraseToAnyPublisher())
+    }
+
+    func familiarFollowersSelected() {
+        eventsSubject.send(
+            Just(
+                .navigation(
+                    .collection(
+                        identityContext
+                            .service
+                            .navigationService
+                            .familiarFollowersService(
+                                familiarFollowers: familiarFollowers
+                            )
+                    )
+                )
+            )
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+        )
     }
 
     func reportViewModel() -> ReportViewModel {
@@ -190,6 +226,10 @@ public extension AccountViewModel {
 
     func unpin() {
         ignorableOutputEvent(accountService.unpin())
+    }
+
+    func editNote() {
+        eventsSubject.send(Just(.editNote(self)).setFailureType(to: Error.self).eraseToAnyPublisher())
     }
 
     func set(note: String) {

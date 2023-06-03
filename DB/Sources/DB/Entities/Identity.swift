@@ -19,6 +19,7 @@ public struct Identity: Codable, Hashable, Identifiable {
 public extension Identity {
     typealias Id = UUID
 
+    /// Summary version of `Mastodon.Instance` that should be available anywhere an identity is.
     struct Instance: Codable, Hashable {
         public let uri: String
         public let streamingAPI: UnicodeURL
@@ -26,6 +27,7 @@ public extension Identity {
         public let thumbnail: UnicodeURL?
         public let version: String
         public let maxTootChars: Int?
+        public let rules: [Rule]?
     }
 
     struct Account: Codable, Hashable {
@@ -69,6 +71,7 @@ public extension Identity.Preferences {
         if useServerPostingReadingPreferences {
             mutable.postingDefaultVisibility = serverPreferences.postingDefaultVisibility
             mutable.postingDefaultSensitive = serverPreferences.postingDefaultSensitive
+            mutable.postingDefaultLanguage = serverPreferences.postingDefaultLanguage
             mutable.readingExpandMedia = serverPreferences.readingExpandMedia
             mutable.readingExpandSpoilers = serverPreferences.readingExpandSpoilers
         }

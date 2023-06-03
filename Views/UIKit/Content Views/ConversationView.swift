@@ -62,7 +62,6 @@ extension ConversationView: UIContentView {
 }
 
 private extension ConversationView {
-    // swiftlint:disable:next function_body_length
     func initialSetup() {
         let containerStackView = UIStackView()
         let sideStackView = UIStackView()

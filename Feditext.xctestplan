@@ -9,11 +9,7 @@
     }
   ],
   "defaultOptions" : {
-    "targetForVariableExpansion" : {
-      "containerPath" : "container:Metatext.xcodeproj",
-      "identifier" : "D047FA8B24C3E21200AF17C5",
-      "name" : "Metatext"
-    }
+
   },
   "testTargets" : [
     {

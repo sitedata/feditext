@@ -10,6 +10,7 @@ extension CollectionItem {
         AccountTableViewCell.self,
         LoadMoreTableViewCell.self,
         NotificationTableViewCell.self,
+        MultiNotificationTableViewCell.self,
         ConversationTableViewCell.self,
         TagTableViewCell.self,
         AnnouncementTableViewCell.self,
@@ -25,6 +26,8 @@ extension CollectionItem {
             return LoadMoreTableViewCell.self
         case let .notification(_, statusConfiguration):
             return statusConfiguration == nil ? NotificationTableViewCell.self : StatusTableViewCell.self
+        case .multiNotification:
+            return MultiNotificationTableViewCell.self
         case .conversation:
             return ConversationTableViewCell.self
         case .tag:
@@ -44,8 +47,14 @@ extension CollectionItem {
                 identityContext: identityContext,
                 status: status,
                 configuration: configuration)
-        case let .account(account, configuration, _):
-            return AccountView.estimatedHeight(width: width, account: account, configuration: configuration)
+        case let .account(account, configuration, relationship, familiarFollowers):
+            return AccountView.estimatedHeight(
+                width: width,
+                account: account,
+                configuration: configuration,
+                relationship: relationship,
+                familiarFollowers: familiarFollowers
+            )
         case .loadMore:
             return LoadMoreView.estimatedHeight
         case let .notification(notification, configuration):
@@ -54,6 +63,12 @@ extension CollectionItem {
                 identityContext: identityContext,
                 notification: notification,
                 configuration: configuration)
+        case let .multiNotification(notifications, _, _, status):
+            return MultiNotificationView.estimatedHeight(
+                width: width,
+                identityContext: identityContext,
+                notifications: notifications,
+                status: status)
         case let .conversation(conversation):
             return ConversationView.estimatedHeight(
                 width: width,
@@ -72,7 +87,7 @@ extension CollectionItem {
         switch self {
         case let .status(status, _, _):
             return status.mediaPrefetchURLs(identityContext: identityContext)
-        case let .account(account, _, _):
+        case let .account(account, _, _, _):
             return account.mediaPrefetchURLs(identityContext: identityContext)
         case let .notification(notification, _):
             var urls = notification.account.mediaPrefetchURLs(identityContext: identityContext)

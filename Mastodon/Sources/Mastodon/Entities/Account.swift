@@ -21,6 +21,7 @@ public final class Account: Codable, Identifiable {
     public let fields: [Field]
     public let emojis: [Emoji]
     @DecodableDefault.False public private(set) var bot: Bool
+    @DecodableDefault.False public private(set) var group: Bool
     @DecodableDefault.False public private(set) var discoverable: Bool
     public var moved: Account?
     public var source: Source?
@@ -43,6 +44,7 @@ public final class Account: Codable, Identifiable {
                 fields: [Account.Field],
                 emojis: [Emoji],
                 bot: Bool,
+                group: Bool,
                 discoverable: Bool,
                 moved: Account?) {
         self.id = id
@@ -63,6 +65,7 @@ public final class Account: Codable, Identifiable {
         self.fields = fields
         self.emojis = emojis
         self.bot = bot
+        self.group = group
         self.discoverable = discoverable
         self.moved = moved
     }
@@ -107,30 +110,12 @@ extension Account: Hashable {
             lhs.fields == rhs.fields &&
             lhs.emojis == rhs.emojis &&
             lhs._bot == rhs._bot &&
+            lhs._group == rhs._group &&
             lhs._discoverable == rhs._discoverable &&
             lhs.moved == rhs.moved
     }
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
-        hasher.combine(username)
-        hasher.combine(acct)
-        hasher.combine(displayName)
-        hasher.combine(locked)
-        hasher.combine(createdAt)
-        hasher.combine(followersCount)
-        hasher.combine(followingCount)
-        hasher.combine(statusesCount)
-        hasher.combine(note)
-        hasher.combine(url)
-        hasher.combine(avatar)
-        hasher.combine(avatarStatic)
-        hasher.combine(header)
-        hasher.combine(headerStatic)
-        hasher.combine(fields)
-        hasher.combine(emojis)
-        hasher.combine(bot)
-        hasher.combine(discoverable)
-        hasher.combine(moved)
     }
 }

@@ -186,6 +186,8 @@ class TableViewController: UITableViewController {
         sizeTableHeaderFooterViews()
     }
 
+    // TODO: (Vyr) can we subsume this into timeline actions?
+    /// Not used if `viewModel.timelineActionViewModel` exists because that takes precedence.
     func configureRightBarButtonItem(expandAllState: ExpandAllState) {
         switch expandAllState {
         case .hidden:
@@ -304,6 +306,12 @@ extension TableViewController: NavigationHandling {
         case let .url(url):
             open(url: url, identityContext: viewModel.identityContext)
             webfingerIndicatorView.stopAnimating()
+        case let .authenticatedWebView(authenticatedWebViewService, url):
+            authenticatedWebViewService
+                .authenticatedWebViewPublisher(url: url)
+                .sink { _ in } receiveValue: { _ in }
+                .store(in: &cancellables)
+            webfingerIndicatorView.stopAnimating()
         case .searchScope:
             break
         case .webfingerStart:
@@ -409,9 +417,13 @@ private extension TableViewController {
             .sink { [weak self] in self?.handle(event: $0) }
             .store(in: &cancellables)
 
-        viewModel.expandAll.receive(on: DispatchQueue.main)
-            .sink { [weak self] in self?.configureRightBarButtonItem(expandAllState: $0) }
-            .store(in: &cancellables)
+        if let timelineActionViewModel = viewModel.timelineActionViewModel {
+            setupTimelineActionBarButtonItem(timelineActionViewModel)
+        } else {
+            viewModel.expandAll.receive(on: DispatchQueue.main)
+                .sink { [weak self] in self?.configureRightBarButtonItem(expandAllState: $0) }
+                .store(in: &cancellables)
+        }
 
         viewModel.loading.receive(on: DispatchQueue.main).assign(to: &$loading)
 
@@ -461,7 +473,7 @@ private extension TableViewController {
             .store(in: &cancellables)
 
         NotificationCenter.default.publisher(for: UIScene.willEnterForegroundNotification)
-            .merge(with: NotificationCenter.default.publisher(for: NewStatusViewController.newStatusPostedNotification))
+            .merge(with: NotificationCenter.default.publisher(for: ComposeStatusViewController.newStatusPostedNotification))
             .sink { [weak self] _ in
                 guard let self = self, self.isVisible else { return }
 
@@ -553,11 +565,12 @@ private extension TableViewController {
             presentEmojiPicker(sourceViewTag: sourceViewTag, selectionAction: selectionAction)
         case let .attachment(attachmentViewModel, statusViewModel):
             present(attachmentViewModel: attachmentViewModel, statusViewModel: statusViewModel)
-        case let .compose(identity, inReplyToViewModel, redraft, redraftWasContextParent, directMessageTo):
+        case let .compose(identity, inReplyToViewModel, redraft, edit, wasContextParent, directMessageTo):
             compose(identity: identity,
                     inReplyToViewModel: inReplyToViewModel,
                     redraft: redraft,
-                    redraftWasContextParent: redraftWasContextParent,
+                    edit: edit,
+                    wasContextParent: wasContextParent,
                     directMessageTo: directMessageTo)
         case let .confirmDelete(statusViewModel, redraft):
             confirmDelete(statusViewModel: statusViewModel, redraft: redraft)
@@ -583,6 +596,10 @@ private extension TableViewController {
             report(reportViewModel: reportViewModel)
         case let .accountListEdit(accountViewModel, edit):
             accountListEdit(accountViewModel: accountViewModel, edit: edit)
+        case let .presentHistory(history):
+            present(history: history)
+        case let .editNote(accountViewModel):
+            editNote(accountViewModel: accountViewModel)
         }
     }
 
@@ -671,21 +688,34 @@ private extension TableViewController {
         }
     }
 
-    func compose(identity: Identity?,
-                 inReplyToViewModel: StatusViewModel?,
-                 redraft: Status?,
-                 redraftWasContextParent: Bool,
-                 directMessageTo: AccountViewModel?) {
-        if redraftWasContextParent {
+    func present(history: StatusHistoryViewModel) {
+        let hostingController = UIHostingController(
+            rootView: StatusEditHistoryView(history)
+        )
+        present(hostingController, animated: true)
+    }
+
+    // swiftlint:disable:next function_parameter_count
+    func compose(
+        identity: Identity?,
+        inReplyToViewModel: StatusViewModel?,
+        redraft: Status?,
+        edit: Status?,
+        wasContextParent: Bool,
+        directMessageTo: AccountViewModel?
+    ) {
+        if wasContextParent {
             navigationController?.popViewController(animated: true)
         }
 
-        rootViewModel?.navigationViewModel?.presentedNewStatusViewModel = rootViewModel?.newStatusViewModel(
+        rootViewModel?.navigationViewModel?.presentedComposeStatusViewModel = rootViewModel?.composeStatusViewModel(
             identityContext: viewModel.identityContext,
             identity: identity,
             inReplyTo: inReplyToViewModel,
             redraft: redraft,
-            directMessageTo: directMessageTo)
+            edit: edit,
+            directMessageTo: directMessageTo
+        )
     }
 
     func confirmDelete(statusViewModel: StatusViewModel, redraft: Bool) {
@@ -819,6 +849,16 @@ private extension TableViewController {
         viewModel.applyAccountListEdit(viewModel: accountViewModel, edit: edit)
     }
 
+    func editNote(accountViewModel: AccountViewModel) {
+        let hostingController = UIHostingController(
+            rootView: EditNoteView(
+                accountViewModel: accountViewModel,
+                noteViewModel: NoteViewModel(note: accountViewModel.relationship?.note ?? "")
+            )
+        )
+        present(hostingController, animated: true)
+    }
+
     func share(url: URL) {
         let activityViewController = UIActivityViewController(
             activityItems: [url],
@@ -893,6 +933,43 @@ private extension TableViewController {
 
         snapshot.reloadItems(visibleItems)
         dataSource.apply(snapshot, animatingDifferences: false)
+    }
+
+    func setupTimelineActionBarButtonItem(_ timelineActionViewModel: TimelineActionViewModel) {
+        switch timelineActionViewModel {
+        case let .tag(tagTimelineActionViewModel):
+            tagTimelineActionViewModel.tag
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] tag in
+                    switch tag?.following {
+                    case nil:
+                        self?.navigationItem.rightBarButtonItem = nil
+                    case .some(false):
+                        self?.navigationItem.rightBarButtonItem = .init(
+                            title: NSLocalizedString(
+                                "tag.followed.add",
+                                comment: ""
+                            ),
+                            image: UIImage(named: "tag.followed.add"),
+                            primaryAction: .init { [weak tagTimelineActionViewModel] _ in
+                                tagTimelineActionViewModel?.follow()
+                            }
+                        )
+                    case .some(true):
+                        self?.navigationItem.rightBarButtonItem = .init(
+                            title: NSLocalizedString(
+                                "tag.followed.remove",
+                                comment: ""
+                            ),
+                            image: UIImage(named: "tag.followed.remove"),
+                            primaryAction: .init { [weak tagTimelineActionViewModel] _ in
+                                tagTimelineActionViewModel?.unfollow()
+                            }
+                        )
+                    }
+                }
+                .store(in: &cancellables)
+        }
     }
 }
 // swiftlint:enable file_length

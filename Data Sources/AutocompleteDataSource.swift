@@ -26,7 +26,7 @@ final class AutocompleteDataSource: UICollectionViewDiffableDataSource<Autocompl
 
     init(collectionView: UICollectionView,
          queryPublisher: AnyPublisher<String?, Never>,
-         parentViewModel: NewStatusViewModel) {
+         parentViewModel: ComposeStatusViewModel) {
         searchViewModel = SearchViewModel(identityContext: parentViewModel.identityContext)
         emojiPickerViewModel = EmojiPickerViewModel(identityContext: parentViewModel.identityContext, queryOnly: true)
 
@@ -108,7 +108,7 @@ private extension AutocompleteDataSource {
         var newSnapshot = NSDiffableDataSourceSnapshot<AutocompleteSection, AutocompleteItem>()
         let items: [AutocompleteItem] = searchViewModelUpdate.sections.map(\.items).reduce([], +).compactMap {
             switch $0 {
-            case let .account(account, _, _):
+            case let .account(account, _, _, _):
                 return .account(account)
             case let .tag(tag):
                 return .tag(tag)

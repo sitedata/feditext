@@ -29,6 +29,8 @@ final class TableViewDataSource: UITableViewDiffableDataSource<CollectionSection
                 loadMoreCell.viewModel = loadMoreViewModel
             case let (notificationCell as NotificationTableViewCell, notificationViewModel as NotificationViewModel):
                 notificationCell.viewModel = notificationViewModel
+            case let (multiNotificationCell as MultiNotificationTableViewCell, multiNotificationViewModel as MultiNotificationViewModel):
+                multiNotificationCell.viewModel = multiNotificationViewModel
             case let (conversationCell as ConversationTableViewCell, conversationViewModel as ConversationViewModel):
                 conversationCell.viewModel = conversationViewModel
             case let (tagCell as TagTableViewCell, tagViewModel as TagViewModel):

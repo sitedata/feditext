@@ -296,6 +296,52 @@ extension ContentDatabase {
             }
         }
 
+        migrator.registerMigration("1.7.4-edit-history") { db in
+            try db.alter(table: "statusRecord") { t in
+                t.add(column: "editedAt", .datetime)
+            }
+        }
+
+        migrator.registerMigration("1.7.4-reports-phase-1") { db in
+            try db.create(table: "reportRecord") { t in
+                t.column("id", .text).primaryKey(onConflict: .replace)
+                t.column("actionTaken", .boolean).notNull()
+            }
+
+            try db.alter(table: "notificationRecord") { t in
+                t.add(column: "reportId", .text)
+                    .references("reportRecord", onDelete: .cascade)
+            }
+        }
+
+        migrator.registerMigration("1.7.4-followed-tags") { db in
+            try db.create(table: "followedTag") { t in
+                t.column("name", .text).primaryKey(onConflict: .replace)
+            }
+        }
+
+        migrator.registerMigration("1.7.4-rules") { db in
+            try db.alter(table: "instanceRecord") { t in
+                t.add(column: "rules", .blob)
+            }
+        }
+
+        migrator.registerMigration("1.7.4-account-group-flag") { db in
+            try db.alter(table: "accountRecord") { t in
+                t.add(column: "group", .boolean).notNull().defaults(to: false)
+            }
+        }
+
+        migrator.registerMigration("1.7.4-familiar-followers") { db in
+            try db.create(table: "familiarFollowersJoin") { t in
+                t.column("followedAccountId", .text).indexed().notNull()
+                    .references("accountRecord", onDelete: .cascade)
+                t.column("followingAccountId", .text).indexed().notNull()
+                    .references("accountRecord", onDelete: .cascade)
+                t.primaryKey(["followedAccountId", "followingAccountId"], onConflict: .replace)
+            }
+        }
+
         return migrator
     }
 }

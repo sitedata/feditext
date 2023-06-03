@@ -126,10 +126,10 @@
 			<key>CFBundleURLIconFile</key>
 			<string>AppIconClassic@3x</string>
 			<key>CFBundleURLName</key>
-			<string>com.metabolist.metatext</string>
+			<string>com.gotgoat.metatext</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>metatext</string>
+				<string>feditext</string>
 			</array>
 		</dict>
 	</array>
@@ -151,6 +151,8 @@
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<true/>
+		<key>UISceneConfigurations</key>
+		<dict/>
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>

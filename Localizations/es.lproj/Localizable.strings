@@ -50,6 +50,10 @@
 "account.statuses.toot" = "Toots";
 "account.statuses-and-replies.post" = "Publicaciones y respuestas";
 "account.statuses-and-replies.toot" = "Toots y respuestas";
+"account.statuses-and-replies.short" = "y respuestas";
+"account.statuses-and-boosts.post" = "Publicaciones y boosts";
+"account.statuses-and-boosts.toot" = "Toots y boosts";
+"account.statuses-and-boosts.short" = "y boosts";
 "account.media" = "Multimedia";
 "account.show-reblogs" = "Mostrar boosts";
 "account.show-reblogs.confirm-%@" = "¿Mostrar boosts de %@?";
@@ -195,6 +199,7 @@
 "notification.status-%@" = "%@ acaba de publicar";
 "notifications.all" = "Todos";
 "notifications.mentions" = "Menciones";
+"notifications.admin" = "Administración";
 "ok" = "OK";
 "pending.pending-confirmation" = "Tu cuenta está pendiente de confirmación";
 "post.noun" = "Publicación";
@@ -223,6 +228,8 @@
 "preferences.media.autoplay.wifi" = "Con Wi-Fi";
 "preferences.media.autoplay.never" = "Nunca";
 "preferences.use-preferences-from-server" = "Usar preferencias del servidor";
+"preferences.posting-default-language" = "Lingua por defecto";
+"preferences.posting-default-language.not-set" = "Sin configuración";
 "preferences.posting-default-visiblility" = "Visibilidad por defecto";
 "preferences.posting-default-sensitive" = "Marcar contenido delicado por defecto";
 "preferences.reading-expand-media" = "Expandir multimedia";
@@ -233,6 +240,7 @@
 "preferences.filters" = "Filtros";
 "preferences.links.open-in-default-browser" = "Abrir enlaces en el navegador predeterminado";
 "preferences.links.use-universal-links" = "Abrir enlaces en otras aplicaciones cuando estén disponibles";
+"preferences.long-content.fold" = "Doblar texto largo";
 "preferences.notification-types" = "Tipos de notificación";
 "preferences.notification-types.follow" = "Seguir";
 "preferences.notification-types.favourite" = "Favorito";
@@ -241,6 +249,9 @@
 "preferences.notification-types.mention" = "Mencionar";
 "preferences.notification-types.poll" = "Encuesta";
 "preferences.notification-types.status" = "Suscripción";
+"preferences.notification-types.update" = "Editar";
+"preferences.notification-types.admin-signup" = "Enrolar";
+"preferences.notification-types.admin-report" = "Reportar";
 "preferences.notifications" = "Notificaciones";
 "preferences.notifications.include-account-name" = "Añade un nombre de cuenta";
 "preferences.notifications.include-pictures" = "Añade imágenes";
@@ -286,6 +297,8 @@
 "notifications.followed-you-%@" = "%@ te ha seguido";
 "notifications.poll-ended" = "Una encuesta en la que votaste ha finalizado";
 "notifications.your-poll-ended" = "Tu encuesta ha finalizado";
+"notifications.signed-up-%@" = "%@ enroló";
+"notifications.reported-an-account-%@" = "%@ reportó a una cuenta";
 "notifications.unknown-%@" = "Notificación de %@";
 "remove" = "Eliminar";
 "report" = "Reportar";
@@ -317,6 +330,13 @@
 "status.delete-and-redraft" = "Eliminar y volver a redactar";
 "status.delete-and-redraft.confirm.post" = "¿Estás seguro de que quieres eliminar esta publicación y volverla a redactar? Tus boosts y favoritos se perderán y las respuestas a la publicación original se quedarán colgando.";
 "status.delete-and-redraft.confirm.toot" = "¿Estás seguro de que quieres eliminar este toot y volver a redactarlo? Los favoritos y los boosts se perderán y las respuestas al toot original quedarán colgando.";
+"status.edit" = "Editar";
+"status.edited" = "Editado";
+"status.edit-history.not-available.post" = "Esta publicación ha fue editado, pero esta no tiene un historial de ediciones para ver.";
+"status.edit-history.not-available.toot" = "Esta toot ha fue editado, pero esta no tiene un historial de ediciones para ver.";
+"status.edit-history.versions" = "Versiones";
+"status.edit-history.versions.select" = "Seleccionar un edicion";
+"status.edit-history.view" = "Ver historial de ediciones";
 "status.mute" = "Silenciar conversación";
 "status.new-items.post" = "Nuevas publicaciones";
 "status.new-items.toot" = "Nuevos toots";
@@ -361,3 +381,4 @@
 "timelines.federated" = "Federado";
 "toot.action" = "Tootear";
 "toot.noun" = "Toot";
+"update.action" = "Actualizar";

@@ -92,11 +92,41 @@ public extension StatusService {
             .eraseToAnyPublisher()
     }
 
-    func deleteAndRedraft() -> AnyPublisher<(Status, Self?), Error> {
-        let inReplyToPublisher: AnyPublisher<Self?, Never>
+    func deleteAndRedraft() -> AnyPublisher<Status, Error> {
+        return mastodonAPIClient.request(StatusEndpoint.delete(id: status.displayStatus.id))
+            .flatMap { status in contentDatabase.delete(id: status.id).collect().map { _ in status } }
+            .eraseToAnyPublisher()
+    }
 
+    /// Called when editing a status to fetch the raw source text.
+    func withSource() -> AnyPublisher<Status, Error> {
+        guard status.displayStatus.text == nil else {
+            // Either we're using a non-standard backend that always provides this,
+            // or we already had it from a previous edit attempt.
+            return Just(status.displayStatus)
+                .setFailureType(to: Error.self)
+                .eraseToAnyPublisher()
+        }
+
+        // We normally won't have this from Mastodon proper, since it's only set
+        // on the status returned from a delete, so we have to ask for it.
+        return mastodonAPIClient.request(StatusSourceEndpoint.source(id: status.displayStatus.id))
+            .andAlso { contentDatabase.update(id: status.displayStatus.id, source: $0) }
+            .map { status.displayStatus.with(source: $0) }
+            .eraseToAnyPublisher()
+    }
+
+    /// Retrieve the edit history.
+    func history() -> AnyPublisher<[StatusEdit], Error> {
+        // TODO: (Vyr) use DB as cache
+        mastodonAPIClient.request(StatusEditsEndpoint.history(id: status.displayStatus.id))
+    }
+
+    /// Re-fetch the status being replied to, but we're okay with it failing,
+    /// in which case it will succeed but return nil.
+    func inReplyTo() -> AnyPublisher<Self?, Error> {
         if let inReplyToId = status.displayStatus.inReplyToId {
-            inReplyToPublisher = mastodonAPIClient.request(StatusEndpoint.status(id: inReplyToId))
+            return mastodonAPIClient.request(StatusEndpoint.status(id: inReplyToId))
                 .map {
                     Self(environment: environment,
                          status: $0,
@@ -104,15 +134,13 @@ public extension StatusService {
                          contentDatabase: contentDatabase) as Self?
                 }
                 .replaceError(with: nil)
+                .setFailureType(to: Error.self)
                 .eraseToAnyPublisher()
         } else {
-            inReplyToPublisher = Just(nil).eraseToAnyPublisher()
+            return Just(nil)
+                .setFailureType(to: Error.self)
+                .eraseToAnyPublisher()
         }
-
-        return mastodonAPIClient.request(StatusEndpoint.delete(id: status.displayStatus.id))
-            .flatMap { status in contentDatabase.delete(id: status.id).collect().map { _ in status } }
-            .zip(inReplyToPublisher.setFailureType(to: Error.self))
-            .eraseToAnyPublisher()
     }
 
     func rebloggedByService() -> AccountListService {
@@ -120,7 +148,9 @@ public extension StatusService {
             endpoint: .rebloggedBy(id: status.id),
             environment: environment,
             mastodonAPIClient: mastodonAPIClient,
-            contentDatabase: contentDatabase)
+            contentDatabase: contentDatabase,
+            titleComponents: ["account-list.title.reblogged-by"]
+        )
     }
 
     func favoritedByService() -> AccountListService {
@@ -128,7 +158,9 @@ public extension StatusService {
             endpoint: .favouritedBy(id: status.id),
             environment: environment,
             mastodonAPIClient: mastodonAPIClient,
-            contentDatabase: contentDatabase)
+            contentDatabase: contentDatabase,
+            titleComponents: ["account-list.title.favourited-by"]
+        )
     }
 
     func vote(selectedOptions: Set<Int>) -> AnyPublisher<Never, Error> {

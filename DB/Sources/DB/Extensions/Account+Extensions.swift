@@ -44,6 +44,7 @@ private extension Account {
                   fields: record.fields,
                   emojis: record.emojis,
                   bot: record.bot,
+                  group: record.group,
                   discoverable: record.discoverable,
                   moved: moved)
     }
