@@ -46,7 +46,7 @@ public extension MastodonNotification {
         case followRequest = "follow_request"
         case status
         case update
-        case adminSignup = "admin.signup"
+        case adminSignup = "admin.sign_up"
         case adminReport = "admin.report"
         case unknown
 
