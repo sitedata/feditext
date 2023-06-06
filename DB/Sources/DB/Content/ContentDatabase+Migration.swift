@@ -352,9 +352,11 @@ extension ContentDatabase {
                 t.column("text", .text).notNull()
             }
 
+            // Delete all stored notifications because we're about to mess with a table that they join to.
+            try db.execute(sql: "DELETE FROM notificationRecord")
+
             // Note: it's possible for a report notification to refer to statuses or rules that no longer exist,
             // so we don't enforce a foreign key constraint on `ruleId`.
-
             try db.create(table: "reportRuleJoin") { t in
                 t.column("reportId", .text).indexed().notNull()
                     .references("reportRecord", onDelete: .cascade)
@@ -363,15 +365,21 @@ extension ContentDatabase {
                 t.primaryKey(["reportId", "ruleId"], onConflict: .replace)
             }
 
-            try db.alter(table: "reportRecord") { t in
-                t.add(column: "actionTakenAt", .date)
-                t.add(column: "category", .text).notNull()
-                t.add(column: "comment", .text).notNull()
-                t.add(column: "forwarded", .boolean).notNull()
-                t.add(column: "createdAt", .date).notNull()
+            // Drop and re-create this table because we're adding a bunch of non-nullable columns without defaults,
+            // which SQLite won't let you do (even if the table is empty, which it might not be).
+            // See https://www.sqlite.org/lang_altertable.html#alter_table_add_column
+            try db.drop(table: "reportRecord")
+            try db.create(table: "reportRecord") { t in
+                t.column("id", .text).primaryKey(onConflict: .replace)
+                t.column("actionTaken", .boolean).notNull()
+                t.column("actionTakenAt", .date)
+                t.column("category", .text).notNull()
+                t.column("comment", .text).notNull()
+                t.column("forwarded", .boolean).notNull()
+                t.column("createdAt", .date).notNull()
                 // We store this as a blob because we don't currently join on it: status IDs are shown only as a count.
-                t.add(column: "statusIds", .blob).notNull()
-                t.add(column: "targetAccountId").indexed().notNull().references("accountRecord", onDelete: .cascade)
+                t.column("statusIds", .blob).notNull()
+                t.column("targetAccountId").indexed().notNull().references("accountRecord", onDelete: .cascade)
             }
         }
 

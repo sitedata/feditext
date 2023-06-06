@@ -18,6 +18,7 @@ class NotificationReportView: UIView {
     private let categoryStackView = UIStackView()
     private let categoryIcon = UIImageView()
     private let categoryLabel = UILabel()
+    private var rules = [Rule]()
     private let ruleStackView = UIStackView()
     private let commentLabel = UILabel()
 
@@ -174,36 +175,42 @@ class NotificationReportView: UIView {
             accessibilityAttributedLabel.appendWithSeparator(NSLocalizedString("report.category", comment: ""))
             accessibilityAttributedLabel.appendWithSeparator(category.title)
 
-            for subview in ruleStackView.arrangedSubviews {
-                subview.removeFromSuperview()
-            }
+            if rules != viewModel.rules {
+                // We guard these view changes because the view model seems to be assigned to many times during
+                // the animation when a notification is tapped, causing flashes of wrong colors or out of place views.
+                rules = viewModel.rules
 
-            for rule in viewModel.rules {
-                let ruleHStackView = UIStackView()
-                ruleStackView.addArrangedSubview(ruleHStackView)
-                ruleHStackView.axis = .horizontal
-                ruleHStackView.spacing = .compactSpacing
+                for subview in ruleStackView.arrangedSubviews {
+                    subview.removeFromSuperview()
+                }
 
-                let ruleIcon = UIImageView(
-                    image: .init(
-                        systemName: "xmark.octagon.fill",
-                        withConfiguration: UIImage.SymbolConfiguration(scale: .small)
+                for rule in viewModel.rules {
+                    let ruleHStackView = UIStackView()
+                    ruleStackView.addArrangedSubview(ruleHStackView)
+                    ruleHStackView.axis = .horizontal
+                    ruleHStackView.spacing = .compactSpacing
+
+                    let ruleIcon = UIImageView(
+                        image: .init(
+                            systemName: "xmark.octagon.fill",
+                            withConfiguration: UIImage.SymbolConfiguration(scale: .small)
+                        )
                     )
-                )
-                ruleHStackView.addArrangedSubview(ruleIcon)
-                ruleIcon.tintColor = .systemOrange
-                ruleIcon.adjustsImageSizeForAccessibilityContentSizeCategory = true
+                    ruleHStackView.addArrangedSubview(ruleIcon)
+                    ruleIcon.tintColor = .systemOrange
+                    ruleIcon.adjustsImageSizeForAccessibilityContentSizeCategory = true
 
-                let ruleLabel = UILabel()
-                ruleHStackView.addArrangedSubview(ruleLabel)
-                // Intentionally left defaulted to one line because some rules are llllooooonnggg.
-                ruleLabel.font = .preferredFont(forTextStyle: .subheadline)
-                ruleLabel.adjustsFontForContentSizeCategory = true
-                ruleLabel.textColor = .secondaryLabel
-                ruleLabel.text = rule.text
-                // Also intentionally left out of accessibility label for the same reason.
+                    let ruleLabel = UILabel()
+                    ruleHStackView.addArrangedSubview(ruleLabel)
+                    // Intentionally left defaulted to one line because some rules are llllooooonnggg.
+                    ruleLabel.font = .preferredFont(forTextStyle: .subheadline)
+                    ruleLabel.adjustsFontForContentSizeCategory = true
+                    ruleLabel.textColor = .secondaryLabel
+                    ruleLabel.text = rule.text
+                    // Also intentionally left out of accessibility label for the same reason.
+                }
+                ruleStackView.isHidden = viewModel.rules.isEmpty
             }
-            ruleStackView.isHidden = viewModel.rules.isEmpty
 
             let comment = viewModel.report.comment
             commentLabel.isHidden = comment.isEmpty
