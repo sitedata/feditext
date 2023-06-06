@@ -45,7 +45,7 @@ public struct NotificationsService {
                 }
             }
             .handleEvents(receiveOutput: {
-                guard case let .notification(notification, _) = $0.last?.items.last,
+                guard case let .notification(notification, _, _) = $0.last?.items.last,
                       notification.id < nextPageMaxIdSubject.value
                 else { return }
 
@@ -74,6 +74,17 @@ extension NotificationsService: CollectionService {
 
                 nextPageMaxIdSubject.send(maxId)
             })
+            .andAlso {
+                // If any of the notifications are reports with rule IDs, update rules.
+                if $0.result.contains(where: { notification in !(notification.report?.ruleIds?.isEmpty ?? true) }) {
+                    return mastodonAPIClient.request(RulesEndpoint.rules)
+                        .flatMap { rules in contentDatabase.update(rules: rules) }
+                        .eraseToAnyPublisher()
+                } else {
+                    return Empty(outputType: Never.self, failureType: Error.self)
+                        .eraseToAnyPublisher()
+                }
+            }
             .flatMap { contentDatabase.insert(notifications: $0.result) }
             .eraseToAnyPublisher()
     }
@@ -141,6 +152,7 @@ private extension NotificationsService {
                                 notification.date,
                                 .notification(
                                     notification.mastodonNotification,
+                                    notification.rules,
                                     notification.statusConfiguration
                                 )
                             ))
@@ -164,12 +176,16 @@ private let groupableTypes: [MastodonNotification.NotificationType] = [
 
 private struct GroupableNotification {
     let mastodonNotification: MastodonNotification
+    /// Only reports actually have these.
+    let rules: [Rule]
+    // TODO: (Vyr) should subscribed-user status notifications also have these?
     /// Only mentions actually have these.
     let statusConfiguration: CollectionItem.StatusConfiguration?
 
     init?(_ item: CollectionItem) {
-        if case let .notification(mastodonNotification, statusConfiguration) = item {
+        if case let .notification(mastodonNotification, rules, statusConfiguration) = item {
             self.mastodonNotification = mastodonNotification
+            self.rules = rules
             self.statusConfiguration = statusConfiguration
         } else {
             assertionFailure("Should only be called with CollectionItems.notification")

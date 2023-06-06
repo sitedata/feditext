@@ -14,21 +14,29 @@ public final class NotificationViewModel: ObservableObject {
     private let notificationService: NotificationService
     private let eventsSubject: PassthroughSubject<AnyPublisher<CollectionItemEvent, Error>, Never>
 
-    init(notificationService: NotificationService,
-         identityContext: IdentityContext,
-         eventsSubject: PassthroughSubject<AnyPublisher<CollectionItemEvent, Error>, Never>) {
+    init(
+        notificationService: NotificationService,
+        rules: [Rule],
+        identityContext: IdentityContext,
+        eventsSubject: PassthroughSubject<AnyPublisher<CollectionItemEvent, Error>, Never>
+    ) {
         self.notificationService = notificationService
         self.identityContext = identityContext
         self.eventsSubject = eventsSubject
         self.accountViewModel = AccountViewModel(
             accountService: notificationService.navigationService.accountService(
-                account: notificationService.notification.account),
+                account: notificationService.notification.account
+            ),
             identityContext: identityContext,
-            eventsSubject: eventsSubject)
+            eventsSubject: eventsSubject
+        )
 
-        if notificationService.notification.report != nil {
-            // TODO: (Vyr) display full report info
-            reportViewModel = NotificationReportViewModel()
+        if let report = notificationService.notification.report {
+            reportViewModel = NotificationReportViewModel(
+                report: report,
+                rules: rules,
+                identityContext: identityContext
+            )
         } else {
             reportViewModel = nil
         }

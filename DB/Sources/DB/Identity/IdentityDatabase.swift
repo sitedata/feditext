@@ -67,8 +67,7 @@ public extension IdentityDatabase {
                 title: instance.title,
                 thumbnail: instance.thumbnail,
                 version: instance.version,
-                maxTootChars: instance.maxTootChars,
-                rules: instance.rules
+                maxTootChars: instance.maxTootChars
             )
                 .save($0)
             try IdentityRecord
