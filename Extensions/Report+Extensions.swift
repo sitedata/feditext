@@ -10,6 +10,8 @@ extension Report.Category {
             return "mail.stack.fill"
         case .violation:
             return "checklist"
+        case .legal:
+            return "hand.raised.square"
         case .other:
             return "rectangle.and.pencil.and.ellipsis"
         case .unknown:
@@ -23,6 +25,8 @@ extension Report.Category {
             return NSLocalizedString("report.category.spam", comment: "")
         case .violation:
             return NSLocalizedString("report.category.violation", comment: "")
+        case .legal:
+            return NSLocalizedString("report.category.legal", comment: "")
         case .other:
             return NSLocalizedString("report.category.other", comment: "")
         case .unknown:

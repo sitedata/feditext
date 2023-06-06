@@ -400,8 +400,9 @@
 "report.additional-comments.hint" = "Additional context or comments, if applicable:";
 "report.category" = "Category";
 "report.category.other" = "Other";
-"report.category.violation" = "Rules violation";
+"report.category.violation" = "Rules";
 "report.category.spam" = "Spam";
+"report.category.legal" = "Legal";
 "report.category.unknown" = "Unknown";
 "report.hint" = "The report will be sent to your server moderators. You can provide an explanation of why you are reporting this account below:";
 "report.target-%@" = "Report %@";

@@ -10,7 +10,7 @@ final class ReportHeaderView: UIView {
     private let stackView = UIStackView()
     private let textView = UITextView()
     private let categoryButtonStack = UIStackView()
-    private let categoryButtonConfig = UIButton.Configuration.plain()
+    private let categoryButtonConfig: UIButton.Configuration
     private var categoryButtons: [UIButton] = []
     private let rulesHintLabel = UILabel()
     /// Checkboxes for picking one or more applicable rules.
@@ -19,6 +19,9 @@ final class ReportHeaderView: UIView {
 
     init(viewModel: ReportViewModel) {
         self.viewModel = viewModel
+        var categoryButtonConfig = UIButton.Configuration.plain()
+        categoryButtonConfig.buttonSize = .small
+        self.categoryButtonConfig = categoryButtonConfig
 
         super.init(frame: .zero)
 
@@ -39,6 +42,10 @@ final class ReportHeaderView: UIView {
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        updateCategoryButtonStack()
     }
 }
 
@@ -204,8 +211,25 @@ private extension ReportHeaderView {
                 }
             )
             categoryButton.changesSelectionAsPrimaryAction = true
+            // If there's only one supported category (GtS as of 0.10.0) it should be pre-selected.
+            categoryButton.isSelected = categories.count == 1
             categoryButtons.append(categoryButton)
             categoryButtonStack.addArrangedSubview(categoryButton)
+        }
+
+        updateCategoryButtonStack()
+    }
+
+    func updateCategoryButtonStack() {
+        let wideScreen = traitCollection.horizontalSizeClass == .regular
+        let largeType = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        let horizontal = wideScreen || !largeType
+        if horizontal {
+            categoryButtonStack.axis = .horizontal
+            categoryButtonStack.alignment = .fill
+        } else {
+            categoryButtonStack.axis = .vertical
+            categoryButtonStack.alignment = .leading
         }
     }
 
@@ -214,6 +238,8 @@ private extension ReportHeaderView {
             ruleCheckbox.removeFromSuperview()
         }
         ruleCheckboxes = []
+
+        rulesHintLabel.isHidden_stackViewSafe = viewModel.elements.category != .violation || rules.isEmpty
 
         guard let rulesHintLabelIndex = stackView.arrangedSubviews.firstIndex(of: rulesHintLabel) else {
             assertionFailure("Can't find rules hint label to insert rules after")

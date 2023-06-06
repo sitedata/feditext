@@ -4,6 +4,8 @@ import Foundation
 import HTTP
 import Mastodon
 
+/// - https://docs.joinmastodon.org/methods/reports/
+/// - https://api.pleroma.social/#tag/Reports
 public enum ReportEndpoint {
     case create(Elements)
 }
@@ -65,6 +67,34 @@ extension ReportEndpoint: Endpoint {
         switch self {
         case .create:
             return .post
+        }
+    }
+
+    public var requires: APICapabilityRequirements? {
+        switch self {
+        case let .create(elements):
+            switch elements.category {
+            case .none:
+                return nil
+            case .unknown:
+                return [:]
+            case .other:
+                return [
+                    .mastodon: "3.5.0",
+                    .hometown: "3.5.0",
+                    .gotosocial: .assumeAvailable
+                ]
+            case .spam, .violation:
+                return [
+                    .mastodon: "3.5.0",
+                    .hometown: "3.5.0"
+                ]
+            case .legal:
+                return [
+                    .mastodon: "4.2.0",
+                    .hometown: "4.2.0"
+                ]
+            }
         }
     }
 }

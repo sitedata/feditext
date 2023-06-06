@@ -3,13 +3,15 @@
 import Combine
 import Foundation
 import Mastodon
+import MastodonAPI
 import ServiceLayer
 
 public final class ReportViewModel: CollectionItemsViewModel {
     @Published public var elements: ReportElements
     @Published public private(set) var reportingState = ReportingState.composing
     @Published public private(set) var rules: [Rule] = []
-    @Published public private(set) var categories: [Report.Category] = ReportViewModel.categoriesFor(rules: [])
+    @Published public private(set) var categories: [Report.Category] = []
+    @Published public private(set) var canSubmit = false
 
     private let accountService: AccountService
     private var cancellables = Set<AnyCancellable>()
@@ -35,8 +37,26 @@ public final class ReportViewModel: CollectionItemsViewModel {
             .assign(to: &$rules)
 
         $rules
-            .map { Self.categoriesFor(rules: $0) }
+            .map { rules in
+                Report.Category
+                    .allCasesExceptUnknown
+                    // Show only categories that the instance supports.
+                    .filter(self.canUseCategory)
+                    // Hide the rules violation category if the instance doesn't have any rules.
+                    .filter { $0 != .violation || !rules.isEmpty }
+            }
             .assign(to: &$categories)
+
+        $elements.combineLatest($categories)
+            .map { elements, categories in
+                if elements.category == .violation {
+                    // If reporting a rule violation, the user must pick at least one rule.
+                    return !elements.ruleIDs.isEmpty
+                }
+                // The user must have picked a category unless the instance doesn't support them.
+                return elements.category != nil || categories.isEmpty
+            }
+            .assign(to: &$canSubmit)
 
         identityContext.service
             .refreshRules()
@@ -60,11 +80,10 @@ public final class ReportViewModel: CollectionItemsViewModel {
         return viewModel as Any
     }
 
-    private static func categoriesFor(rules: [Rule]) -> [Report.Category] {
-        Report.Category
-            .allCasesExceptUnknown
-            // Hide the rules violation category if the instance doesn't have any rules.
-            .filter { $0 != .violation || !rules.isEmpty }
+    private func canUseCategory(_ category: Report.Category) -> Bool {
+        var elements = ReportElements(accountId: "")
+        elements.category = category
+        return ReportEndpoint.create(elements).canCallWith(identityContext.apiCapabilities)
     }
 }
 
@@ -99,15 +118,5 @@ public extension ReportViewModel {
                 }
             } receiveValue: { _ in }
             .store(in: &cancellables)
-    }
-}
-
-public extension ReportElements {
-    var canSubmit: Bool {
-        if category == .violation {
-            // If reporting a rule violation, the user must pick at least one rule.
-            return !ruleIDs.isEmpty
-        }
-        return category != nil
     }
 }

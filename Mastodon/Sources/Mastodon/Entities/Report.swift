@@ -6,6 +6,7 @@ public struct Report: Codable, Identifiable {
     public enum Category: String, Codable, Unknowable {
         case violation
         case spam
+        case legal
         case other
         case unknown
 
