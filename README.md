@@ -23,11 +23,13 @@ Upstream issues can be referenced in the [archived project](https://github.com/m
 
 ## Contributing Translations
 
-You can help translate Metatext on [CrowdIn](https://crowdin.com/project/metatext).
+Existing translations for Metatext are in a [CrowdIn](https://crowdin.com/project/metatext) project.
+Translation contributions will be welcome again after some more
+project infrastructure is in place for Feditext.
 
 ## Contributing Code
 
-See the [contribution guidelines](https://github.com/metabolist/metatext/blob/main/CONTRIBUTING.md).
+See the [contribution guidelines](https://github.com/bdube/metatext/blob/develop/CONTRIBUTING.md).
 
 ## Building
 
