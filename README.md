@@ -18,16 +18,18 @@ or
 ## Contributing Bug Reports
 
 GitHub is used for bug tracking.
-Search [existing issues](https://github.com/bdube/metatext) and create a new one if the issue is not yet tracked.
+Search [existing issues](https://github.com/bdube/metatext/issues) and create a new one if the issue is not yet tracked.
 Upstream issues can be referenced in the [archived project](https://github.com/metabolist/metatext/issues).
 
 ## Contributing Translations
 
-You can help translate Metatext on [CrowdIn](https://crowdin.com/project/metatext).
+Existing translations for Metatext are in a [CrowdIn](https://crowdin.com/project/metatext) project.
+Translation contributions will be welcome again after some more
+project infrastructure is in place for Feditext.
 
 ## Contributing Code
 
-See the [contribution guidelines](https://github.com/metabolist/metatext/blob/main/CONTRIBUTING.md).
+See the [contribution guidelines](https://github.com/bdube/metatext/blob/develop/CONTRIBUTING.md).
 
 ## Building
 
@@ -60,7 +62,6 @@ Metatext uses the following third-party libraries:
 - [GRDB](https://github.com/groue/GRDB.swift)
 - [SDWebImage](https://github.com/SDWebImage/SDWebImage)
 - [SQLCipher](https://github.com/sqlcipher/sqlcipher)
-- [SwiftSoup](https://github.com/scinfu/SwiftSoup)
 
 ## Cryptography Notice
 
