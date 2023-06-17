@@ -14,6 +14,22 @@ public struct PushSubscription: Codable {
         @DecodableDefault.True public var update: Bool
         @DecodableDefault.True public var adminSignup: Bool
         @DecodableDefault.True public var adminReport: Bool
+
+        // swiftlint:disable:next nesting
+        enum CodingKeys: String, CodingKey {
+            case follow
+            case favourite
+            case reblog
+            case mention
+            case followRequest
+            case poll
+            case status
+            case update
+            /// Note: this *has* to be wrong because of an interaction with `KeyDecodingStrategy.convertFromSnakeCase`,
+            /// which is used by `MastodonDecoder`. The actual key on the wire is `admin.sign_up`.
+            case adminSignup = "admin.signUp"
+            case adminReport = "admin.report"
+        }
     }
 
     public let endpoint: UnicodeURL

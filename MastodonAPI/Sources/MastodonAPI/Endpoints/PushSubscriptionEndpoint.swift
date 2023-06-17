@@ -4,12 +4,14 @@ import Foundation
 import HTTP
 import Mastodon
 
+/// https://docs.joinmastodon.org/methods/push/
 public enum PushSubscriptionEndpoint {
     case create(
-            endpoint: URL,
-            publicKey: String,
-            auth: String,
-            alerts: PushSubscription.Alerts)
+        endpoint: URL,
+        publicKey: String,
+        auth: String,
+        alerts: PushSubscription.Alerts
+    )
     case read
     case update(alerts: PushSubscription.Alerts)
     case delete
@@ -36,31 +38,46 @@ extension PushSubscriptionEndpoint: Endpoint {
     public var jsonBody: [String: Any]? {
         switch self {
         case let .create(endpoint, publicKey, auth, alerts):
-            return ["subscription":
-                        ["endpoint": endpoint.absoluteString,
-                         "keys": [
-                            "p256dh": publicKey,
-                            "auth": auth]],
-                    "data": [
-                        "alerts": [
-                            "follow": alerts.follow,
-                            "favourite": alerts.favourite,
-                            "reblog": alerts.reblog,
-                            "mention": alerts.mention,
-                            "follow_request": alerts.followRequest,
-                            "poll": alerts.poll,
-                            "status": alerts.status
-                        ]]]
+            return [
+                "subscription": [
+                    "endpoint": endpoint.absoluteString,
+                    "keys": [
+                        "p256dh": publicKey,
+                        "auth": auth
+                    ]
+                ] as [String: Any],
+                "data": [
+                    "alerts": [
+                        "follow": alerts.follow,
+                        "favourite": alerts.favourite,
+                        "reblog": alerts.reblog,
+                        "mention": alerts.mention,
+                        "follow_request": alerts.followRequest,
+                        "poll": alerts.poll,
+                        "status": alerts.status,
+                        "update": alerts.update,
+                        "admin.sign_up": alerts.adminSignup,
+                        "admin.report": alerts.adminReport
+                    ]
+                ]
+            ]
         case let .update(alerts):
-            return ["data":
-                        ["alerts":
-                            ["follow": alerts.follow,
-                             "favourite": alerts.favourite,
-                             "reblog": alerts.reblog,
-                             "mention": alerts.mention,
-                             "follow_request": alerts.followRequest,
-                             "poll": alerts.poll,
-                             "status": alerts.status]]]
+            return [
+                "data": [
+                    "alerts": [
+                        "follow": alerts.follow,
+                        "favourite": alerts.favourite,
+                        "reblog": alerts.reblog,
+                        "mention": alerts.mention,
+                        "follow_request": alerts.followRequest,
+                        "poll": alerts.poll,
+                        "status": alerts.status,
+                        "update": alerts.update,
+                        "admin.sign_up": alerts.adminSignup,
+                        "admin.report": alerts.adminReport
+                    ]
+                ]
+            ]
         default: return nil
         }
     }
