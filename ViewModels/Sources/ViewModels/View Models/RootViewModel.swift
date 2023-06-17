@@ -1,6 +1,7 @@
 // Copyright © 2020 Metabolist. All rights reserved.
 
 import Combine
+import DB
 import Foundation
 import Mastodon
 import ServiceLayer
@@ -134,8 +135,12 @@ private extension RootViewModel {
                         .filter { $0 }
                         .zip(self.registerForRemoteNotifications())
                         .filter { identityContext.identity.lastRegisteredDeviceToken != $1 }
-                        .map { ($1, identityContext.identity.pushSubscriptionAlerts) }
-                        .flatMap(identityContext.service.createPushSubscription(deviceToken:alerts:))
+                        .map { (
+                            $1,
+                            identityContext.identity.pushSubscriptionAlerts,
+                            identityContext.identity.pushSubscriptionPolicy
+                        ) }
+                        .flatMap(identityContext.service.createPushSubscription(deviceToken:alerts:policy:))
                         .sink { _ in } receiveValue: { _ in }
                         .store(in: &self.cancellables)
                 }

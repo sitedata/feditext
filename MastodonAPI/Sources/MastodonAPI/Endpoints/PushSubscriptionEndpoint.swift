@@ -10,10 +10,14 @@ public enum PushSubscriptionEndpoint {
         endpoint: URL,
         publicKey: String,
         auth: String,
-        alerts: PushSubscription.Alerts
+        alerts: PushSubscription.Alerts,
+        policy: PushSubscription.Policy
     )
     case read
-    case update(alerts: PushSubscription.Alerts)
+    case update(
+        alerts: PushSubscription.Alerts,
+        policy: PushSubscription.Policy
+    )
     case delete
 }
 
@@ -37,7 +41,7 @@ extension PushSubscriptionEndpoint: Endpoint {
 
     public var jsonBody: [String: Any]? {
         switch self {
-        case let .create(endpoint, publicKey, auth, alerts):
+        case let .create(endpoint, publicKey, auth, alerts, policy):
             return [
                 "subscription": [
                     "endpoint": endpoint.absoluteString,
@@ -58,10 +62,11 @@ extension PushSubscriptionEndpoint: Endpoint {
                         "update": alerts.update,
                         "admin.sign_up": alerts.adminSignup,
                         "admin.report": alerts.adminReport
-                    ]
-                ]
+                    ],
+                    "policy": policy.rawValue
+                ] as [String: Any]
             ]
-        case let .update(alerts):
+        case let .update(alerts, policy):
             return [
                 "data": [
                     "alerts": [
@@ -75,8 +80,9 @@ extension PushSubscriptionEndpoint: Endpoint {
                         "update": alerts.update,
                         "admin.sign_up": alerts.adminSignup,
                         "admin.report": alerts.adminReport
-                    ]
-                ]
+                    ],
+                    "policy": policy.rawValue
+                ] as [String: Any]
             ]
         default: return nil
         }

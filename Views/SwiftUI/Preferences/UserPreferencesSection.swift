@@ -18,7 +18,7 @@ struct UserPreferencesSection: View {
                                destination: FiltersView(
                                 viewModel: .init(identityContext: viewModel.identityContext)))
                 if viewModel.shouldShowNotificationTypePreferences {
-                    NavigationLink("preferences.notification-types",
+                    NavigationLink("preferences.notifications",
                                    destination: NotificationTypesPreferencesView(
                                     viewModel: .init(identityContext: viewModel.identityContext)))
                 }

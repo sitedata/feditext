@@ -246,7 +246,11 @@ public extension IdentityService {
             .eraseToAnyPublisher()
     }
 
-    func createPushSubscription(deviceToken: Data, alerts: PushSubscription.Alerts) -> AnyPublisher<Never, Error> {
+    func createPushSubscription(
+        deviceToken: Data,
+        alerts: PushSubscription.Alerts,
+        policy: PushSubscription.Policy
+    ) -> AnyPublisher<Never, Error> {
         let publicKey: String
         let auth: String
 
@@ -266,16 +270,22 @@ public extension IdentityService {
                 endpoint: endpoint,
                 publicKey: publicKey,
                 auth: auth,
-                alerts: alerts))
-            .map { ($0.alerts, deviceToken, id) }
-            .flatMap(identityDatabase.updatePushSubscription(alerts:deviceToken:id:))
+                alerts: alerts,
+                policy: policy
+            )
+        )
+        .map { ($0.alerts, $0.policy, deviceToken, id) }
+            .flatMap(identityDatabase.updatePushSubscription(alerts:policy:deviceToken:id:))
             .eraseToAnyPublisher()
     }
 
-    func updatePushSubscription(alerts: PushSubscription.Alerts) -> AnyPublisher<Never, Error> {
-        mastodonAPIClient.request(PushSubscriptionEndpoint.update(alerts: alerts))
-            .map { ($0.alerts, nil, id) }
-            .flatMap(identityDatabase.updatePushSubscription(alerts:deviceToken:id:))
+    func updatePushSubscription(
+        alerts: PushSubscription.Alerts,
+        policy: PushSubscription.Policy
+    ) -> AnyPublisher<Never, Error> {
+        mastodonAPIClient.request(PushSubscriptionEndpoint.update(alerts: alerts, policy: policy))
+            .map { ($0.alerts, $0.policy, nil, id) }
+            .flatMap(identityDatabase.updatePushSubscription(alerts:policy:deviceToken:id:))
             .eraseToAnyPublisher()
     }
 

@@ -42,7 +42,9 @@ public extension IdentityDatabase {
                 preferences: Identity.Preferences(),
                 instanceURI: nil,
                 lastRegisteredDeviceToken: nil,
-                pushSubscriptionAlerts: .initial)
+                pushSubscriptionAlerts: .initial,
+                pushSubscriptionPolicy: .all
+            )
             .save($0)
         }
     }
@@ -118,17 +120,24 @@ public extension IdentityDatabase {
         databaseWriter.mutatingPublisher(updates: Self.writePreferences(preferences, id: id))
     }
 
-    func updatePushSubscription(alerts: PushSubscription.Alerts,
-                                deviceToken: Data? = nil,
-                                id: Identity.Id) -> AnyPublisher<Never, Error> {
+    func updatePushSubscription(
+        alerts: PushSubscription.Alerts,
+        policy: PushSubscription.Policy,
+        deviceToken: Data? = nil,
+        id: Identity.Id
+    ) -> AnyPublisher<Never, Error> {
         databaseWriter.mutatingPublisher {
-            let data = try IdentityRecord.databaseJSONEncoder(
+            let alertsData = try IdentityRecord.databaseJSONEncoder(
                 for: IdentityRecord.Columns.pushSubscriptionAlerts.name)
                 .encode(alerts)
 
             try IdentityRecord
                 .filter(IdentityRecord.Columns.id == id)
-                .updateAll($0, IdentityRecord.Columns.pushSubscriptionAlerts.set(to: data))
+                .updateAll(
+                    $0,
+                    IdentityRecord.Columns.pushSubscriptionAlerts.set(to: alertsData),
+                    IdentityRecord.Columns.pushSubscriptionPolicy.set(to: policy.rawValue)
+                )
 
             if let deviceToken = deviceToken {
                 try IdentityRecord

@@ -15,7 +15,9 @@ extension Identity {
             instance: info.instance,
             account: info.account,
             lastRegisteredDeviceToken: info.record.lastRegisteredDeviceToken,
-            pushSubscriptionAlerts: info.record.pushSubscriptionAlerts)
+            pushSubscriptionAlerts: info.record.pushSubscriptionAlerts,
+            pushSubscriptionPolicy: info.record.pushSubscriptionPolicy
+        )
     }
 }
 

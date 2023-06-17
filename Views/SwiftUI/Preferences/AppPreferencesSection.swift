@@ -37,7 +37,7 @@ struct AppPreferencesSection: View {
                         Text(option.localizedStringKey).tag(option)
                     }
                 }
-                NavigationLink("preferences.notifications",
+                NavigationLink("preferences.notifications.display-and-sounds",
                                destination: NotificationPreferencesView(viewModel: viewModel))
                 Picker("preferences.status-word",
                        selection: $identityContext.appPreferences.statusWord) {

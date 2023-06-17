@@ -15,6 +15,8 @@
 		943141D7299AADD900D90FC4 /* AboutInstanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943141D6299AADD900D90FC4 /* AboutInstanceView.swift */; };
 		9460331F2A2D3B8E00F5757E /* NotificationReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9460331E2A2D3B8E00F5757E /* NotificationReportView.swift */; };
 		947E728F29A9618900155DD2 /* EditNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947E728E29A9618900155DD2 /* EditNoteView.swift */; };
+		94979DA42A3E37ED00542793 /* MastodonNotification.NotificationType+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94979DA32A3E37ED00542793 /* MastodonNotification.NotificationType+Extensions.swift */; };
+		94979DA62A3E386D00542793 /* PushSubscription.Policy+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94979DA52A3E386D00542793 /* PushSubscription.Policy+Extensions.swift */; };
 		94B0BCD329859B750075E234 /* StatusEditHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B0BCD229859B750075E234 /* StatusEditHistoryView.swift */; };
 		94B22F342A2A6787008C3044 /* FamiliarFollowersLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B22F332A2A6787008C3044 /* FamiliarFollowersLabel.swift */; };
 		94B2C8C02929617A00087955 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94B2C8BF2929617A00087955 /* UniformTypeIdentifiers.framework */; };
@@ -354,6 +356,8 @@
 		9432DE2929A1587C0007C2BF /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		9460331E2A2D3B8E00F5757E /* NotificationReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationReportView.swift; sourceTree = "<group>"; };
 		947E728E29A9618900155DD2 /* EditNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditNoteView.swift; sourceTree = "<group>"; };
+		94979DA32A3E37ED00542793 /* MastodonNotification.NotificationType+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MastodonNotification.NotificationType+Extensions.swift"; sourceTree = "<group>"; };
+		94979DA52A3E386D00542793 /* PushSubscription.Policy+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PushSubscription.Policy+Extensions.swift"; sourceTree = "<group>"; };
 		94B0BCD229859B750075E234 /* StatusEditHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusEditHistoryView.swift; sourceTree = "<group>"; };
 		94B22F332A2A6787008C3044 /* FamiliarFollowersLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamiliarFollowersLabel.swift; sourceTree = "<group>"; };
 		94B2C8BE2929617A00087955 /* Action Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Action Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1003,10 +1007,12 @@
 				D0F0B135251AA12700942152 /* CollectionItem+Extensions.swift */,
 				D0D2AC3825BBEC0F003D5DF2 /* CollectionSection+Extensions.swift */,
 				D052DBE225EAFDE800FFB628 /* HTTPError+Extensions.swift */,
+				94979DA32A3E37ED00542793 /* MastodonNotification.NotificationType+Extensions.swift */,
 				D035F88625B8016000DC75ED /* NavigationViewModel+Extensions.swift */,
 				D0C7D46B24F76169001EBDBB /* NSMutableAttributedString+Extensions.swift */,
 				D07EC7CE25B13921006DF726 /* PickerEmoji+Extensions.swift */,
 				D0B5FE9A251583DB00478838 /* ProfileCollection+Extensions.swift */,
+				94979DA52A3E386D00542793 /* PushSubscription.Policy+Extensions.swift */,
 				94E174AA299AEC2D00D040B3 /* Report+Extensions.swift */,
 				D097F41A25BE3E1A00859F2C /* SearchScope+Extensions.swift */,
 				D0849C7E25903C4900A5EBCC /* Status+Extensions.swift */,
@@ -1362,6 +1368,7 @@
 				D0BE980E25D241CE0057E161 /* UIImage+Extensions.swift in Sources */,
 				D05936DE25A937EC00754FDF /* EditThumbnailView.swift in Sources */,
 				D0F0B136251AA12700942152 /* CollectionItem+Extensions.swift in Sources */,
+				94979DA42A3E37ED00542793 /* MastodonNotification.NotificationType+Extensions.swift in Sources */,
 				D007023E25562A2800F38136 /* ConversationAvatarsView.swift in Sources */,
 				D0E39AB425D8BF88009C10F8 /* UITextInput+Extensions.swift in Sources */,
 				94E6C24B2991A5BC003771D1 /* PostingLanguagesView.swift in Sources */,
@@ -1503,6 +1510,7 @@
 				D0477F4625C72E50005C5368 /* CapsuleLabel.swift in Sources */,
 				D035F88725B8016000DC75ED /* NavigationViewModel+Extensions.swift in Sources */,
 				14FC7D32292A556E00567DBC /* UIFont+Extensions.swift in Sources */,
+				94979DA62A3E386D00542793 /* PushSubscription.Policy+Extensions.swift in Sources */,
 				D0C7D49B24F7616A001EBDBB /* PreferencesView.swift in Sources */,
 				D09D972225C65682007E6394 /* SeparatorConfiguredCollectionViewListCell.swift in Sources */,
 				947E728F29A9618900155DD2 /* EditNoteView.swift in Sources */,

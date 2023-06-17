@@ -32,8 +32,21 @@ public struct PushSubscription: Codable {
         }
     }
 
+    public enum Policy: String, Codable, Identifiable, Unknowable {
+        case all
+        case followed
+        case follower
+        case none
+        case unknown
+
+        public var id: Self { self }
+
+        public static var unknownCase: Self { .unknown }
+    }
+
     public let endpoint: UnicodeURL
     public let alerts: Alerts
+    public let policy: Policy
     public let serverKey: String
 }
 

@@ -122,7 +122,11 @@ public extension AllIdentitiesService {
             .tryMap { identities -> [AnyPublisher<Never, Never>] in
                 try identities.map {
                     try IdentityService(id: $0.id, database: database, environment: environment)
-                        .createPushSubscription(deviceToken: deviceToken, alerts: $0.pushSubscriptionAlerts)
+                        .createPushSubscription(
+                            deviceToken: deviceToken,
+                            alerts: $0.pushSubscriptionAlerts,
+                            policy: $0.pushSubscriptionPolicy
+                        )
                         .catch { _ in Empty() } // don't want to disrupt pipeline
                         .eraseToAnyPublisher()
                 }

@@ -14,6 +14,7 @@ struct IdentityRecord: Codable, Hashable, FetchableRecord, PersistableRecord {
     let instanceURI: String?
     let lastRegisteredDeviceToken: Data?
     let pushSubscriptionAlerts: PushSubscription.Alerts
+    let pushSubscriptionPolicy: PushSubscription.Policy
 }
 
 extension IdentityRecord {
@@ -27,6 +28,7 @@ extension IdentityRecord {
         static let instanceURI = Column(CodingKeys.instanceURI)
         static let lastRegisteredDeviceToken = Column(CodingKeys.lastRegisteredDeviceToken)
         static let pushSubscriptionAlerts = Column(CodingKeys.pushSubscriptionAlerts)
+        static let pushSubscriptionPolicy = Column(CodingKeys.pushSubscriptionPolicy)
     }
 
     static let instance = belongsTo(Identity.Instance.self)
