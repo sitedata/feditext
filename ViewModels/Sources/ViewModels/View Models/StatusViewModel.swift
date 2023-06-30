@@ -1,6 +1,8 @@
 // Copyright © 2020 Metabolist. All rights reserved.
 
+import AppUrls
 import Combine
+import DB
 import Foundation
 import Mastodon
 import ServiceLayer
@@ -256,6 +258,15 @@ public extension StatusViewModel {
         }
     }
 
+    var tagViewModels: [TagViewModel] {
+        statusService.status.displayStatus.tags.map {
+            .init(
+                tag: $0,
+                identityContext: identityContext
+            )
+        }
+    }
+
     func toggleShowContent() {
         eventsSubject.send(
             statusService.toggleShowContent()
@@ -271,6 +282,27 @@ public extension StatusViewModel {
     }
 
     func urlSelected(_ url: URL) {
+        // Handle navigation from the status's tag list.
+        // See `StatusBodyView.makeLinkedTagViewText`.
+        if let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+           components.scheme == AppUrls.scheme,
+           components.path == AppUrls.timelinePath,
+           let tagId = components.queryItems?.first(where: { $0.name == AppUrls.timelineTagParam })?.value {
+            eventsSubject.send(
+                Just(
+                    .navigation(
+                        .collection(
+                            statusService.navigationService.timelineService(
+                                timeline: .tag(tagId)
+                            )
+                        )
+                    )
+                )
+                    .setFailureType(to: Error.self)
+                    .eraseToAnyPublisher()
+            )
+        }
+
         eventsSubject.send(
             statusService.navigationService.item(url: url)
                 .map { .navigation($0) }

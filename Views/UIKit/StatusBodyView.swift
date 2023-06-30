@@ -1,5 +1,6 @@
 // Copyright © 2020 Metabolist. All rights reserved.
 
+import AppUrls
 import Mastodon
 import UIKit
 import ViewModels
@@ -9,6 +10,7 @@ final class StatusBodyView: UIView {
     let toggleShowContentButton = CapsuleButton()
     let contentTextView = TouchFallthroughTextView()
     let attachmentsView = AttachmentsView()
+    let tagsView = TouchFallthroughTextView()
     let pollView = PollView()
     let cardView = CardView()
 
@@ -19,8 +21,17 @@ final class StatusBodyView: UIView {
         didSet {
             guard let viewModel = viewModel else { return }
 
+            let foldTrailingHashtags = viewModel.identityContext.appPreferences.foldTrailingHashtags
+            let outOfTextTagPairs = findOutOfTextTagPairs()
+
             let mutableContent = NSMutableAttributedString(attributedString: viewModel.content)
             mutableContent.adaptHtmlAttributes(style: contentTextStyle)
+            let trailingTagPairs: [(TagViewModel.ID, String)]
+            if foldTrailingHashtags {
+                trailingTagPairs = dropTrailingHashtags(mutableContent)
+            } else {
+                trailingTagPairs = []
+            }
             let mutableSpoilerText = NSMutableAttributedString(string: viewModel.spoilerText)
             let mutableSpoilerFont = UIFont.preferredFont(forTextStyle: contentTextStyle).bold()
             let contentFont = UIFont.preferredFont(forTextStyle: isContextParent ? .title3 : .callout)
@@ -58,11 +69,18 @@ final class StatusBodyView: UIView {
             toggleShowContentButton.setContentCompressionResistancePriority(.required, for: .vertical)
             toggleShowContentButton.setContentHuggingPriority(.required, for: .vertical)
 
-            contentTextView.isHidden = viewModel.shouldHideDueToSpoiler && !viewModel.shouldShowContent
+            let hideContent = viewModel.shouldHideDueToSpoiler && !viewModel.shouldShowContent
+            contentTextView.isHidden = hideContent
             contentTextView.textContainer.lineBreakMode = .byTruncatingTail
             contentTextView.textContainer.maximumNumberOfLines = viewModel.shouldShowContentPreview
                 ? Self.numLinesFoldedPreview
                 : 0
+
+            let tagViewTagPairs = trailingTagPairs + outOfTextTagPairs
+            tagsView.isHidden = hideContent
+                || (!foldTrailingHashtags && outOfTextTagPairs.isEmpty)
+                || tagViewTagPairs.isEmpty
+            tagsView.attributedText = makeLinkedTagViewText(tagViewTagPairs)
 
             attachmentsView.isHidden = viewModel.attachmentViewModels.isEmpty
             attachmentsView.viewModel = viewModel
@@ -115,6 +133,32 @@ final class StatusBodyView: UIView {
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    /// De-emphasize links in tag view. Disabled if high contrast mode is on.
+    private static var tagsViewLinkColor: UIColor = .init { traitCollection in
+        if traitCollection.accessibilityContrast == .high {
+            return .link
+        }
+
+        var h1: CGFloat = 0
+        var s1: CGFloat = 0
+        var b1: CGFloat = 0
+        var a1: CGFloat = 0
+        UIColor.link.getHue(&h1, saturation: &s1, brightness: &b1, alpha: &a1)
+
+        var h2: CGFloat = 0
+        var s2: CGFloat = 0
+        var b2: CGFloat = 0
+        var a2: CGFloat = 0
+        UIColor.secondaryLabel.getHue(&h2, saturation: &s2, brightness: &b2, alpha: &a2)
+
+        return .init(
+            hue: (h1 + h2) / 2,
+            saturation: (s1 + s2) / 2,
+            brightness: (b1 + b2) / 2,
+            alpha: (a1 + a2) / 2
+        )
     }
 }
 
@@ -267,6 +311,12 @@ private extension StatusBodyView {
         contentTextView.delegate = self
         stackView.addArrangedSubview(contentTextView)
 
+        tagsView.adjustsFontForContentSizeCategory = true
+        tagsView.backgroundColor = .clear
+        tagsView.delegate = self
+        tagsView.linkTextAttributes[.foregroundColor] = Self.tagsViewLinkColor
+        stackView.addArrangedSubview(tagsView)
+
         stackView.addArrangedSubview(attachmentsView)
 
         stackView.addArrangedSubview(pollView)
@@ -291,11 +341,120 @@ private extension StatusBodyView {
         ])
     }
 
-    private var isContextParent: Bool {
+    var isContextParent: Bool {
         viewModel?.configuration.isContextParent ?? false
     }
 
-    private var contentTextStyle: UIFont.TextStyle {
+    var contentTextStyle: UIFont.TextStyle {
         isContextParent ? .title3 : .callout
+    }
+
+    /// Find any hashtags that are attached to the status but don't appear in the text.
+    /// Return their IDs and display text.
+    func findOutOfTextTagPairs() -> [(TagViewModel.ID, String)] {
+        guard let viewModel = viewModel else { return [] }
+        let tagViewModels = viewModel.tagViewModels
+        let content = viewModel.content
+
+        var tagIds = Set(tagViewModels.map { $0.id })
+        let entireString = NSRange(location: 0, length: content.length)
+        content.enumerateAttribute(HTML.Key.hashtag, in: entireString) { val, _, _ in
+            guard let tagId = val as? TagViewModel.ID else {
+                return
+            }
+            tagIds.remove(tagId)
+        }
+
+        return tagViewModels
+            .filter { tagIds.contains($0.id) }
+            .map { ($0.id, $0.name) }
+    }
+
+    /// Drop trailing hashtags from the string.
+    /// Return a list of the tag IDs that were dropped and the original text for each.
+    func dropTrailingHashtags(_ mutableContent: NSMutableAttributedString) -> [(TagViewModel.ID, String)] {
+        var tagIds = Set<TagViewModel.ID>()
+        var tagPairs = [(TagViewModel.ID, String)]()
+        var startOfTrailingHashtags: String.Index = mutableContent.string.endIndex
+
+        let entireString = NSRange(location: 0, length: mutableContent.length)
+        mutableContent.enumerateAttribute(
+            HTML.Key.hashtag,
+            in: entireString,
+            options: .reverse
+        ) { val, nsRange, stop in
+            guard let range = Range(nsRange, in: mutableContent.string) else {
+                assertionFailure("Couldn't create range for substring")
+                stop.pointee = true
+                return
+            }
+            let substring = mutableContent.string[range]
+
+            if let tagId = val as? TagViewModel.ID {
+                startOfTrailingHashtags = range.lowerBound
+                let (firstSeen, _) = tagIds.insert(tagId)
+                if firstSeen {
+                    tagPairs.append((tagId, String(substring)))
+                }
+            } else {
+                // Go back through the substring while there is trailing whitespace.
+                var i = substring.endIndex
+                while i > substring.startIndex {
+                    let prevI = substring.index(before: i)
+                    if !substring[prevI].isWhitespace {
+                        break
+                    }
+                    i = prevI
+                }
+                startOfTrailingHashtags = i
+                if i > substring.startIndex {
+                    // Contains non-hashtag, non-whitespace text. Stop here.
+                    stop.pointee = true
+                }
+            }
+        }
+
+        guard startOfTrailingHashtags < mutableContent.string.endIndex else { return tagPairs }
+
+        mutableContent.deleteCharacters(
+            in: NSRange(
+                startOfTrailingHashtags..<mutableContent.string.endIndex,
+                in: mutableContent.string
+            )
+        )
+
+        return tagPairs
+    }
+
+    /// Returns text with tappable hashtag links for each trailing or out-of-text tag.
+    func makeLinkedTagViewText(_ tagPairs: [(TagViewModel.ID, String)]) -> NSAttributedString? {
+        let text = NSMutableAttributedString()
+
+        var firstTag = true
+        for (tagId, tagText) in tagPairs {
+            if !firstTag {
+                text.mutableString.append(" ")
+            }
+            firstTag = false
+
+            let linkStart = text.length
+            text.mutableString.append(tagText)
+            let linkLength = text.length - linkStart
+            text.addAttribute(
+                .link,
+                value: AppUrls.makeTagTimeline(name: tagId),
+                range: NSRange(location: linkStart, length: linkLength)
+            )
+        }
+
+        text.addAttributes(
+            [
+                .font: UIFont.preferredFont(forTextStyle: isContextParent ? .callout : .footnote),
+                .foregroundColor: UIColor.secondaryLabel
+            ],
+            range: NSRange(location: 0, length: text.length)
+        )
+
+        return text
     }
 }

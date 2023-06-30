@@ -18,12 +18,13 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/groue/CombineExpectations.git", .upToNextMajor(from: "0.7.0")),
+        .package(path: "AppUrls"),
         .package(path: "ServiceLayer")
     ],
     targets: [
         .target(
             name: "ViewModels",
-            dependencies: ["ServiceLayer"]),
+            dependencies: ["AppUrls", "ServiceLayer"]),
         .target(
             name: "PreviewViewModels",
             dependencies: ["ViewModels", .product(name: "ServiceLayerMocks", package: "ServiceLayer")]),

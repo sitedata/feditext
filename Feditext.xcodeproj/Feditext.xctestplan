@@ -25,6 +25,13 @@
         "identifier" : "ViewModelsTests",
         "name" : "ViewModelsTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:AppUrls",
+        "identifier" : "AppUrlsTests",
+        "name" : "AppUrlsTests"
+      }
     }
   ],
   "version" : 1

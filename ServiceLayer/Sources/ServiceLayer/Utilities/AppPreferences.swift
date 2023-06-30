@@ -236,6 +236,11 @@ public extension AppPreferences {
         set { self[.foldLongPosts] = newValue }
     }
 
+    var foldTrailingHashtags: Bool {
+        get { self[.foldTrailingHashtags] ?? true }
+        set { self[.foldTrailingHashtags] = newValue }
+    }
+
     var postingLanguages: [PrefsLanguage.Tag] {
         get {
             self[.postingLanguages]
@@ -269,6 +274,7 @@ private extension AppPreferences {
         case useUniversalLinks
         case hideContentWarningButton
         case foldLongPosts
+        case foldTrailingHashtags
         case postingLanguages
     }
 

@@ -17,12 +17,13 @@ let package = Package(
         .package(
             url: "https://github.com/scinfu/SwiftSoup.git",
             from: "2.4.3"
-        )
+        ),
+        .package(path: "AppUrls")
     ],
     targets: [
         .target(
             name: "Mastodon",
-            dependencies: ["SwiftSoup"]),
+            dependencies: ["AppUrls", "SwiftSoup"]),
         .testTarget(
             name: "MastodonTests",
             dependencies: ["Mastodon"])

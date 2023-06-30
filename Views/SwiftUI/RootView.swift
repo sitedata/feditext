@@ -1,5 +1,7 @@
 // Copyright © 2020 Metabolist. All rights reserved.
 
+import AppUrls
+import ServiceLayer
 import SwiftUI
 import UIKit
 import ViewModels
@@ -35,16 +37,18 @@ struct RootView: View {
     /// Open `metatext:` URLs from the action extension.
     private func openURL(_ navigationViewModel: NavigationViewModel, _ metatextUrl: URL) {
         guard
-            let metatextComponents = URLComponents(url: metatextUrl, resolvingAgainstBaseURL: true),
-            metatextComponents.scheme == "feditext"
+            let components = URLComponents(url: metatextUrl, resolvingAgainstBaseURL: true),
+            components.scheme == AppUrls.scheme
         else {
             return
         }
-        switch metatextComponents.path {
-        case "search":
-            // Expecting `metatext:search?url=https://…`, which we open by searching for the wrapped URL.
+        switch components.path {
+        case AppUrls.searchPath:
+            // Expecting `feditext:search?url=https://…`, which we open by searching for the wrapped URL.
             guard
-                let searchUrlString = metatextComponents.queryItems?.first(where: { $0.name == "url" })?.value,
+                let searchUrlString = components.queryItems?.first(
+                    where: { $0.name == AppUrls.searchUrlParam }
+                )?.value,
                 let searchComponents = URLComponents(string: searchUrlString),
                 searchComponents.scheme == "https",
                 let searchUrl = searchComponents.url

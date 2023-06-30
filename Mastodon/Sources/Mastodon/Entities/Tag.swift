@@ -3,10 +3,6 @@
 import Foundation
 
 public struct Tag: Codable {
-    /// > Warning: Two tag names that are not equal may still represent the same tag.
-    /// > Authoritative tag comparison should only be done server-side due to this… thing:
-    /// > https://github.com/mastodon/mastodon/blob/main/app/lib/hashtag_normalizer.rb
-    /// > https://github.com/mastodon/mastodon/blob/main/app/lib/ascii_folding.rb
     public typealias Name = String
 
     public let name: Name
@@ -20,6 +16,15 @@ public extension Tag {
         public let day: String
         public let uses: String
         public let accounts: String
+    }
+
+    /// > Warning: Two tag names that are not equal may still represent the same tag.
+    /// > Authoritative tag comparison should only be done server-side due to this… thing:
+    /// > https://github.com/mastodon/mastodon/blob/main/app/lib/hashtag_normalizer.rb
+    /// > https://github.com/mastodon/mastodon/blob/main/app/lib/ascii_folding.rb
+    static func normalizeName(_ name: any StringProtocol) -> Tag.Name {
+        // TODO: (Vyr) (i18n) implement the rest of that mess, assuming we're talking to a Mastodon server
+        name.lowercased()
     }
 }
 

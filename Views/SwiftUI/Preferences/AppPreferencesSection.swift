@@ -98,6 +98,8 @@ struct AppPreferencesSection: View {
                        isOn: $identityContext.appPreferences.hideContentWarningButton)
                 Toggle("preferences.long-content.fold",
                        isOn: $identityContext.appPreferences.foldLongPosts)
+                Toggle("preferences.trailing-hashtags.fold",
+                       isOn: $identityContext.appPreferences.foldTrailingHashtags)
             }
             if viewModel.identityContext.identity.authenticated
                 && !viewModel.identityContext.identity.pending {

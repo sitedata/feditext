@@ -314,11 +314,6 @@ private extension StatusView {
         contextParentEditedTimeLabel.setContentHuggingPriority(.required, for: .horizontal)
         contextParentTimeApplicationStackView.addArrangedSubview(contextParentEditedTimeLabel)
 
-        contextParentTimeApplicationStackView.addArrangedSubview(visibilityImageView)
-        visibilityImageView.contentMode = .scaleAspectFit
-        visibilityImageView.tintColor = .secondaryLabel
-        visibilityImageView.isAccessibilityElement = true
-
         contextParentTimeApplicationStackView.addArrangedSubview(editedTimeVisibilityDividerLabel)
 
         contextParentTimeApplicationStackView.addArrangedSubview(visibilityImageView)

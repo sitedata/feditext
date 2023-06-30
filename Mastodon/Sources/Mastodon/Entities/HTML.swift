@@ -1,5 +1,6 @@
 // Copyright © 2020 Metabolist. All rights reserved.
 
+import AppUrls
 import Foundation
 #if !os(macOS)
 import UIKit
@@ -49,6 +50,8 @@ public extension HTML {
         public static let linkClass: NSAttributedString.Key = .init("feditextLinkClass")
         /// Value expected to be an `Int` indicating how many levels of quote we're on.
         public static let quoteLevel: NSAttributedString.Key = .init("feditextQuoteLevel")
+        /// Value expected to be a normalized `Tag.Name`.
+        public static let hashtag: NSAttributedString.Key = .init("feditextHashtag")
     }
 
     enum LinkClass: Int {
@@ -119,6 +122,8 @@ private extension HTML {
         </style>
     """
 
+    /// Parse the subset of HTML we support, including semantic classes where present
+    /// (not all Fedi servers send them, and Mastodon does a terrible job of normalizing remote HTML).
     static func parse(_ raw: String) -> NSAttributedString {
         guard
             let sanitized: String = try? SwiftSoup.clean(
@@ -128,6 +133,7 @@ private extension HTML {
                     .addTags("kbd", "samp", "tt")
                     .addTags("s", "ins", "del")
                     .removeProtocols("a", "href", "ftp", "mailto")
+                    .addAttributes("a", "class")
                     .addAttributes("span", "class")
             ),
             let attributed = NSMutableAttributedString(html: style.appending(sanitized))
@@ -162,8 +168,70 @@ private extension HTML {
             }
         }
 
+        Self.rewriteLinks(attributed)
+
         attributed.fixAttributes(in: entireString)
         return attributed
+    }
+
+    /// Apply heuristics to rewrite HTTPS links for mentions and hashtags into Feditext internal links.
+    static func rewriteLinks(_ attributed: NSMutableAttributedString) {
+        let entireString = NSRange(location: 0, length: attributed.length)
+        attributed.enumerateAttribute(.link, in: entireString) { val, nsRange, stop in
+            guard let url = val as? URL else { return }
+
+            guard let range = Range(nsRange, in: attributed.string) else {
+                assertionFailure("Getting the substring range should always succeed")
+                stop.pointee = true
+                return
+            }
+
+            let substring = attributed.string[range]
+
+            var linkClass = attributed.attribute(
+                Self.Key.linkClass,
+                at: nsRange.location,
+                effectiveRange: nil
+            ) as? Self.LinkClass
+
+            if linkClass == nil {
+                if substring.starts(with: "#") {
+                    linkClass = .hashtag
+                } else if substring.starts(with: "@") {
+                    linkClass = .mention
+                }
+            }
+
+            guard let linkClass = linkClass else {
+                return
+            }
+
+            switch linkClass {
+            case .hashtag:
+                let trimmed: Substring
+                if #available(iOS 16.0, *) {
+                    trimmed = substring.trimmingPrefix("#")
+                } else {
+                    trimmed = substring.drop(while: { $0 == "#" })
+                }
+                let normalized = Tag.normalizeName(trimmed)
+                attributed.addAttributes(
+                    [
+                        Self.Key.hashtag: normalized,
+                        .link: AppUrls.makeTagTimeline(name: normalized)
+                    ],
+                    range: nsRange
+                )
+            case .mention:
+                attributed.addAttribute(
+                    .link,
+                    value: AppUrls.makeMention(url: url),
+                    range: nsRange
+                )
+            default:
+                break
+            }
+        }
     }
 }
 

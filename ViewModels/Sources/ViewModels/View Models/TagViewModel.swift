@@ -15,6 +15,10 @@ public struct TagViewModel {
     }
 }
 
+extension TagViewModel: Identifiable {
+    public var id: Tag.Name { Tag.normalizeName(tag.name) }
+}
+
 public extension TagViewModel {
     var name: String { "#".appending(tag.name) }
 

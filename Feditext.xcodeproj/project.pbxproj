@@ -12,6 +12,8 @@
 		941F79CC2A243418007FCC65 /* MultiNotificationContentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941F79CB2A243418007FCC65 /* MultiNotificationContentConfiguration.swift */; };
 		941F79CE2A243446007FCC65 /* MultiNotificationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941F79CD2A243446007FCC65 /* MultiNotificationTableViewCell.swift */; };
 		941F79D02A243499007FCC65 /* MultiNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941F79CF2A243499007FCC65 /* MultiNotificationView.swift */; };
+		942099F32A4E2DDE00007663 /* AppUrls in Frameworks */ = {isa = PBXBuildFile; productRef = 942099F22A4E2DDE00007663 /* AppUrls */; };
+		942099F52A4E328B00007663 /* AppUrls in Frameworks */ = {isa = PBXBuildFile; productRef = 942099F42A4E328B00007663 /* AppUrls */; };
 		943141D7299AADD900D90FC4 /* AboutInstanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943141D6299AADD900D90FC4 /* AboutInstanceView.swift */; };
 		9460331F2A2D3B8E00F5757E /* NotificationReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9460331E2A2D3B8E00F5757E /* NotificationReportView.swift */; };
 		947E728F29A9618900155DD2 /* EditNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947E728E29A9618900155DD2 /* EditNoteView.swift */; };
@@ -348,6 +350,7 @@
 		941F79CB2A243418007FCC65 /* MultiNotificationContentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiNotificationContentConfiguration.swift; sourceTree = "<group>"; };
 		941F79CD2A243446007FCC65 /* MultiNotificationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiNotificationTableViewCell.swift; sourceTree = "<group>"; };
 		941F79CF2A243499007FCC65 /* MultiNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiNotificationView.swift; sourceTree = "<group>"; };
+		942099F12A4E2D6900007663 /* AppUrls */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AppUrls; sourceTree = "<group>"; };
 		943141D6299AADD900D90FC4 /* AboutInstanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutInstanceView.swift; sourceTree = "<group>"; };
 		9432DE2529A1587C0007C2BF /* SECURITY.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = SECURITY.md; sourceTree = "<group>"; };
 		9432DE2629A1587C0007C2BF /* CONTRIBUTING.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
@@ -589,6 +592,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				942099F32A4E2DDE00007663 /* AppUrls in Frameworks */,
 				94B2C8C02929617A00087955 /* UniformTypeIdentifiers.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -599,6 +603,7 @@
 			files = (
 				D0E2C1D124FD97F000854680 /* ViewModels in Frameworks */,
 				D06FA32725F0659600C9639A /* BlurHash in Frameworks */,
+				942099F52A4E328B00007663 /* AppUrls in Frameworks */,
 				D04F34B625E42ABE00714251 /* SDWebImage in Frameworks */,
 				D0FE7C8025C4C79F00203957 /* PreviewViewModels in Frameworks */,
 			);
@@ -676,6 +681,7 @@
 				D0CEC10F25E3462B00FEF5A6 /* AnimatedAttachmentLabel.swift */,
 				D0CEC10025E337C900FEF5A6 /* AnimatedTextAttachment.swift */,
 				D0CEC0F625E3303200FEF5A6 /* AnimatingLayoutManager.swift */,
+				D05A0A76263644B600F9BCE1 /* AnnouncementReactionsCollectionView.swift */,
 				D01F41E224F8889700D55A2D /* AttachmentsView.swift */,
 				D0CE9F86258B076900E3A6B6 /* AttachmentUploadView.swift */,
 				D0BEB1F224F8EE8C001B0F04 /* AttachmentView.swift */,
@@ -695,8 +701,8 @@
 				D07EC7FC25B16994006DF726 /* EmojiCategoryHeaderView.swift */,
 				D0CEC11F25E35FE100FEF5A6 /* EmojiInsertable.swift */,
 				D0DDA77E25C6058300FA0F91 /* ExploreSectionHeaderView.swift */,
+				94B22F332A2A6787008C3044 /* FamiliarFollowersLabel.swift */,
 				D0BE97D625D0863E0057E161 /* ImagePastableTextView.swift */,
-				D05A0A76263644B600F9BCE1 /* AnnouncementReactionsCollectionView.swift */,
 				D0D2AC6625BD0484003D5DF2 /* LineChartView.swift */,
 				D0BEB1F624F9A84B001B0F04 /* LoadingTableFooterView.swift */,
 				D05936FE25AA94EA00754FDF /* MarkAttachmentsSensitiveView.swift */,
@@ -714,7 +720,6 @@
 				D021A66E25C3E1E4008A0C0D /* Table View Cells */,
 				D01F41D624F880C400D55A2D /* TouchFallthroughTextView.swift */,
 				D0E1F582251F13EC00D45315 /* WebfingerIndicatorView.swift */,
-				94B22F332A2A6787008C3044 /* FamiliarFollowersLabel.swift */,
 			);
 			path = UIKit;
 			sourceTree = "<group>";
@@ -841,6 +846,7 @@
 		D047FA7F24C3E21000AF17C5 = {
 			isa = PBXGroup;
 			children = (
+				942099F12A4E2D6900007663 /* AppUrls */,
 				F168BCBF2966369200306FAF /* Feditext.xctestplan */,
 				D0477F2A25C6EB90005C5368 /* Activities */,
 				94B2C8C12929617A00087955 /* Action Extension */,
@@ -1089,6 +1095,9 @@
 			dependencies = (
 			);
 			name = "Action Extension";
+			packageProductDependencies = (
+				942099F22A4E2DDE00007663 /* AppUrls */,
+			);
 			productName = "com.metabolist.metatext.action-extension";
 			productReference = 94B2C8BE2929617A00087955 /* Action Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -1116,6 +1125,7 @@
 				D0FE7C7F25C4C79F00203957 /* PreviewViewModels */,
 				D04F34B525E42ABE00714251 /* SDWebImage */,
 				D06FA32625F0659600C9639A /* BlurHash */,
+				942099F42A4E328B00007663 /* AppUrls */,
 			);
 			productName = "Metatext (iOS)";
 			productReference = D047FA8C24C3E21200AF17C5 /* Feditext.app */;
@@ -2187,6 +2197,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		942099F22A4E2DDE00007663 /* AppUrls */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppUrls;
+		};
+		942099F42A4E328B00007663 /* AppUrls */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppUrls;
+		};
 		D025B16925C4EB18001C69A8 /* ServiceLayer */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ServiceLayer;

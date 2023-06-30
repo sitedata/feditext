@@ -18,6 +18,10 @@ final class AttachmentsView: UIView {
 
     var viewModel: AttachmentsRenderingViewModel? {
         didSet {
+            guard viewModel?.attachmentViewModels != oldValue?.attachmentViewModels else {
+                return
+            }
+
             for stackView in [leftStackView, rightStackView] {
                 for view in stackView.arrangedSubviews {
                     stackView.removeArrangedSubview(view)
