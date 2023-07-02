@@ -282,25 +282,35 @@ public extension StatusViewModel {
     }
 
     func urlSelected(_ url: URL) {
-        // Handle navigation from the status's tag list.
-        // See `StatusBodyView.makeLinkedTagViewText`.
-        if let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
-           components.scheme == AppUrls.scheme,
-           components.path == AppUrls.timelinePath,
-           let tagId = components.queryItems?.first(where: { $0.name == AppUrls.timelineTagParam })?.value {
-            eventsSubject.send(
-                Just(
-                    .navigation(
-                        .collection(
-                            statusService.navigationService.timelineService(
-                                timeline: .tag(tagId)
-                            )
-                        )
-                    )
+        if let appUrl = AppUrl(url: url) {
+            switch appUrl {
+            case let .tagTimeline(name):
+                 eventsSubject.send(
+                     Just(
+                         .navigation(
+                             .collection(
+                                 statusService.navigationService.timelineService(
+                                     timeline: .tag(name)
+                                 )
+                             )
+                         )
+                     )
+                         .setFailureType(to: Error.self)
+                         .eraseToAnyPublisher()
+                 )
+
+            case let .mention(userUrl):
+                eventsSubject.send(
+                    statusService.navigationService.item(url: userUrl, shouldWebfinger: true)
+                        .map { .navigation($0) }
+                        .setFailureType(to: Error.self)
+                        .eraseToAnyPublisher()
                 )
-                    .setFailureType(to: Error.self)
-                    .eraseToAnyPublisher()
-            )
+
+            default:
+                assertionFailure("Other types of app URL should not appear in this context.")
+                return
+            }
         }
 
         eventsSubject.send(

@@ -218,14 +218,14 @@ private extension HTML {
                 attributed.addAttributes(
                     [
                         Self.Key.hashtag: normalized,
-                        .link: AppUrls.makeTagTimeline(name: normalized)
+                        .link: AppUrl.tagTimeline(normalized).url
                     ],
                     range: nsRange
                 )
             case .mention:
                 attributed.addAttribute(
                     .link,
-                    value: AppUrls.makeMention(url: url),
+                    value: AppUrl.mention(url).url,
                     range: nsRange
                 )
             default:

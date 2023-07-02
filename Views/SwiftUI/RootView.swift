@@ -35,26 +35,10 @@ struct RootView: View {
     }
 
     /// Open `metatext:` URLs from the action extension.
-    private func openURL(_ navigationViewModel: NavigationViewModel, _ metatextUrl: URL) {
-        guard
-            let components = URLComponents(url: metatextUrl, resolvingAgainstBaseURL: true),
-            components.scheme == AppUrls.scheme
-        else {
-            return
-        }
-        switch components.path {
-        case AppUrls.searchPath:
-            // Expecting `feditext:search?url=https://…`, which we open by searching for the wrapped URL.
-            guard
-                let searchUrlString = components.queryItems?.first(
-                    where: { $0.name == AppUrls.searchUrlParam }
-                )?.value,
-                let searchComponents = URLComponents(string: searchUrlString),
-                searchComponents.scheme == "https",
-                let searchUrl = searchComponents.url
-            else {
-                return
-            }
+    private func openURL(_ navigationViewModel: NavigationViewModel, _ url: URL) {
+        guard let appUrl = AppUrl(url: url) else { return }
+        switch appUrl {
+        case let .search(searchUrl):
             navigationViewModel.navigateToURL(searchUrl)
         default:
             break

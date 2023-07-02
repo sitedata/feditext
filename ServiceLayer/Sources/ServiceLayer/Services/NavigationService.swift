@@ -37,7 +37,9 @@ public struct NavigationService {
 }
 
 public extension NavigationService {
-    func item(url: URL) -> AnyPublisher<Navigation, Never> {
+    /// Set `shouldWebfinger` to `true` when we know the URL should resolve to some activity or actor,
+    /// like when resolving a mentioned user.
+    func item(url: URL, shouldWebfinger: Bool = false) -> AnyPublisher<Navigation, Never> {
         if let tag = tag(url: url) {
             return Just(
                 .collection(
@@ -53,7 +55,7 @@ public extension NavigationService {
             return Just(.collection(contextService(id: statusId))).eraseToAnyPublisher()
         }
 
-        if url.shouldWebfinger {
+        if shouldWebfinger || url.shouldWebfinger {
             return webfinger(url: url)
         } else {
             return Just(.url(url)).eraseToAnyPublisher()

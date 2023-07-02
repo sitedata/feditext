@@ -44,12 +44,7 @@ class ActionExtensionViewController: UIViewController {
                             self.extensionContext!.cancelRequest(withError: error)
                         } else if let url = url {
                             // Create a `feditext:search?url=https…` URL from our web URL.
-                            var urlBuilder = URLComponents()
-                            urlBuilder.scheme = AppUrls.scheme
-                            urlBuilder.path = AppUrls.searchPath
-                            urlBuilder.queryItems = [.init(name: AppUrls.searchUrlParam, value: url.absoluteString)]
-                            let metatextURL = urlBuilder.url!
-                            self.open(url: metatextURL)
+                            self.open(url: AppUrl.search(url).url)
                             self.extensionContext!.completeRequest(returningItems: [])
                         } else {
                             // Should never happen. Return a generic not-found error.

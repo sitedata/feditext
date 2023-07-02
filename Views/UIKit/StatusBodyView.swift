@@ -261,7 +261,9 @@ extension StatusBodyView {
             accessibilityAttributedLabel.append(content)
         }
 
-        for view in [attachmentsView, pollView, cardView] where !view.isHidden {
+        // TODO: (Vyr) modify accessibility label for tagsView to read out "hashtags: foo, bar"
+        //  vs. "number foo number bar"
+        for view in [tagsView, attachmentsView, pollView, cardView] where !view.isHidden {
             guard let viewAccessibilityLabel = view.accessibilityLabel else { continue }
 
             accessibilityAttributedLabel.appendWithSeparator(viewAccessibilityLabel)
@@ -442,7 +444,7 @@ private extension StatusBodyView {
             let linkLength = text.length - linkStart
             text.addAttribute(
                 .link,
-                value: AppUrls.makeTagTimeline(name: tagId),
+                value: AppUrl.tagTimeline(tagId).url,
                 range: NSRange(location: linkStart, length: linkLength)
             )
         }
