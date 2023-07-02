@@ -26,12 +26,6 @@ public final class AttachmentViewModel: ObservableObject {
     }
 }
 
-extension AttachmentViewModel: Equatable {
-    public static func == (lhs: AttachmentViewModel, rhs: AttachmentViewModel) -> Bool {
-        lhs.attachment == rhs.attachment && lhs.status == rhs.status
-    }
-}
-
 public extension AttachmentViewModel {
     var tag: Int {
         attachment.id.appending(status?.id ?? "").hashValue

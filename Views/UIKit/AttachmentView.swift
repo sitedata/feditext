@@ -9,6 +9,14 @@ import ViewModels
 
 final class AttachmentView: UIView {
     let playerView = PlayerView()
+    let playView: UIVisualEffectView
+    let playVibrancyView: UIVisualEffectView
+    let playImageView = UIImageView(
+        image: UIImage(
+            systemName: "play.circle",
+            withConfiguration: UIImage.SymbolConfiguration(textStyle: .largeTitle)
+        )
+    )
     let imageView = SDAnimatedImageView()
     let removeButton = UIButton(type: .close)
     let uncaptionedLabel = CapsuleLabel()
@@ -16,6 +24,12 @@ final class AttachmentView: UIView {
 
     var playing: Bool = false {
         didSet {
+            guard let viewModel = viewModel else {
+                imageView.tag = 0
+                playerView.tag = 0
+                return
+            }
+
             if playing {
                 play()
                 imageView.tag = 0
@@ -28,13 +42,71 @@ final class AttachmentView: UIView {
         }
     }
 
-    private let viewModel: AttachmentViewModel
-    private let parentViewModel: AttachmentsRenderingViewModel
+    public var viewModel: AttachmentViewModel? {
+        didSet {
+            guard let viewModel = viewModel else {
+                playing = false
+                imageView.image = nil
+                return
+            }
+
+            imageView.tag = viewModel.tag
+
+            playView.isHidden = viewModel.attachment.type == .image
+
+            if let description = viewModel.attachment.description, !description.isEmpty {
+                selectionButton.accessibilityLabel?.appendWithSeparator(description)
+            }
+
+            updateUncaptionedLabel()
+
+            switch viewModel.attachment.type {
+            case .image, .video, .gifv:
+                let placeholderImage: UIImage?
+
+                if let blurHash = viewModel.attachment.blurhash {
+                    placeholderImage = UIImage(blurHash: blurHash, size: .blurHashSize)
+                } else {
+                    placeholderImage = nil
+                }
+
+                imageView.sd_setImage(
+                    with: viewModel.attachment.previewUrl?.url,
+                    placeholderImage: placeholderImage) { [weak self] _, _, _, _ in
+                    self?.layoutSubviews()
+                }
+            case .audio:
+                playImageView.image = UIImage(systemName: "waveform.circle",
+                                              withConfiguration: UIImage.SymbolConfiguration(textStyle: .largeTitle))
+                backgroundColor = .secondarySystemBackground
+            case .unknown:
+                playImageView.image = UIImage(systemName: "link",
+                                              withConfiguration: UIImage.SymbolConfiguration(textStyle: .largeTitle))
+                backgroundColor = .secondarySystemBackground
+            }
+
+            var accessibilityLabel = viewModel.attachment.type.accessibilityName
+
+            if let description = viewModel.attachment.description {
+                accessibilityLabel.appendWithSeparator(description)
+            }
+
+            self.accessibilityLabel = accessibilityLabel
+        }
+    }
+
+    public var parentViewModel: AttachmentsRenderingViewModel? {
+        didSet {
+            updateUncaptionedLabel()
+        }
+    }
+
     private var playerCancellable: AnyCancellable?
 
-    init(viewModel: AttachmentViewModel, parentViewModel: AttachmentsRenderingViewModel) {
-        self.viewModel = viewModel
-        self.parentViewModel = parentViewModel
+    init() {
+        let blurEffect = UIBlurEffect(style: .systemUltraThinMaterial)
+        playView = UIVisualEffectView(effect: blurEffect)
+        playVibrancyView = UIVisualEffectView(effect: UIVibrancyEffect(blurEffect: blurEffect))
 
         super.init(frame: .zero)
 
@@ -49,7 +121,7 @@ final class AttachmentView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        if let focus = viewModel.attachment.meta?.focus {
+        if let focus = viewModel?.attachment.meta?.focus {
             let viewsAndMediaSizes: [(UIView, CGSize?)] = [
                 (imageView, imageView.image?.size),
                 (playerView, playerView.player?.currentItem?.presentationSize)]
@@ -64,6 +136,8 @@ final class AttachmentView: UIView {
 
 extension AttachmentView {
     func play() {
+        guard let viewModel = viewModel else { return }
+
         let player = PlayerCache.shared.player(url: viewModel.attachment.url.url)
 
         playerCancellable = NotificationCenter.default.publisher(
@@ -99,7 +173,9 @@ extension AttachmentView {
     }
 
     func selectAttachment() {
-        parentViewModel.attachmentSelected(viewModel: viewModel)
+        guard let viewModel = viewModel else { return }
+
+        parentViewModel?.attachmentSelected(viewModel: viewModel)
     }
 }
 
@@ -111,14 +187,6 @@ private extension AttachmentView {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.autoPlayAnimatedImage = false
-        imageView.tag = viewModel.tag
-
-        let blurEffect = UIBlurEffect(style: .systemUltraThinMaterial)
-        let playView = UIVisualEffectView(effect: blurEffect)
-        let playVibrancyView = UIVisualEffectView(effect: UIVibrancyEffect(blurEffect: blurEffect))
-        let playImageView = UIImageView(
-            image: UIImage(systemName: "play.circle",
-                           withConfiguration: UIImage.SymbolConfiguration(textStyle: .largeTitle)))
 
         playImageView.translatesAutoresizingMaskIntoConstraints = false
         playVibrancyView.translatesAutoresizingMaskIntoConstraints = false
@@ -129,7 +197,6 @@ private extension AttachmentView {
         playView.translatesAutoresizingMaskIntoConstraints = false
         playView.clipsToBounds = true
         playView.layer.cornerRadius = .defaultCornerRadius
-        playView.isHidden = viewModel.attachment.type == .image
 
         addSubview(playerView)
         playerView.translatesAutoresizingMaskIntoConstraints = false
@@ -144,10 +211,6 @@ private extension AttachmentView {
             for: .touchUpInside)
         selectionButton.accessibilityLabel = NSLocalizedString("compose.attachment.edit", comment: "")
 
-        if let description = viewModel.attachment.description, !description.isEmpty {
-            selectionButton.accessibilityLabel?.appendWithSeparator(description)
-        }
-
         addSubview(removeButton)
         removeButton.translatesAutoresizingMaskIntoConstraints = false
         removeButton.showsMenuAsPrimaryAction = true
@@ -157,42 +220,18 @@ private extension AttachmentView {
                 UIAction(
                     title: NSLocalizedString("remove", comment: ""),
                     image: UIImage(systemName: "trash"),
-                    attributes: .destructive) { [weak self] _ in
-                    guard let self = self else { return }
+                    attributes: .destructive
+                ) { [weak self] _ in
+                    guard let self = self, let viewModel = self.viewModel else { return }
 
-                    self.parentViewModel.removeAttachment(viewModel: self.viewModel)
-                }])
+                    self.parentViewModel?.removeAttachment(viewModel: viewModel)
+                }
+            ]
+        )
 
         addSubview(uncaptionedLabel)
         uncaptionedLabel.translatesAutoresizingMaskIntoConstraints = false
         uncaptionedLabel.text = NSLocalizedString("compose.attachment.uncaptioned", comment: "")
-        uncaptionedLabel.isHidden = !(parentViewModel.canRemoveAttachments
-                                        && (viewModel.attachment.description?.isEmpty ?? true))
-
-        switch viewModel.attachment.type {
-        case .image, .video, .gifv:
-            let placeholderImage: UIImage?
-
-            if let blurHash = viewModel.attachment.blurhash {
-                placeholderImage = UIImage(blurHash: blurHash, size: .blurHashSize)
-            } else {
-                placeholderImage = nil
-            }
-
-            imageView.sd_setImage(
-                with: viewModel.attachment.previewUrl?.url,
-                placeholderImage: placeholderImage) { [weak self] _, _, _, _ in
-                self?.layoutSubviews()
-            }
-        case .audio:
-            playImageView.image = UIImage(systemName: "waveform.circle",
-                                          withConfiguration: UIImage.SymbolConfiguration(textStyle: .largeTitle))
-            backgroundColor = .secondarySystemBackground
-        case .unknown:
-            playImageView.image = UIImage(systemName: "link",
-                                          withConfiguration: UIImage.SymbolConfiguration(textStyle: .largeTitle))
-            backgroundColor = .secondarySystemBackground
-        }
 
         NSLayoutConstraint.activate([
             imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -228,13 +267,17 @@ private extension AttachmentView {
             uncaptionedLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
             uncaptionedLabel.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
         ])
+    }
 
-        var accessibilityLabel = viewModel.attachment.type.accessibilityName
-
-        if let description = viewModel.attachment.description {
-            accessibilityLabel.appendWithSeparator(description)
+    func updateUncaptionedLabel() {
+        guard let viewModel = viewModel,
+              let parentViewModel = parentViewModel else {
+            return
         }
 
-        self.accessibilityLabel = accessibilityLabel
+        uncaptionedLabel.isHidden = !(
+            parentViewModel.canRemoveAttachments
+            && (viewModel.attachment.description?.isEmpty ?? true)
+        )
     }
 }

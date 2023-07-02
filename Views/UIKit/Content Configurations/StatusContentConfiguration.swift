@@ -16,9 +16,3 @@ extension StatusContentConfiguration: UIContentConfiguration {
         self
     }
 }
-
-extension StatusContentConfiguration: Equatable {
-    static func == (lhs: StatusContentConfiguration, rhs: StatusContentConfiguration) -> Bool {
-        lhs.viewModel === rhs.viewModel
-    }
-}
