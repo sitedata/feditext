@@ -182,10 +182,10 @@
 "follow-requests" = "Follow Requests";
 "instance.about-instance-title-%@" = "About %@";
 "instance.registration" = "Registration";
-"instance.registration.approval-not-required" = "Registration approval required";
-"instance.registration.approval-required" = "Registration approval not required";
-"instance.registration.registration-closed" = "Open registration";
-"instance.registration.registration-open" = "Closed registration";
+"instance.registration.approval-not-required" = "Registration approval not required";
+"instance.registration.approval-required" = "Registration approval required";
+"instance.registration.registration-closed" = "Closed registration";
+"instance.registration.registration-open" = "Open registration";
 "instance.registration.invites-disabled" = "Invites disabled";
 "instance.registration.invites-enabled" = "Invites enabled";
 "instance.rules" = "Rules";
