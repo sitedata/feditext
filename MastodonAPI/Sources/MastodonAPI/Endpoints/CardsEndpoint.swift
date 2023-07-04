@@ -1,27 +1,25 @@
-// Copyright © 2020 Metabolist. All rights reserved.
+// Copyright © 2023 Vyr Cossont. All rights reserved.
 
 import Foundation
 import HTTP
 import Mastodon
 
-public enum TagsEndpoint {
+public enum CardsEndpoint {
     case trends(limit: Int? = nil, offset: Int? = nil)
-    case followed
 }
 
-extension TagsEndpoint: Endpoint {
-    public typealias ResultType = [Tag]
+extension CardsEndpoint: Endpoint {
+    public typealias ResultType = [Card]
 
     public var pathComponentsInContext: [String] {
         switch self {
-        case .trends: return ["trends", "tags"]
-        case .followed: return ["followed_tags"]
+        case .trends: return ["trends", "links"]
         }
     }
 
     public var method: HTTPMethod {
         switch self {
-        case .trends, .followed: return .get
+        case .trends: return .get
         }
     }
 
@@ -29,8 +27,6 @@ extension TagsEndpoint: Endpoint {
         switch self {
         case let .trends(limit, offset):
             return queryParameters(limit, offset)
-        case .followed:
-            return []
         }
     }
 }

@@ -41,5 +41,6 @@ public extension CollectionItemEvent {
     enum AccountListEdit {
         case acceptFollowRequest
         case rejectFollowRequest
+        case removeFollowSuggestion
     }
 }

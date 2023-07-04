@@ -108,7 +108,7 @@ private extension AutocompleteDataSource {
         var newSnapshot = NSDiffableDataSourceSnapshot<AutocompleteSection, AutocompleteItem>()
         let items: [AutocompleteItem] = searchViewModelUpdate.sections.map(\.items).reduce([], +).compactMap {
             switch $0 {
-            case let .account(account, _, _, _):
+            case let .account(account, _, _, _, _):
                 return .account(account)
             case let .tag(tag):
                 return .tag(tag)

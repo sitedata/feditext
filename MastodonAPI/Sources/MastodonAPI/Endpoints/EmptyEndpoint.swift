@@ -15,6 +15,7 @@ public enum EmptyEndpoint {
     case dismissAnnouncement(id: Announcement.Id)
     case addAnnouncementReaction(id: Announcement.Id, name: String)
     case removeAnnouncementReaction(id: Announcement.Id, name: String)
+    case removeFollowSuggestion(id: Account.Id)
 }
 
 extension EmptyEndpoint: Endpoint {
@@ -32,6 +33,8 @@ extension EmptyEndpoint: Endpoint {
             return defaultContext + ["domain_blocks"]
         case .dismissAnnouncement, .addAnnouncementReaction, .removeAnnouncementReaction:
             return defaultContext + ["announcements"]
+        case .removeFollowSuggestion:
+            return defaultContext + ["suggestions"]
         }
     }
 
@@ -49,6 +52,8 @@ extension EmptyEndpoint: Endpoint {
             return [id, "dismiss"]
         case let .addAnnouncementReaction(id, name), let .removeAnnouncementReaction(id, name):
             return [id, "reactions", name]
+        case let .removeFollowSuggestion(id):
+            return [id]
         }
     }
 
@@ -58,7 +63,12 @@ extension EmptyEndpoint: Endpoint {
             return .post
         case .addAnnouncementReaction:
             return .put
-        case .removeAccountsFromList, .deleteList, .deleteFilter, .unblockDomain, .removeAnnouncementReaction:
+        case .removeAccountsFromList,
+                .deleteList,
+                .deleteFilter,
+                .unblockDomain,
+                .removeAnnouncementReaction,
+                .removeFollowSuggestion:
             return .delete
         }
     }
@@ -71,7 +81,12 @@ extension EmptyEndpoint: Endpoint {
             return ["account_ids": Array(accountIds)]
         case let .blockDomain(domain), let .unblockDomain(domain):
             return ["domain": domain]
-        case .deleteList, .deleteFilter, .dismissAnnouncement, .addAnnouncementReaction, .removeAnnouncementReaction:
+        case .deleteList,
+                .deleteFilter,
+                .dismissAnnouncement,
+                .addAnnouncementReaction,
+                .removeAnnouncementReaction,
+                .removeFollowSuggestion:
             return nil
         }
     }

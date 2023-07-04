@@ -15,14 +15,24 @@ public struct ExploreService {
     init(environment: AppEnvironment, mastodonAPIClient: MastodonAPIClient, contentDatabase: ContentDatabase) {
         self.mastodonAPIClient = mastodonAPIClient
         self.contentDatabase = contentDatabase
-        navigationService = NavigationService(environment: environment,
-                                              mastodonAPIClient: mastodonAPIClient,
-                                              contentDatabase: contentDatabase)
+        navigationService = NavigationService(
+            environment: environment,
+            mastodonAPIClient: mastodonAPIClient,
+            contentDatabase: contentDatabase
+        )
     }
 }
 
 public extension ExploreService {
-    func fetchTrends() -> AnyPublisher<[Tag], Error> {
-        mastodonAPIClient.request(TagsEndpoint.trends)
+    func fetchTrendingTags() -> AnyPublisher<[Tag], Error> {
+        mastodonAPIClient.request(TagsEndpoint.trends())
+    }
+
+    func fetchTrendingLinks() -> AnyPublisher<[Card], Error> {
+        mastodonAPIClient.request(CardsEndpoint.trends())
+    }
+
+    func fetchTrendingStatuses() -> AnyPublisher<[Status], Error> {
+        mastodonAPIClient.request(StatusesEndpoint.trends())
     }
 }

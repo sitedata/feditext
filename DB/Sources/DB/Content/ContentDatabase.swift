@@ -305,6 +305,14 @@ public extension ContentDatabase {
                 .deleteAll)
     }
 
+    func remove(suggestion: Account.Id) -> AnyPublisher<Never, Error> {
+        databaseWriter.mutatingPublisher { db in
+            try SuggestionRecord
+                .filter(SuggestionRecord.Columns.id == id)
+                .deleteAll(db)
+        }
+    }
+
     func insert(identityProofs: [IdentityProof], id: Account.Id) -> AnyPublisher<Never, Error> {
         databaseWriter.mutatingPublisher {
             for identityProof in identityProofs {
@@ -345,8 +353,6 @@ public extension ContentDatabase {
 
     func insert(familiarFollowers: [FamiliarFollowers]) -> AnyPublisher<Never, Error> {
         databaseWriter.mutatingPublisher {
-            $0.trace { x in print(x) }
-
             for followedAccount in familiarFollowers {
                 var followingAccountIds: [Account.Id] = []
 
@@ -503,6 +509,18 @@ public extension ContentDatabase {
         try Rule.filter(!rules.map(\.id).contains(Rule.Columns.id)).deleteAll(db)
     }
 
+    func update(suggestions: [Suggestion]) -> AnyPublisher<Never, Error> {
+        databaseWriter.mutatingPublisher { db in
+            for suggestion in suggestions {
+                try suggestion.save(db)
+            }
+
+            try SuggestionRecord
+                .filter(!suggestions.map(\.account.id).contains(SuggestionRecord.Columns.id))
+                .deleteAll(db)
+        }
+    }
+
     func insert(results: Results) -> AnyPublisher<Never, Error> {
         databaseWriter.mutatingPublisher {
             for account in results.accounts {
@@ -554,7 +572,8 @@ public extension ContentDatabase {
 
     func accountListPublisher(
         id: AccountList.Id,
-        configuration: CollectionItem.AccountConfiguration) -> AnyPublisher<[CollectionSection], Error> {
+        configuration: CollectionItem.AccountConfiguration
+    ) -> AnyPublisher<[CollectionSection], Error> {
         ValueObservation.tracking(
             AccountListItemsInfo.request(AccountList.filter(AccountList.Columns.id == id)).fetchOne)
             .removeDuplicates()
@@ -565,7 +584,8 @@ public extension ContentDatabase {
                         .init(info: $0.accountInfo),
                         configuration,
                         $0.relationship,
-                        $0.familiarFollowers.map { followingAccountInfo in .init(info: followingAccountInfo) }
+                        $0.familiarFollowers.map { followingAccountInfo in .init(info: followingAccountInfo) },
+                        $0.suggestion?.source
                     )
                 }
             }
@@ -637,7 +657,8 @@ public extension ContentDatabase {
                 .init(info: $0.accountInfo),
                 .withoutNote,
                 $0.relationship,
-                $0.familiarFollowers.map { followingAccountInfo in .init(info: followingAccountInfo) }
+                $0.familiarFollowers.map { followingAccountInfo in .init(info: followingAccountInfo) },
+                $0.suggestion?.source
             ) }
 
             if let limit = limit, accounts.count >= limit {

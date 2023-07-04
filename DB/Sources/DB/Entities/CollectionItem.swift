@@ -6,11 +6,12 @@ import Mastodon
 public enum CollectionItem: Hashable {
     case status(Status, StatusConfiguration, Relationship?)
     case loadMore(LoadMore)
-    case account(Account, AccountConfiguration, Relationship?, [Account])
+    case account(Account, AccountConfiguration, Relationship?, [Account], Suggestion.Source?)
     case notification(MastodonNotification, [Rule], StatusConfiguration?)
     case multiNotification([MastodonNotification], MastodonNotification.NotificationType, Date, Status?)
     case conversation(Conversation)
     case tag(Tag)
+    case link(Card)
     case announcement(Announcement)
     case moreResults(MoreResults)
 }
@@ -48,6 +49,7 @@ public extension CollectionItem {
         case withNote
         case withoutNote
         case followRequest
+        case followSuggestion
         case mute
         case block
     }
@@ -58,7 +60,7 @@ public extension CollectionItem {
             return status.id
         case .loadMore:
             return nil
-        case let .account(account, _, _, _):
+        case let .account(account, _, _, _, _):
             return account.id
         case let .notification(notification, _, _):
             return notification.id
@@ -68,6 +70,8 @@ public extension CollectionItem {
             return conversation.id
         case let .tag(tag):
             return tag.name
+        case let .link(card):
+            return card.url.raw
         case let .announcement(announcement):
             return announcement.id
         case .moreResults:

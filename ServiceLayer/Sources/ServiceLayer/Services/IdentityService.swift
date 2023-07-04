@@ -331,7 +331,17 @@ public extension IdentityService {
             environment: environment,
             mastodonAPIClient: mastodonAPIClient,
             contentDatabase: contentDatabase,
-            titleComponents: titleComponents)
+            titleComponents: titleComponents
+        )
+    }
+
+    func suggestedAccountListService(titleComponents: [String]? = nil) -> SuggestedAccountListService {
+        SuggestedAccountListService(
+            environment: environment,
+            mastodonAPIClient: mastodonAPIClient,
+            contentDatabase: contentDatabase,
+            titleComponents: titleComponents
+        )
     }
 
     func exploreService() -> ExploreService {

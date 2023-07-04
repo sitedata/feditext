@@ -22,6 +22,9 @@ public struct Card: Codable, Equatable {
     public let height: Int?
     public let image: UnicodeURL?
     public let embedUrl: String?
+    /// Only present when returned from trends API:
+    /// https://docs.joinmastodon.org/entities/PreviewCard/#history
+    public let history: [History]?
 }
 
 extension Card: Hashable {

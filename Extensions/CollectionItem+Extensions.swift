@@ -13,8 +13,10 @@ extension CollectionItem {
         MultiNotificationTableViewCell.self,
         ConversationTableViewCell.self,
         TagTableViewCell.self,
+        CardTableViewCell.self,
         AnnouncementTableViewCell.self,
-        SeparatorConfiguredTableViewCell.self]
+        SeparatorConfiguredTableViewCell.self
+    ]
 
     var cellClass: AnyClass {
         switch self {
@@ -32,6 +34,8 @@ extension CollectionItem {
             return ConversationTableViewCell.self
         case .tag:
             return TagTableViewCell.self
+        case .link:
+            return CardTableViewCell.self
         case .announcement:
             return AnnouncementTableViewCell.self
         case .moreResults:
@@ -48,13 +52,14 @@ extension CollectionItem {
                 status: status,
                 configuration: configuration
             )
-        case let .account(account, configuration, relationship, familiarFollowers):
+        case let .account(account, configuration, relationship, familiarFollowers, suggestionSource):
             return AccountView.estimatedHeight(
                 width: width,
                 account: account,
                 configuration: configuration,
                 relationship: relationship,
-                familiarFollowers: familiarFollowers
+                familiarFollowers: familiarFollowers,
+                suggestionSource: suggestionSource
             )
         case .loadMore:
             return LoadMoreView.estimatedHeight
@@ -80,6 +85,8 @@ extension CollectionItem {
                 conversation: conversation)
         case let .tag(tag):
             return TagView.estimatedHeight(width: width, tag: tag)
+        case .link:
+            return UITableView.automaticDimension
         case let .announcement(announcement):
             return AnnouncementView.estimatedHeight(width: width, announcement: announcement)
         case .moreResults:
@@ -91,7 +98,7 @@ extension CollectionItem {
         switch self {
         case let .status(status, _, _):
             return status.mediaPrefetchURLs(identityContext: identityContext)
-        case let .account(account, _, _, _):
+        case let .account(account, _, _, _, _):
             return account.mediaPrefetchURLs(identityContext: identityContext)
         case let .notification(notification, _, _):
             var urls = notification.account.mediaPrefetchURLs(identityContext: identityContext)

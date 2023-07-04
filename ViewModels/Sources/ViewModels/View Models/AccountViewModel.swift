@@ -12,6 +12,7 @@ public final class AccountViewModel: ObservableObject {
     public internal(set) var configuration = CollectionItem.AccountConfiguration.withNote
     public internal(set) var relationship: Relationship?
     public internal(set) var familiarFollowers = [Account]()
+    public internal(set) var suggestionSource: Suggestion.Source?
     public internal(set) var identityProofs = [IdentityProof]()
     public internal(set) var featuredTags = [FeaturedTag]()
 
@@ -78,6 +79,20 @@ public extension AccountViewModel {
         } else if isGroup {
             return NSLocalizedString("account.type.group", comment: "")
         } else {
+            return ""
+        }
+    }
+
+    var suggestionSourceText: String {
+        guard let suggestionSource = suggestionSource else { return "" }
+        switch suggestionSource {
+        case .global:
+            return NSLocalizedString("account.type.group", comment: "")
+        case .pastInteractions:
+            return NSLocalizedString("account.type.group", comment: "")
+        case .staff:
+            return NSLocalizedString("account.type.group", comment: "")
+        case .unknown:
             return ""
         }
     }
@@ -277,6 +292,10 @@ public extension AccountViewModel {
         accountListEdit(accountService.rejectFollowRequest(), event: .rejectFollowRequest)
     }
 
+    func removeFollowSuggestion() {
+        accountListEdit(accountService.removeFollowSuggestion(), event: .removeFollowSuggestion)
+    }
+
     func confirmDomainBlock(domain: String) {
         eventsSubject.send(Just(.confirmDomainBlock(self)).setFailureType(to: Error.self).eraseToAnyPublisher())
     }
@@ -305,7 +324,7 @@ private extension AccountViewModel {
                 .map { [weak self] _ -> CollectionItemEvent in
                     guard let self = self else { return .ignorableOutput }
 
-                    return .accountListEdit(self, .acceptFollowRequest)
+                    return .accountListEdit(self, event)
                 }
                 .eraseToAnyPublisher())
     }

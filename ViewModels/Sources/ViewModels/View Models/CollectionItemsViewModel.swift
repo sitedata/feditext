@@ -137,6 +137,7 @@ public class CollectionItemsViewModel: ObservableObject {
             viewModel.accountViewModel.relationship = relationship
 
             return viewModel
+
         case let .loadMore(loadMore):
             if let cachedViewModel = cachedViewModel {
                 return cachedViewModel
@@ -150,7 +151,8 @@ public class CollectionItemsViewModel: ObservableObject {
             viewModelCache[item] = viewModel
 
             return viewModel
-        case let .account(account, configuration, relationship, familiarFollowers):
+
+        case let .account(account, configuration, relationship, familiarFollowers, suggestionSource):
             let viewModel: AccountViewModel
 
             if let cachedViewModel = cachedViewModel as? AccountViewModel {
@@ -166,8 +168,10 @@ public class CollectionItemsViewModel: ObservableObject {
             viewModel.configuration = configuration
             viewModel.relationship = relationship
             viewModel.familiarFollowers = familiarFollowers
+            viewModel.suggestionSource = suggestionSource
 
             return viewModel
+
         case let .notification(notification, rules, statusConfiguration):
             let viewModel: Any
 
@@ -196,6 +200,7 @@ public class CollectionItemsViewModel: ObservableObject {
             viewModelCache[item] = viewModel
 
             return viewModel
+
         case let .multiNotification(notifications, notificationType, date, status):
             if let cachedViewModel = cachedViewModel {
                 return cachedViewModel
@@ -215,6 +220,7 @@ public class CollectionItemsViewModel: ObservableObject {
             viewModelCache[item] = viewModel
 
             return viewModel
+
         case let .conversation(conversation):
             if let cachedViewModel = cachedViewModel {
                 return cachedViewModel
@@ -228,6 +234,7 @@ public class CollectionItemsViewModel: ObservableObject {
             viewModelCache[item] = viewModel
 
             return viewModel
+
         case let .tag(tag):
             if let cachedViewModel = cachedViewModel {
                 return cachedViewModel
@@ -238,6 +245,18 @@ public class CollectionItemsViewModel: ObservableObject {
             viewModelCache[item] = viewModel
 
             return viewModel
+
+        case let .link(card):
+            if let cachedViewModel = cachedViewModel {
+                return cachedViewModel
+            }
+
+            let viewModel = CardViewModel(card: card)
+
+            viewModelCache[item] = viewModel
+
+            return viewModel
+
         case let .announcement(announcement):
             if let cachedViewModel = cachedViewModel {
                 return cachedViewModel
@@ -252,6 +271,7 @@ public class CollectionItemsViewModel: ObservableObject {
             viewModelCache[item] = viewModel
 
             return viewModel
+
         case let .moreResults(moreResults):
             if let cachedViewModel = cachedViewModel {
                 return cachedViewModel
@@ -326,10 +346,13 @@ extension CollectionItemsViewModel: CollectionViewModel {
             send(event: .navigation(.collection(collectionService
                                                     .navigationService
                                                     .contextService(id: status.displayStatus.id))))
+
         case let .loadMore(loadMore):
             lastSelectedLoadMore = loadMore
             (viewModel(indexPath: indexPath) as? LoadMoreViewModel)?.loadMore()
-        case let .account(account, _, relationship, familiarFollowers):
+
+        case let .account(account, _, relationship, familiarFollowers, _):
+            // Suggestion source not used because it's only relevant in the context of the follow suggestions list.
             send(
                 event: .navigation(
                     .profile(
@@ -343,18 +366,36 @@ extension CollectionItemsViewModel: CollectionViewModel {
                     )
                 )
             )
+
         case let .notification(notification, _, _):
             if let report = notification.report {
-                send(event: .navigation(collectionService.navigationService.report(id: report.id)))
+                send(
+                    event: .navigation(
+                        collectionService.navigationService.report(id: report.id)
+                    )
+                )
             } else if let status = notification.status {
-                send(event: .navigation(.collection(collectionService
-                                                        .navigationService
-                                                        .contextService(id: status.displayStatus.id))))
+                send(
+                    event: .navigation(
+                        .collection(
+                            collectionService.navigationService.contextService(
+                                id: status.displayStatus.id
+                            )
+                        )
+                    )
+                )
             } else {
-                send(event: .navigation(.profile(collectionService
-                                                    .navigationService
-                                                    .profileService(account: notification.account))))
+                send(
+                    event: .navigation(
+                        .profile(
+                            collectionService.navigationService.profileService(
+                                account: notification.account
+                            )
+                        )
+                    )
+                )
             }
+
         case let .multiNotification(notifications, notificationType, date, status):
             if let status = status {
                 send(
@@ -384,6 +425,7 @@ extension CollectionItemsViewModel: CollectionViewModel {
                     )
                 )
             }
+
         case let .conversation(conversation):
             guard let status = conversation.lastStatus else { break }
 
@@ -391,15 +433,37 @@ extension CollectionItemsViewModel: CollectionViewModel {
                 .sink { _ in } receiveValue: { _ in }
                 .store(in: &cancellables)
 
-            send(event: .navigation(.collection(collectionService
-                                                    .navigationService
-                                                    .contextService(id: status.displayStatus.id))))
+            send(
+                event: .navigation(
+                    .collection(
+                        collectionService.navigationService.contextService(
+                            id: status.displayStatus.id
+                        )
+                    )
+                )
+            )
+
         case let .tag(tag):
-            send(event: .navigation(.collection(collectionService
-                                                    .navigationService
-                                                    .timelineService(timeline: .tag(tag.name)))))
+            send(
+                event: .navigation(
+                    .collection(
+                        collectionService.navigationService.timelineService(
+                            timeline: .tag(tag.name)
+                        )
+                    )
+                )
+            )
+
+        case let .link(card):
+            send(
+                event: .navigation(
+                    .url(card.url.url)
+                )
+            )
+
         case .announcement:
             break
+
         case let .moreResults(moreResults):
             searchScopeChangesSubject.send(moreResults.scope)
         }
@@ -453,16 +517,24 @@ extension CollectionItemsViewModel: CollectionViewModel {
     }
 
     public func applyAccountListEdit(viewModel: AccountViewModel, edit: CollectionItemEvent.AccountListEdit) {
-        (collectionService as? AccountListService)?.remove(id: viewModel.id)
-            .sink { _ in } receiveValue: { _ in }
-            .store(in: &cancellables)
-
         switch edit {
         case .acceptFollowRequest, .rejectFollowRequest:
+            (collectionService as? AccountListService)?.remove(id: viewModel.id)
+                .sink { _ in } receiveValue: { _ in }
+                .store(in: &cancellables)
+
             identityContext.service.verifyCredentials()
                 .assignErrorsToAlertItem(to: \.alertItem, on: self)
                 .sink { _ in }
                 .store(in: &cancellables)
+
+        case .removeFollowSuggestion:
+            (collectionService as? SuggestedAccountListService)?.remove(id: viewModel.id)
+                .sink { _ in } receiveValue: { _ in }
+                .store(in: &cancellables)
+
+            // Assume that the user will pull to refresh if they want more suggestions,
+            // so we don't refresh the list here.
         }
     }
 }

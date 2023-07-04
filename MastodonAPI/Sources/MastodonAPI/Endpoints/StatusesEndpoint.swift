@@ -12,6 +12,7 @@ public enum StatusesEndpoint {
     case accountsStatuses(id: Account.Id, excludeReplies: Bool, excludeReblogs: Bool, onlyMedia: Bool, pinned: Bool)
     case favourites
     case bookmarks
+    case trends(limit: Int? = nil, offset: Int? = nil)
 }
 
 extension StatusesEndpoint: Endpoint {
@@ -23,7 +24,7 @@ extension StatusesEndpoint: Endpoint {
             return defaultContext + ["timelines"]
         case .accountsStatuses:
             return defaultContext + ["accounts"]
-        case .favourites, .bookmarks:
+        default:
             return defaultContext
         }
     }
@@ -44,6 +45,8 @@ extension StatusesEndpoint: Endpoint {
             return ["favourites"]
         case .bookmarks:
             return ["bookmarks"]
+        case .trends:
+            return ["trends", "statuses"]
         }
     }
 
@@ -56,6 +59,8 @@ extension StatusesEndpoint: Endpoint {
                     URLQueryItem(name: "exclude_reblogs", value: String(excludeReblogs)),
                     URLQueryItem(name: "only_media", value: String(onlyMedia)),
                     URLQueryItem(name: "pinned", value: String(pinned))]
+        case let .trends(limit, offset):
+            return queryParameters(limit, offset)
         default:
             return []
         }

@@ -38,3 +38,16 @@ public extension Endpoint {
 
     var headers: [String: String]? { nil }
 }
+
+internal extension Endpoint {
+    func queryParameters(_ limit: Int?, _ offset: Int?) -> [URLQueryItem] {
+        var params = [URLQueryItem]()
+        if let limit = limit {
+            params.append(.init(name: "limit", value: .init(limit)))
+        }
+        if let offset = offset {
+            params.append(.init(name: "offset", value: .init(offset)))
+        }
+        return params
+    }
+}

@@ -93,24 +93,22 @@ private extension TagView {
 
         nameLabel.text = viewModel.name
 
-        if let accounts = viewModel.accounts {
-            let accountsText = String.localizedStringWithFormat(
-                NSLocalizedString("tag.people-talking-%ld", comment: ""),
-                accounts)
+        if let accountsText = viewModel.accountsText {
             accountsLabel.text = accountsText
-            accessibilityLabel.appendWithSeparator(accountsText)
             accountsLabel.isHidden = false
+            if let accessibilityAccountsText = viewModel.accessibilityAccountsText {
+                accessibilityLabel.appendWithSeparator(accessibilityAccountsText)
+            }
         } else {
             accountsLabel.isHidden = true
         }
 
-        if let uses = viewModel.uses {
-            usesLabel.text = String(uses)
+        if let recentUsesText = viewModel.recentUsesText {
+            usesLabel.text = recentUsesText
             usesLabel.isHidden = false
-            let accessibilityRecentUses = String.localizedStringWithFormat(
-                NSLocalizedString("tag.accessibility-recent-uses-%ld", comment: ""),
-                uses)
-            accessibilityLabel.appendWithSeparator(accessibilityRecentUses)
+            if let accessibilityRecentUsesText = viewModel.accessibilityRecentUsesText {
+                accessibilityLabel.appendWithSeparator(accessibilityRecentUsesText)
+            }
         } else {
             usesLabel.isHidden = true
         }

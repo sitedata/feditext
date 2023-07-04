@@ -383,6 +383,14 @@ extension ContentDatabase {
             }
         }
 
+        migrator.registerMigration("1.7.4-suggested-follows") { db in
+            try db.create(table: "suggestionRecord") { t in
+                t.column("id", .text).primaryKey(onConflict: .replace)
+                    .references("accountRecord", onDelete: .cascade)
+                t.column("source", .text).notNull()
+            }
+        }
+
         return migrator
     }
 }

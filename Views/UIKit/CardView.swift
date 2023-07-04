@@ -25,14 +25,7 @@ final class CardView: UIView {
             titleLabel.text = viewModel.title
             descriptionLabel.text = viewModel.description
             descriptionLabel.isHidden = descriptionLabel.text == "" || descriptionLabel.text == titleLabel.text
-
-            if
-                let host = viewModel.url.host, host.hasPrefix("www."),
-                let withoutWww = host.components(separatedBy: "www.").last {
-                urlLabel.text = withoutWww
-            } else {
-                urlLabel.text = viewModel.url.host
-            }
+            urlLabel.text = viewModel.displayHost
 
             if let urlLabelText = urlLabel.text {
                 accessibilityLabel.appendWithSeparator(urlLabelText)
@@ -95,6 +88,7 @@ private extension CardView {
         imageView.clipsToBounds = true
         imageView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         imageView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        imageView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
         innerStackView.axis = .vertical
         innerStackView.isLayoutMarginsRelativeArrangement = true

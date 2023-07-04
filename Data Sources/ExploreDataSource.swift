@@ -9,12 +9,22 @@ final class ExploreDataSource: UICollectionViewDiffableDataSource<ExploreViewMod
     private let updateQueue =
         DispatchQueue(label: "com.metabolist.metatext.explore-data-source.update-queue")
     private weak var collectionView: UICollectionView?
+    private let identityContext: IdentityContext
     private var cancellables = Set<AnyCancellable>()
 
     init(collectionView: UICollectionView, viewModel: ExploreViewModel) {
         self.collectionView = collectionView
+        self.identityContext = viewModel.identityContext
 
         let tagRegistration = UICollectionView.CellRegistration<TagCollectionViewCell, TagViewModel> {
+            $0.viewModel = $2
+        }
+
+        let linkRegistration = UICollectionView.CellRegistration<CardCollectionViewCell, CardViewModel> {
+            $0.viewModel = $2
+        }
+
+        let statusRegistration = UICollectionView.CellRegistration<StatusCollectionViewCell, StatusViewModel> {
             $0.viewModel = $2
         }
 
@@ -30,6 +40,9 @@ final class ExploreDataSource: UICollectionViewDiffableDataSource<ExploreViewMod
             case .profileDirectory:
                 configuration.text = NSLocalizedString("explore.profile-directory", comment: "")
                 configuration.image = UIImage(systemName: "person.crop.square.fill.and.at.rectangle")
+            case .suggestedAccounts:
+                configuration.text = NSLocalizedString("explore.suggested-accounts", comment: "")
+                configuration.image = UIImage(systemName: "person.line.dotted.person.fill")
             default:
                 break
             }
@@ -45,6 +58,16 @@ final class ExploreDataSource: UICollectionViewDiffableDataSource<ExploreViewMod
                     using: tagRegistration,
                     for: $1,
                     item: viewModel.viewModel(tag: tag))
+            case let .link(card):
+                return $0.dequeueConfiguredReusableCell(
+                    using: linkRegistration,
+                    for: $1,
+                    item: viewModel.viewModel(card: card))
+            case let .status(status):
+                return $0.dequeueConfiguredReusableCell(
+                    using: statusRegistration,
+                    for: $1,
+                    item: viewModel.viewModel(status: status))
             case .instance:
                 return $0.dequeueConfiguredReusableCell(
                     using: instanceRegistration,
@@ -57,15 +80,16 @@ final class ExploreDataSource: UICollectionViewDiffableDataSource<ExploreViewMod
 
         let headerRegistration = UICollectionView.SupplementaryRegistration
         <ExploreSectionHeaderView>(elementKind: UICollectionView.elementKindSectionHeader) { [weak self] in
-            $0.label.text = self?.snapshot().sectionIdentifiers[$2.section].displayName
+            $0.label.text = self?.snapshot().sectionIdentifiers[$2.section]
+                .displayName(viewModel.identityContext.appPreferences.statusWord)
         }
 
         supplementaryViewProvider = {
             $0.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: $2)
         }
 
-        viewModel.$trends.combineLatest(viewModel.$instanceViewModel)
-            .sink { [weak self] in self?.update(tags: $0, instanceViewModel: $1) }
+        viewModel.$instanceViewModel.combineLatest(viewModel.$tags, viewModel.$links, viewModel.$statuses)
+            .sink { [weak self] in self?.update(instanceViewModel: $0, tags: $1, links: $2, statuses: $3) }
             .store(in: &cancellables)
     }
 
@@ -79,21 +103,35 @@ final class ExploreDataSource: UICollectionViewDiffableDataSource<ExploreViewMod
 }
 
 private extension ExploreDataSource {
-    func update(tags: [Tag], instanceViewModel: InstanceViewModel?) {
+    func update(instanceViewModel: InstanceViewModel?, tags: [Tag], links: [Card], statuses: [Status]) {
         var newsnapshot = NSDiffableDataSourceSnapshot<ExploreViewModel.Section, ExploreViewModel.Item>()
 
-        if !tags.isEmpty {
-            newsnapshot.appendSections([.trending])
-            newsnapshot.appendItems(tags.map(ExploreViewModel.Item.tag), toSection: .trending)
-        }
-
-        if let instanceViewModel = instanceViewModel {
-            newsnapshot.appendSections([.instance])
-            newsnapshot.appendItems([.instance], toSection: .instance)
+        // TODO: (Vyr) move these to their own tab. Note that the .instance *item* is not used at the moment,
+        //  but could be restored on a future instance tab.
+        if let instanceViewModel = instanceViewModel {newsnapshot.appendSections([.instance])
+//            newsnapshot.appendItems([.instance], toSection: .instance)
 
             if instanceViewModel.instance.canShowProfileDirectory {
                 newsnapshot.appendItems([.profileDirectory], toSection: .instance)
             }
+
+            // TODO: (Vyr) rewrite these to not need version-based support flags
+            newsnapshot.appendItems([.suggestedAccounts], toSection: .instance)
+        }
+
+        if !tags.isEmpty {
+            newsnapshot.appendSections([.tags])
+            newsnapshot.appendItems(tags.map(ExploreViewModel.Item.tag), toSection: .tags)
+        }
+
+        if !links.isEmpty {
+            newsnapshot.appendSections([.links])
+            newsnapshot.appendItems(links.map(ExploreViewModel.Item.link), toSection: .links)
+        }
+
+        if !statuses.isEmpty {
+            newsnapshot.appendSections([.statuses])
+            newsnapshot.appendItems(statuses.map(ExploreViewModel.Item.status), toSection: .statuses)
         }
 
         let wasEmpty = self.snapshot().itemIdentifiers.isEmpty
@@ -108,10 +146,19 @@ private extension ExploreDataSource {
 }
 
 private extension ExploreViewModel.Section {
-    var displayName: String {
+    func displayName(_ statusWord: AppPreferences.StatusWord) -> String {
         switch self {
-        case .trending:
-            return NSLocalizedString("explore.trending", comment: "")
+        case .tags:
+            return NSLocalizedString("explore.trending.tags", comment: "")
+        case .links:
+            return NSLocalizedString("explore.trending.links", comment: "")
+        case .statuses:
+            switch statusWord {
+            case .post:
+                return NSLocalizedString("explore.trending.statuses.post", comment: "")
+            case .toot:
+                return NSLocalizedString("explore.trending.statuses.toot", comment: "")
+            }
         case .instance:
             return NSLocalizedString("explore.instance", comment: "")
         }

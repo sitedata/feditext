@@ -5,6 +5,7 @@ import SDWebImage
 import UIKit
 import ViewModels
 
+// TODO: (Vyr) support follow/reject buttons for suggested follows
 final class AccountView: UIView {
     let avatarImageView = SDAnimatedImageView()
     let displayNameLabel = AnimatedAttachmentLabel()
@@ -33,6 +34,11 @@ final class AccountView: UIView {
     /// Displays first few display names of current user's follows who also follow this account.
     let familiarFollowersLabel = FamiliarFollowersLabel()
 
+    let suggestionSourceStack = UIStackView()
+    let suggestionSourceIcon = UIImageView()
+    /// Displays text explanation of why this account was suggested as a follow.
+    let suggestionSourceLabel = UILabel()
+
     let relationshipNoteStack = UIStackView()
     /// Displays the current user's note for this account.
     let relationshipNotes = UILabel()
@@ -41,6 +47,7 @@ final class AccountView: UIView {
     let noteTextView = TouchFallthroughTextView()
 
     let acceptFollowRequestButton = UIButton()
+    /// Overloaded: also removes follow suggestions.
     let rejectFollowRequestButton = UIButton()
     let muteButton = UIButton(type: .system)
     let unmuteButton = UIButton(type: .system)
@@ -70,7 +77,8 @@ extension AccountView {
         account: Account,
         configuration: CollectionItem.AccountConfiguration,
         relationship: Relationship?,
-        familiarFollowers: [Account]
+        familiarFollowers: [Account],
+        suggestionSource: Suggestion.Source?
     ) -> CGFloat {
         var height = CGFloat.defaultSpacing * 2
             + .compactSpacing
@@ -81,6 +89,8 @@ extension AccountView {
             height += relationshipNote.height(width: width, font: .preferredFont(forTextStyle: .subheadline))
         }
 
+        // TODO: (Vyr) this is missing a bunch of relationship labels
+
         if !familiarFollowers.isEmpty {
             height += familiarFollowers
                 .prefix(4)
@@ -88,7 +98,7 @@ extension AccountView {
                 .joined(separator: ", ")
                 .height(
                     width: width,
-                    font: .preferredFont(forTextStyle: .subheadline)
+                    font: .preferredFont(forTextStyle: .footnote)
                 )
         }
 
@@ -96,6 +106,8 @@ extension AccountView {
             height += .compactSpacing + account.note.attributed.string.height(
                 width: width,
                 font: .preferredFont(forTextStyle: .callout))
+        } else if configuration == .followSuggestion, suggestionSource != nil {
+            height += .compactSpacing + UIFont.preferredFont(forTextStyle: .footnote).lineHeight
         }
 
         return max(height, .avatarDimension + .defaultSpacing * 2)
@@ -204,6 +216,7 @@ private extension AccountView {
         verticalStackView.addArrangedSubview(visibilityRelationshipStack)
         verticalStackView.addArrangedSubview(followRelationshipStack)
         verticalStackView.addArrangedSubview(familiarFollowersLabel)
+        verticalStackView.addArrangedSubview(suggestionSourceStack)
         verticalStackView.addArrangedSubview(relationshipNoteStack)
         verticalStackView.addArrangedSubview(noteTextView)
 
@@ -272,6 +285,21 @@ private extension AccountView {
         familiarFollowersLabel.adjustsFontForContentSizeCategory = true
         familiarFollowersLabel.textColor = .secondaryLabel
 
+        suggestionSourceStack.axis = .horizontal
+        suggestionSourceStack.alignment = .center
+        suggestionSourceStack.spacing = .ultraCompactSpacing
+
+        suggestionSourceStack.addArrangedSubview(suggestionSourceIcon)
+        suggestionSourceIcon.tintColor = .secondaryLabel
+        suggestionSourceIcon.setContentHuggingPriority(.required, for: .horizontal)
+        suggestionSourceIcon.setContentHuggingPriority(.required, for: .vertical)
+        suggestionSourceIcon.adjustsImageSizeForAccessibilityContentSizeCategory = true
+
+        suggestionSourceStack.addArrangedSubview(suggestionSourceLabel)
+        suggestionSourceLabel.font = .preferredFont(forTextStyle: .footnote)
+        suggestionSourceLabel.adjustsFontForContentSizeCategory = true
+        suggestionSourceLabel.textColor = .secondaryLabel
+
         let relationshipNoteIcon = UIImageView()
         relationshipNoteStack.addArrangedSubview(relationshipNoteIcon)
         relationshipNoteIcon.image = .init(systemName: "note.text")
@@ -311,7 +339,17 @@ private extension AccountView {
         rejectFollowRequestButton.tintColor = .systemRed
         rejectFollowRequestButton.setContentHuggingPriority(.required, for: .horizontal)
         rejectFollowRequestButton.addAction(
-            UIAction { [weak self] _ in self?.accountConfiguration.viewModel.rejectFollowRequest() },
+            UIAction { [weak self] _ in
+                guard let viewModel = self?.accountConfiguration.viewModel else { return }
+                switch viewModel.configuration {
+                case .followRequest:
+                    viewModel.rejectFollowRequest()
+                case .followSuggestion:
+                    viewModel.removeFollowSuggestion()
+                default:
+                    break
+                }
+            },
             for: .touchUpInside)
 
         stackView.addArrangedSubview(muteButton)
@@ -428,9 +466,10 @@ private extension AccountView {
         }
 
         let isFollowRequest = viewModel.configuration == .followRequest
+        let isFollowSuggestion = viewModel.configuration == .followSuggestion
 
         acceptFollowRequestButton.isHidden = !isFollowRequest
-        rejectFollowRequestButton.isHidden = !isFollowRequest
+        rejectFollowRequestButton.isHidden = !isFollowRequest && !isFollowSuggestion
 
         let followRelationshipShown: Bool
         if !viewModel.isSelf, let relationship = viewModel.relationship {
@@ -516,6 +555,17 @@ private extension AccountView {
             familiarFollowersLabel.isHidden = true
         }
 
+        if viewModel.configuration == .followSuggestion, let suggestionSource = viewModel.suggestionSource {
+            suggestionSourceStack.isHidden = false
+            suggestionSourceIcon.image = .init(
+                systemName: suggestionSource.systemImageName,
+                withConfiguration: UIImage.SymbolConfiguration(scale: .small)
+            )
+            suggestionSourceLabel.text = NSLocalizedString(suggestionSource.localizedStringKey, comment: "")
+        } else {
+            suggestionSourceStack.isHidden = true
+        }
+
         let accessibilityAttributedLabel = NSMutableAttributedString(string: "")
 
         if !displayNameLabel.isHidden, let displayName = displayNameLabel.attributedText {
@@ -523,6 +573,11 @@ private extension AccountView {
             accessibilityAttributedLabel.appendWithSeparator(viewModel.accountName)
         } else {
             accessibilityAttributedLabel.appendWithSeparator(viewModel.accountName)
+        }
+
+        if !verifiedStack.isHidden, let verifiedValue = verifiedLabel.attributedText {
+            accessibilityAttributedLabel.appendWithSeparator(NSLocalizedString("account.verified", comment: ""))
+            accessibilityAttributedLabel.appendWithSeparator(verifiedValue)
         }
 
         if !visibilityRelationshipStack.isHidden, let visibility = visibilityRelationshipLabel.attributedText {
@@ -537,13 +592,12 @@ private extension AccountView {
             accessibilityAttributedLabel.appendWithSeparator(familiarFollowers)
         }
 
-        if !verifiedStack.isHidden, let verifiedValue = verifiedLabel.attributedText {
-            accessibilityAttributedLabel.appendWithSeparator(NSLocalizedString("account.verified", comment: ""))
-            accessibilityAttributedLabel.appendWithSeparator(verifiedValue)
-        }
-
         if !relationshipNoteStack.isHidden, let relationshipNote = relationshipNotes.attributedText {
             accessibilityAttributedLabel.appendWithSeparator(relationshipNote)
+        }
+
+        if !suggestionSourceStack.isHidden, let suggestionSource = suggestionSourceLabel.attributedText {
+            accessibilityAttributedLabel.appendWithSeparator(suggestionSource)
         }
 
         if !noteTextView.isHidden, let note = noteTextView.attributedText {
@@ -557,19 +611,37 @@ private extension AccountView {
                 UIAccessibilityCustomAction(
                     name: NSLocalizedString(
                         "account.accept-follow-request-button.accessibility-label",
-                        comment: "")) { [weak self] _ in
-                        self?.accountConfiguration.viewModel.acceptFollowRequest()
+                        comment: ""
+                    )
+                ) { [weak self] _ in
+                    self?.accountConfiguration.viewModel.acceptFollowRequest()
 
-                        return true
-                    },
+                    return true
+                },
                 UIAccessibilityCustomAction(
                     name: NSLocalizedString(
                         "account.reject-follow-request-button.accessibility-label",
-                        comment: "")) { [weak self] _ in
-                        self?.accountConfiguration.viewModel.rejectFollowRequest()
+                        comment: ""
+                    )
+                ) { [weak self] _ in
+                    self?.accountConfiguration.viewModel.rejectFollowRequest()
 
-                        return true
-                    }]
+                    return true
+                }
+            ]
+        } else if isFollowSuggestion {
+            accessibilityCustomActions = [
+                UIAccessibilityCustomAction(
+                    name: NSLocalizedString(
+                        "account.remove-follow-suggestion-button.accessibility-label",
+                        comment: ""
+                    )
+                ) { [weak self] _ in
+                    self?.accountConfiguration.viewModel.rejectFollowRequest()
+
+                    return true
+                }
+            ]
         } else if viewModel.configuration == .mute, let relationship = viewModel.relationship {
             if relationship.muting {
                 accessibilityCustomActions = [

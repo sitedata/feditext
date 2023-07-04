@@ -74,6 +74,7 @@ extension AccountRecord {
         through: familiarFollowersJoins,
         using: FamiliarFollowersJoin.followingAccount
     )
+    static let suggestion = hasOne(SuggestionRecord.self)
 
     var pinnedStatuses: QueryInterfaceRequest<StatusInfo> {
         StatusInfo.request(request(for: Self.pinnedStatuses))

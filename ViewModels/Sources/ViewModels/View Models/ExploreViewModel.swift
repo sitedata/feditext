@@ -9,13 +9,16 @@ public final class ExploreViewModel: ObservableObject {
     public let searchViewModel: SearchViewModel
     public let events: AnyPublisher<Event, Never>
     @Published public var instanceViewModel: InstanceViewModel?
-    @Published public var trends = [Tag]()
+    @Published public var tags = [Tag]()
+    @Published public var links = [Card]()
+    @Published public var statuses = [Status]()
     @Published public private(set) var loading = false
     @Published public var alertItem: AlertItem?
     public let identityContext: IdentityContext
 
     private let exploreService: ExploreService
     private let eventsSubject = PassthroughSubject<Event, Never>()
+    private let statusEventsSubject = PassthroughSubject<AnyPublisher<CollectionItemEvent, Error>, Never>()
     private var cancellables = Set<AnyCancellable>()
 
     init(service: ExploreService, identityContext: IdentityContext) {
@@ -30,6 +33,22 @@ public final class ExploreViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .assignErrorsToAlertItem(to: \.alertItem, on: self)
             .assign(to: &$instanceViewModel)
+
+        // Forward collection navigation events to our events subject.
+        statusEventsSubject
+            .receive(on: DispatchQueue.main)
+            .flatMap { $0.assignErrorsToAlertItem(to: \.alertItem, on: self) }
+            .compactMap {
+                switch $0 {
+                case let CollectionItemEvent.navigation(nav):
+                    return Event.navigation(nav)
+                default:
+                    assertionFailure("Untranslatable CollectionItemEvent: \($0)")
+                    return nil
+                }
+            }
+            .sink(receiveValue: { [weak self] in self?.eventsSubject.send($0) })
+            .store(in: &cancellables)
     }
 }
 
@@ -39,25 +58,49 @@ public extension ExploreViewModel {
     }
 
     enum Section: Hashable {
-        case trending
+        case tags
+        case links
+        case statuses
         case instance
     }
 
     enum Item: Hashable {
         case tag(Tag)
+        case link(Card)
+        case status(Status)
         case instance
         case profileDirectory
+        case suggestedAccounts
     }
 
     func refresh() {
-        exploreService.fetchTrends()
-            .handleEvents(receiveOutput: { [weak self] trends in
+        let refreshInstance = identityContext.service.refreshInstance()
+
+        let refreshTags = exploreService.fetchTrendingTags()
+            .handleEvents(receiveOutput: { [weak self] tags in
                 DispatchQueue.main.async {
-                    self?.trends = trends
+                    self?.tags = tags
                 }
             })
             .ignoreOutput()
-            .merge(with: identityContext.service.refreshInstance())
+
+        let refreshLinks = exploreService.fetchTrendingLinks()
+            .handleEvents(receiveOutput: { [weak self] links in
+                DispatchQueue.main.async {
+                    self?.links = links
+                }
+            })
+            .ignoreOutput()
+
+        let refreshStatuses = exploreService.fetchTrendingStatuses()
+            .handleEvents(receiveOutput: { [weak self] statuses in
+                DispatchQueue.main.async {
+                    self?.statuses = statuses
+                }
+            })
+            .ignoreOutput()
+
+        refreshInstance.merge(with: refreshTags, refreshLinks, refreshStatuses)
             .receive(on: DispatchQueue.main)
             .handleEvents(receiveSubscription: { [weak self] _ in self?.loading = true },
                           receiveCompletion: { [weak self] _ in self?.loading = false })
@@ -69,21 +112,70 @@ public extension ExploreViewModel {
         return .init(tag: tag, identityContext: identityContext)
     }
 
+    func viewModel(card: Card) -> CardViewModel {
+        .init(card: card)
+    }
+
+    func viewModel(status: Status) -> StatusViewModel {
+        .init(
+            statusService: exploreService.navigationService.statusService(status: status),
+            identityContext: identityContext,
+            eventsSubject: statusEventsSubject
+        )
+    }
+
     func select(item: ExploreViewModel.Item) {
         switch item {
         case let .tag(tag):
             eventsSubject.send(
-                .navigation(.collection(exploreService
-                                            .navigationService
-                                            .timelineService(timeline: .tag(tag.name)))))
+                .navigation(
+                    .collection(
+                        exploreService.navigationService.timelineService(
+                            timeline: .tag(tag.name)
+                        )
+                    )
+                )
+            )
+
+        case let .link(card):
+            eventsSubject.send(.navigation(.url(card.url.url)))
+
+        case let .status(status):
+            eventsSubject.send(
+                .navigation(
+                    .collection(
+                        exploreService.navigationService.contextService(
+                            id: status.id
+                        )
+                    )
+                )
+            )
+
         case .instance:
             break
+
         case .profileDirectory:
             eventsSubject.send(
-                .navigation(.collection(identityContext
-                                            .service
-                                            .service(accountList: .directory(local: true),
-                                                     titleComponents: ["explore.profile-directory"]))))
+                .navigation(
+                    .collection(
+                        identityContext.service.service(
+                            accountList: .directory(local: true),
+                            titleComponents: ["explore.profile-directory"]
+                        )
+                    )
+                )
+            )
+
+        case .suggestedAccounts:
+            eventsSubject.send(
+                .navigation(
+                    .collection(
+                        identityContext.service.suggestedAccountListService(
+                            titleComponents: ["explore.suggested-accounts"]
+                        )
+                    )
+                )
+            )
         }
     }
 }

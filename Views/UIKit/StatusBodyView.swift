@@ -189,7 +189,8 @@ extension StatusBodyView {
                 width: width,
                 identityContext: identityContext,
                 status: status,
-                configuration: configuration)
+                configuration: configuration
+            )
         }
 
         //  This would be so much more convenient if it took a StatusViewModel…

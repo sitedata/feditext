@@ -122,6 +122,10 @@ public extension AccountService {
         relationshipAction(.rejectFollowRequest(id: account.id))
     }
 
+    func removeFollowSuggestion() -> AnyPublisher<Never, Error> {
+        removeFollowSuggestionAction(id: account.id)
+    }
+
     func report(_ elements: ReportElements) -> AnyPublisher<Never, Error> {
         mastodonAPIClient.request(ReportEndpoint.create(elements)).ignoreOutput().eraseToAnyPublisher()
     }
@@ -168,6 +172,13 @@ private extension AccountService {
         mastodonAPIClient.request(endpoint)
             .flatMap { _ in mastodonAPIClient.request(RelationshipsEndpoint.relationships(ids: [account.id])) }
             .flatMap { contentDatabase.insert(relationships: $0) }
+            .ignoreOutput()
+            .eraseToAnyPublisher()
+    }
+
+    func removeFollowSuggestionAction(id: Account.Id) -> AnyPublisher<Never, Error> {
+        mastodonAPIClient.request(EmptyEndpoint.removeFollowSuggestion(id: id))
+            .flatMap { _ in contentDatabase.remove(suggestion: id) }
             .ignoreOutput()
             .eraseToAnyPublisher()
     }

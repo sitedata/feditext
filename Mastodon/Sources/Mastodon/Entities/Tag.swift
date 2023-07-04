@@ -9,15 +9,16 @@ public struct Tag: Codable {
     public let url: UnicodeURL
     public let history: [History]?
     public let following: Bool?
+
+    public init(name: Name, url: UnicodeURL, history: [History]?, following: Bool?) {
+        self.name = name
+        self.url = url
+        self.history = history
+        self.following = following
+    }
 }
 
 public extension Tag {
-    struct History: Codable, Hashable {
-        public let day: String
-        public let uses: String
-        public let accounts: String
-    }
-
     /// > Warning: Two tag names that are not equal may still represent the same tag.
     /// > Authoritative tag comparison should only be done server-side due to this… thing:
     /// > https://github.com/mastodon/mastodon/blob/main/app/lib/hashtag_normalizer.rb
