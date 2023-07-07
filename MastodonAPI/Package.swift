@@ -18,12 +18,13 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "HTTP"),
-        .package(path: "Mastodon")
+        .package(path: "Mastodon"),
+        .package(url: "https://github.com/ddddxxx/Semver.git", .upToNextMinor(from: "0.2.0"))
     ],
     targets: [
         .target(
             name: "MastodonAPI",
-            dependencies: ["HTTP", "Mastodon"]),
+            dependencies: ["HTTP", "Mastodon", "Semver"]),
         .target(
             name: "MastodonAPIStubs",
             dependencies: ["MastodonAPI", .product(name: "Stubbing", package: "HTTP")],

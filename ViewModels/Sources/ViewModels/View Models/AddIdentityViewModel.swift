@@ -27,7 +27,7 @@ public final class AddIdentityViewModel: ObservableObject {
         self.instanceURLService = instanceURLService
 
         let url = $urlFieldText
-            .throttle(for: .seconds(Self.textFieldThrottleInterval), scheduler: DispatchQueue.global(), latest: true)
+            .debounce(for: .seconds(Self.textFieldDebounceInterval), scheduler: DispatchQueue.global())
             .removeDuplicates()
             .flatMap {
                 instanceURLService.url(text: $0.trimmingCharacters(in: .whitespacesAndNewlines)).publisher
@@ -80,7 +80,7 @@ public extension AddIdentityViewModel {
 }
 
 private extension AddIdentityViewModel {
-    private static let textFieldThrottleInterval: TimeInterval = 0.5
+    private static let textFieldDebounceInterval: TimeInterval = 0.5
     func addIdentity(kind: AllIdentitiesService.IdentityCreation) {
         instanceURLService.url(text: urlFieldText.trimmingCharacters(in: .whitespacesAndNewlines)).publisher
             .map { ($0, kind) }

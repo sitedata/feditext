@@ -4,6 +4,7 @@ import Foundation
 import HTTP
 import Mastodon
 
+/// https://docs.joinmastodon.org/methods/suggestions/
 public enum SuggestionsEndpoint {
     case suggestions(limit: Int? = nil)
 }
@@ -20,4 +21,13 @@ extension SuggestionsEndpoint: Endpoint {
             return queryParameters(limit, nil)
         }
     }
+
+    public var requires: APICapabilityRequirements? {
+        [
+            .mastodon: "3.4.0",
+            .hometown: "3.4.0"
+        ]
+    }
+
+    public var fallback: [Suggestion]? { [] }
 }

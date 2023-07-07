@@ -33,6 +33,15 @@ public struct Instance: Codable {
     }
 
     public let uri: String
+    /// Mastodon servers use a bare domain in the `uri` field,
+    /// but Akkoma and GotoSocial (at least) use an `https://` URL.
+    public var domain: String {
+        if let url = URL(string: uri), let host = url.host {
+            return host
+        } else {
+            return uri
+        }
+    }
     public let title: String
     public let description: HTML
     public let shortDescription: String?
@@ -84,35 +93,5 @@ public struct Instance: Codable {
 extension Instance: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(uri)
-    }
-}
-
-public extension Instance {
-    var majorVersion: Int? {
-        guard let majorVersionString = version.split(separator: ".").first else { return nil }
-
-        return Int(majorVersionString)
-    }
-
-    var minorVersion: Int? {
-        let versionComponents = version.split(separator: ".")
-
-        guard versionComponents.count > 1 else { return nil }
-
-        return Int(versionComponents[1])
-    }
-
-    var patchVersion: String? {
-        let versionComponents = version.split(separator: ".")
-
-        guard versionComponents.count > 2 else { return nil }
-
-        return String(versionComponents[2])
-    }
-
-    var canShowProfileDirectory: Bool {
-        guard let majorVersion = majorVersion else { return false }
-
-        return majorVersion >= 3
     }
 }

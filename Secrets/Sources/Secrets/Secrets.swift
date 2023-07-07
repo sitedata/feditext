@@ -37,6 +37,12 @@ public extension Secrets {
         case identityDatabaseName
         case accountId
         case username
+        /// - See: `NodeInfo.software.name`
+        /// - See: `APICapabilities`
+        case softwareName
+        /// - See: `NodeInfo.software.version`
+        /// - See: `APICapabilities`
+        case softwareVersion
     }
 }
 
@@ -181,6 +187,22 @@ public extension Secrets {
 
     func setUsername(_ username: String) throws {
         try set(username, forItem: .username)
+    }
+
+    func getSoftwareName() throws -> String {
+        try item(.softwareName)
+    }
+
+    func setSoftwareName(_ name: String) throws {
+        try set(name, forItem: .softwareName)
+    }
+
+    func getSoftwareVersion() throws -> String {
+        try item(.softwareVersion)
+    }
+
+    func setSoftwareVersion(_ version: String) throws {
+        try set(version, forItem: .softwareVersion)
     }
 
     func generatePushKeyAndReturnPublicKey() throws -> Data {

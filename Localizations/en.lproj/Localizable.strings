@@ -91,6 +91,7 @@
 "activity.open-in-default-browser" = "Open in default browser";
 "add" = "Add";
 "announcement.insert-emoji" = "Insert emoji";
+"api-error.api-not-available" = "API not available on this instance";
 "api-error.unable-to-fetch-remote-status" = "Unable to fetch remote status";
 "apns-default-message" = "New notification";
 "app-icon.brutalist" = "Brutalist";
@@ -188,6 +189,12 @@
 "explore.suggested-accounts.source.unknown" = "Suggested for unknown reason";
 "error" = "Error";
 "favorites" = "Favorites";
+"flavor.mastodon.name" = "Mastodon";
+"flavor.hometown.name" = "Hometown";
+"flavor.pleroma.name" = "Pleroma";
+"flavor.akkoma.name" = "Akkoma";
+"flavor.gotosocial.name" = "GotoSocial";
+"flavor.calckey.name" = "Calckey";
 "followed-tags.new-tag-title" = "Hashtag (without #)";
 "follow-requests" = "Follow Requests";
 "instance.about-instance-title-%@" = "About %@";

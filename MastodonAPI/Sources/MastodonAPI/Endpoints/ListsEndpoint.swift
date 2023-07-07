@@ -4,6 +4,7 @@ import Foundation
 import HTTP
 import Mastodon
 
+/// https://docs.joinmastodon.org/methods/lists/
 public enum ListsEndpoint {
     case lists
     case listsWithAccount(id: Account.Id)
@@ -33,4 +34,16 @@ extension ListsEndpoint: Endpoint {
     public var method: HTTPMethod {
         .get
     }
+
+    public var requires: APICapabilityRequirements? {
+        [
+            .mastodon: "2.1.0",
+            .hometown: "2.1.0",
+            .pleroma: APICapabilityRequirements.assumeAvailable,
+            .akkoma: APICapabilityRequirements.assumeAvailable,
+            .gotosocial: "0.10.0"
+        ]
+    }
+
+    public var fallback: [List]? { [] }
 }

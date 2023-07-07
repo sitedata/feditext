@@ -16,6 +16,7 @@ public struct IdentityService {
     private let contentDatabase: ContentDatabase
     private let environment: AppEnvironment
     private let mastodonAPIClient: MastodonAPIClient
+    private let nodeInfoClient: NodeInfoClient
     private let secrets: Secrets
 
     init(id: Identity.Id, database: IdentityDatabase, environment: AppEnvironment) throws {
@@ -25,9 +26,17 @@ public struct IdentityService {
         secrets = Secrets(
             identityId: id,
             keychain: environment.keychain)
-        mastodonAPIClient = MastodonAPIClient(session: environment.session,
-                                              instanceURL: try secrets.getInstanceURL())
+
+        let instanceURL = try secrets.getInstanceURL()
+
+        mastodonAPIClient = MastodonAPIClient(
+            session: environment.session,
+            instanceURL: instanceURL,
+            apiCapabilities: secrets.getAPICapabilities()
+        )
         mastodonAPIClient.accessToken = try? secrets.getAccessToken()
+
+        nodeInfoClient = NodeInfoClient(session: environment.session, instanceURL: instanceURL)
 
         let appPreferences = AppPreferences(environment: environment)
 
@@ -46,6 +55,14 @@ public struct IdentityService {
 }
 
 public extension IdentityService {
+    var apiCapabilities: APICapabilities { secrets.getAPICapabilities() }
+
+    func refreshAPICapabilities() -> AnyPublisher<Never, Error> {
+        nodeInfoClient.refreshAPICapabilities(secrets: secrets)
+            .ignoreOutput()
+            .eraseToAnyPublisher()
+    }
+
     func updateLastUse() -> AnyPublisher<Never, Error> {
         identityDatabase.updateLastUsedAt(id: id)
     }

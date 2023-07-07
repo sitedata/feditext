@@ -15,7 +15,7 @@ struct RegistrationView: View {
                     .textContentType(.username)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
-                Text("@".appending(viewModel.instance.uri))
+                Text("@".appending(viewModel.instance.domain))
                     .foregroundColor(.secondary)
             }
             TextField("registration.email", text: $viewModel.registration.email)
@@ -28,7 +28,7 @@ struct RegistrationView: View {
             SecureField("registration.password-confirmation", text: $viewModel.passwordConfirmation)
             if viewModel.instance.approvalRequired {
                 VStack(alignment: .leading) {
-                    Text("registration.reason-\(viewModel.instance.uri)")
+                    Text("registration.reason-\(viewModel.instance.domain)")
                     TextEditor(text: $viewModel.registration.reason)
                 }
             }

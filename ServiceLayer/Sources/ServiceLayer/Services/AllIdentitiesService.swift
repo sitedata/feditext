@@ -53,11 +53,17 @@ public extension AllIdentitiesService {
             return Fail(error: error).eraseToAnyPublisher()
         }
 
-        let createIdentityPublisher = database.createIdentity(
-            id: id,
-            url: url,
-            authenticated: kind.authenticated,
-            pending: kind.pending)
+        // Detect the capabilities of the server we're creating an identity with.
+        let nodeInfoClient = NodeInfoClient(session: environment.session, instanceURL: url)
+        let apiCapabilitiesPublisher = nodeInfoClient.refreshAPICapabilities(secrets: secrets)
+
+        let createIdentityPublisher = database
+            .createIdentity(
+                id: id,
+                url: url,
+                authenticated: kind.authenticated,
+                pending: kind.pending
+            )
             .ignoreOutput()
             .handleEvents(receiveCompletion: {
                 if case .finished = $0 {
@@ -70,13 +76,25 @@ public extension AllIdentitiesService {
 
         switch kind {
         case .authentication:
-            authenticationPublisher = AuthenticationService(url: url, environment: environment)
-                .authenticate()
+            authenticationPublisher = apiCapabilitiesPublisher
+                .flatMap { apiCapabilities in
+                    AuthenticationService(url: url, environment: environment, apiCapabilities: apiCapabilities)
+                        .authenticate()
+                }
+                .eraseToAnyPublisher()
         case let .registration(registration):
-            authenticationPublisher = AuthenticationService(url: url, environment: environment)
-                .register(registration, id: id)
+            authenticationPublisher = apiCapabilitiesPublisher
+                .flatMap { apiCapabilities in
+                    AuthenticationService(url: url, environment: environment, apiCapabilities: apiCapabilities)
+                        .register(registration, id: id)
+                }
+                .eraseToAnyPublisher()
         case .browsing:
-            return createIdentityPublisher
+            return apiCapabilitiesPublisher
+                .flatMap { _ in
+                    createIdentityPublisher
+                }
+                .eraseToAnyPublisher()
         }
 
         return authenticationPublisher
@@ -102,11 +120,16 @@ public extension AllIdentitiesService {
                 do {
                     return MastodonAPIClient(
                         session: environment.session,
-                        instanceURL: try secrets.getInstanceURL())
-                        .request(EmptyEndpoint.oauthRevoke(
-                                    token: try secrets.getAccessToken(),
-                                    clientId: try secrets.getClientId(),
-                                    clientSecret: try secrets.getClientSecret()))
+                        instanceURL: try secrets.getInstanceURL(),
+                        apiCapabilities: secrets.getAPICapabilities()
+                    )
+                        .request(
+                            EmptyEndpoint.oauthRevoke(
+                                token: try secrets.getAccessToken(),
+                                clientId: try secrets.getClientId(),
+                                clientSecret: try secrets.getClientSecret()
+                            )
+                        )
                         .ignoreOutput()
                         .eraseToAnyPublisher()
                 } catch {

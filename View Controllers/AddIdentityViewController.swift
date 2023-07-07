@@ -309,7 +309,7 @@ private extension AddIdentityViewController {
 
             if let instance = instance {
                 self.instanceTitleLabel.text = instance.title
-                self.instanceURLLabel.text = instance.uri
+                self.instanceURLLabel.text = instance.domain
                 self.instanceImageView.sd_setImage(with: instance.thumbnail?.url)
                 self.instanceStackView.isHidden_stackViewSafe = false
 

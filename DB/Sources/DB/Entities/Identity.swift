@@ -23,6 +23,15 @@ public extension Identity {
     /// Summary version of `Mastodon.Instance` that should be available anywhere an identity is.
     struct Instance: Codable, Hashable {
         public let uri: String
+        /// Mastodon servers use a bare domain in the `uri` field,
+        /// but Akkoma and GotoSocial (at least) use an `https://` URL.
+        public var domain: String {
+            if let url = URL(string: uri), let host = url.host {
+                return host
+            } else {
+                return uri
+            }
+        }
         public let streamingAPI: UnicodeURL
         public let title: String
         public let thumbnail: UnicodeURL?

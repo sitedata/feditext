@@ -2,6 +2,7 @@
 
 import Combine
 import CryptoKit
+import DB
 import Foundation
 import Mastodon
 import MastodonAPI
@@ -69,7 +70,11 @@ public extension PushNotificationParsingService {
                 return Fail(error: error).eraseToAnyPublisher()
             }
 
-            let mastodonAPIClient = MastodonAPIClient(session: .shared, instanceURL: instanceURL)
+            let mastodonAPIClient = MastodonAPIClient(
+                session: .shared,
+                instanceURL: instanceURL,
+                apiCapabilities: secrets.getAPICapabilities()
+            )
 
             mastodonAPIClient.accessToken = pushNotification.accessToken
 

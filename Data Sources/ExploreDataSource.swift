@@ -2,6 +2,7 @@
 
 import Combine
 import Mastodon
+import MastodonAPI
 import UIKit
 import ViewModels
 
@@ -106,17 +107,27 @@ private extension ExploreDataSource {
     func update(instanceViewModel: InstanceViewModel?, tags: [Tag], links: [Card], statuses: [Status]) {
         var newsnapshot = NSDiffableDataSourceSnapshot<ExploreViewModel.Section, ExploreViewModel.Item>()
 
-        // TODO: (Vyr) move these to their own tab. Note that the .instance *item* is not used at the moment,
-        //  but could be restored on a future instance tab.
-        if let instanceViewModel = instanceViewModel {newsnapshot.appendSections([.instance])
-//            newsnapshot.appendItems([.instance], toSection: .instance)
+        // TODO: (Vyr) move directory and suggetions to their own tab or secondary nav.
+        var instanceSectionItems = [ExploreViewModel.Item]()
 
-            if instanceViewModel.instance.canShowProfileDirectory {
-                newsnapshot.appendItems([.profileDirectory], toSection: .instance)
-            }
+        if AccountsEndpoint.directory(local: false).canCallWith(identityContext.apiCapabilities) {
+            instanceSectionItems.append(.profileDirectory)
+        }
 
-            // TODO: (Vyr) rewrite these to not need version-based support flags
-            newsnapshot.appendItems([.suggestedAccounts], toSection: .instance)
+        if SuggestionsEndpoint.suggestions().canCallWith(identityContext.apiCapabilities) {
+            instanceSectionItems.append(.suggestedAccounts)
+        }
+
+        // Use the `.instance` item as a fallback for decoration on instances that don't support trends or suggestions.
+        // TODO: (Vyr) roll this into `AboutInstanceView`.
+        if instanceSectionItems.isEmpty && tags.isEmpty && links.isEmpty && statuses.isEmpty,
+            instanceViewModel != nil {
+            instanceSectionItems.append(.instance)
+        }
+
+        if !instanceSectionItems.isEmpty {
+            newsnapshot.appendSections([.instance])
+            newsnapshot.appendItems(instanceSectionItems, toSection: .instance)
         }
 
         if !tags.isEmpty {

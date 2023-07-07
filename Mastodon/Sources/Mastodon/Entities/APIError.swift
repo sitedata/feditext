@@ -13,4 +13,6 @@ extension APIError: LocalizedError {
 public extension APIError {
     static let unableToFetchRemoteStatus =
         Self(error: NSLocalizedString("api-error.unable-to-fetch-remote-status", comment: ""))
+    static let apiNotAvailable =
+        Self(error: NSLocalizedString("api-error.api-not-available", comment: ""))
 }

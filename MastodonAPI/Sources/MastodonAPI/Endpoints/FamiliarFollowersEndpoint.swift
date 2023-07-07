@@ -4,6 +4,7 @@ import Foundation
 import HTTP
 import Mastodon
 
+/// https://docs.joinmastodon.org/methods/accounts/#familiar_followers
 public enum FamiliarFollowersEndpoint {
     case familiarFollowers(ids: [Account.Id])
 }
@@ -29,4 +30,13 @@ extension FamiliarFollowersEndpoint: Endpoint {
             return ids.map { URLQueryItem(name: "id[]", value: $0) }
         }
     }
+
+    public var requires: APICapabilityRequirements? {
+        [
+            .mastodon: "3.5.0",
+            .hometown: "3.5.0"
+        ]
+    }
+
+    public var fallback: ResultType? { [] }
 }

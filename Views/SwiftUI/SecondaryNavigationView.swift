@@ -1,5 +1,6 @@
 // Copyright © 2020 Metabolist. All rights reserved.
 
+import MastodonAPI
 import SwiftUI
 import ViewModels
 
@@ -50,14 +51,21 @@ struct SecondaryNavigationView: View {
             }
             if viewModel.identityContext.identity.authenticated && !viewModel.identityContext.identity.pending {
                 Section {
-                    NavigationLink(destination: ListsView(viewModel: .init(identityContext: viewModel.identityContext))
-                                    .environmentObject(rootViewModel)) {
-                        Label("secondary-navigation.lists", systemImage: "scroll")
+                    if ListsEndpoint.lists.canCallWith(viewModel.identityContext.apiCapabilities) {
+                        NavigationLink(
+                            destination: ListsView(viewModel: .init(identityContext: viewModel.identityContext))
+                                .environmentObject(rootViewModel)
+                        ) {
+                            Label("secondary-navigation.lists", systemImage: "scroll")
+                        }
                     }
-                    NavigationLink(
-                        destination: FollowedTagsView(viewModel: .init(identityContext: viewModel.identityContext))
-                            .environmentObject(rootViewModel)) {
-                        Label("secondary-navigation.followed-tags", systemImage: "number")
+                    if TagsEndpoint.followed.canCallWith(viewModel.identityContext.apiCapabilities) {
+                        NavigationLink(
+                            destination: FollowedTagsView(viewModel: .init(identityContext: viewModel.identityContext))
+                                .environmentObject(rootViewModel)
+                        ) {
+                            Label("secondary-navigation.followed-tags", systemImage: "number")
+                        }
                     }
                     ForEach([Timeline.favorites, Timeline.bookmarks]) { timeline in
                         Button {
@@ -97,7 +105,8 @@ struct SecondaryNavigationView: View {
                 NavigationLink(
                     destination: AboutInstanceLoader(
                         exploreViewModel: viewModel.exploreViewModel(),
-                        navigationViewModel: viewModel
+                        navigationViewModel: viewModel,
+                        identityContext: viewModel.identityContext
                     )
                 ) {
                     Label {
@@ -117,26 +126,30 @@ struct SecondaryNavigationView: View {
 
     /// Return a string based on the instance's URI, or a fallback if it's not available for some reason.
     private var aboutInstanceLocalizedTitle: String {
-        if let uri = viewModel.identityContext.identity.instance?.uri {
+        if let domain = viewModel.identityContext.identity.instance?.domain {
             return String.localizedStringWithFormat(
                 NSLocalizedString("secondary-navigation.about-instance-%@", comment: ""),
-                uri
+                domain
             )
         } else {
-            return NSLocalizedString("secondary-navigation.about-instance", comment: "")
+            return NSLocalizedString("secondary-navigation.about-this-instance", comment: "")
         }
     }
 
+    // TODO: (Vyr) this doesn't really work as intended.
+    //  Test it by breaking `/api/v1/instance`; the blank view shows and looks weird.
     /// Exists entirely to wait for the instance view model to load.
     private struct AboutInstanceLoader: View {
         @ObservedObject var exploreViewModel: ExploreViewModel
         @ObservedObject var navigationViewModel: NavigationViewModel
+        @ObservedObject var identityContext: IdentityContext
 
         var body: some View {
             if let instanceViewModel = exploreViewModel.instanceViewModel {
                 AboutInstanceView(
                     viewModel: instanceViewModel,
-                    navigationViewModel: navigationViewModel
+                    navigationViewModel: navigationViewModel,
+                    apiCapabilitiesViewModel: .init(apiCapabilities: identityContext.apiCapabilities)
                 )
             } else {
                 EmptyView()

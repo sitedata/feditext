@@ -2,24 +2,29 @@
 
 import Combine
 import Mastodon
+import MastodonAPI
 import SwiftUI
 import ViewModels
 
 final class ProfileViewController: TableViewController {
     private let viewModel: ProfileViewModel
     private var cancellables = Set<AnyCancellable>()
+    private var identityContext: IdentityContext
 
     required init(
         viewModel: ProfileViewModel,
         rootViewModel: RootViewModel?,
         identityContext: IdentityContext,
-        parentNavigationController: UINavigationController?) {
+        parentNavigationController: UINavigationController?
+    ) {
         self.viewModel = viewModel
+        self.identityContext = identityContext
 
         super.init(
             viewModel: viewModel,
             rootViewModel: rootViewModel,
-            parentNavigationController: parentNavigationController)
+            parentNavigationController: parentNavigationController
+        )
     }
 
     override func viewDidLoad() {
@@ -80,11 +85,13 @@ private extension ProfileViewController {
         }]
 
         if relationship.following {
-            actions.append(UIAction(
-                title: NSLocalizedString("account.add-remove-lists", comment: ""),
-                image: UIImage(systemName: "scroll")) { [weak self] _ in
-                self?.addRemoveFromLists(accountViewModel: accountViewModel)
-            })
+            if ListsEndpoint.lists.canCallWith(identityContext.apiCapabilities) {
+                actions.append(UIAction(
+                    title: NSLocalizedString("account.add-remove-lists", comment: ""),
+                    image: UIImage(systemName: "scroll")) { [weak self] _ in
+                        self?.addRemoveFromLists(accountViewModel: accountViewModel)
+                    })
+            }
 
             if relationship.showingReblogs {
                 actions.append(UIAction(
@@ -101,18 +108,20 @@ private extension ProfileViewController {
             }
         }
 
-        if relationship.note.isEmpty {
-            actions.append(UIAction(
-                title: NSLocalizedString("account.note.add", comment: ""),
-                image: UIImage(systemName: "note.text.badge.plus")) { _ in
-                accountViewModel.editNote()
-            })
-        } else {
-            actions.append(UIAction(
-                title: NSLocalizedString("account.note.edit", comment: ""),
-                image: UIImage(systemName: "note.text")) { _ in
-                accountViewModel.editNote()
-            })
+        if RelationshipEndpoint.note("", id: "").canCallWith(identityContext.apiCapabilities) {
+            if relationship.note.isEmpty {
+                actions.append(UIAction(
+                    title: NSLocalizedString("account.note.add", comment: ""),
+                    image: UIImage(systemName: "note.text.badge.plus")) { _ in
+                        accountViewModel.editNote()
+                    })
+            } else {
+                actions.append(UIAction(
+                    title: NSLocalizedString("account.note.edit", comment: ""),
+                    image: UIImage(systemName: "note.text")) { _ in
+                        accountViewModel.editNote()
+                    })
+            }
         }
 
         if relationship.muting {

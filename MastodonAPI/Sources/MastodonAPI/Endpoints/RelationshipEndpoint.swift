@@ -13,6 +13,8 @@ public enum RelationshipEndpoint {
     case accountsUnmute(id: Account.Id)
     case accountsPin(id: Account.Id)
     case accountsUnpin(id: Account.Id)
+    /// - https://docs.joinmastodon.org/methods/accounts/#note
+    /// - https://api.pleroma.social/#operation/AccountController.note
     case note(String, id: Account.Id)
     case acceptFollowRequest(id: Account.Id)
     case rejectFollowRequest(id: Account.Id)
@@ -89,5 +91,19 @@ extension RelationshipEndpoint: Endpoint {
 
     public var method: HTTPMethod {
         .post
+    }
+
+    public var requires: APICapabilityRequirements? {
+        switch self {
+        case .note:
+            return [
+                .mastodon: "3.0.0",
+                .hometown: "3.0.0",
+                .pleroma: APICapabilityRequirements.assumeAvailable,
+                .akkoma: APICapabilityRequirements.assumeAvailable
+            ]
+        default:
+            return nil
+        }
     }
 }

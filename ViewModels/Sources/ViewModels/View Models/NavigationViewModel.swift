@@ -98,6 +98,10 @@ public extension NavigationViewModel {
             }
         }
 
+        identityContext.service.refreshAPICapabilities()
+            .sink { _ in } receiveValue: { _ in }
+            .store(in: &cancellables)
+
         identityContext.service.refreshInstance()
             .sink { _ in } receiveValue: { _ in }
             .store(in: &cancellables)

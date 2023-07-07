@@ -12,6 +12,7 @@ public enum StatusesEndpoint {
     case accountsStatuses(id: Account.Id, excludeReplies: Bool, excludeReblogs: Bool, onlyMedia: Bool, pinned: Bool)
     case favourites
     case bookmarks
+    /// https://docs.joinmastodon.org/methods/trends/#statuses
     case trends(limit: Int? = nil, offset: Int? = nil)
 }
 
@@ -67,4 +68,18 @@ extension StatusesEndpoint: Endpoint {
     }
 
     public var method: HTTPMethod { .get }
+
+    public var requires: APICapabilityRequirements? {
+        switch self {
+        case .trends:
+            return [
+                .mastodon: "3.5.0",
+                .hometown: "3.5.0"
+            ]
+        default:
+            return nil
+        }
+    }
+
+    public var fallback: [Status]? { [] }
 }

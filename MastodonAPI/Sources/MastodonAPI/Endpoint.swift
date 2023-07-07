@@ -13,6 +13,10 @@ public protocol Endpoint {
     var jsonBody: [String: Any]? { get }
     var multipartFormData: [String: MultipartFormValue]? { get }
     var headers: [String: String]? { get }
+    /// Does this API only exist on some servers?
+    var requires: APICapabilityRequirements? { get }
+    /// Is there a value we can return if the API doesn't exist?
+    var fallback: ResultType? { get }
 }
 
 public extension Endpoint {
@@ -37,6 +41,15 @@ public extension Endpoint {
     var multipartFormData: [String: MultipartFormValue]? { nil }
 
     var headers: [String: String]? { nil }
+
+    var requires: APICapabilityRequirements? { nil }
+
+    var fallback: ResultType? { nil }
+
+    /// We only have to satisfy requirements if they exist.
+    func canCallWith(_ apiCapabilities: APICapabilities) -> Bool {
+        requires?.satisfiedBy(apiCapabilities) ?? true
+    }
 }
 
 internal extension Endpoint {

@@ -4,6 +4,7 @@ import Foundation
 import HTTP
 import Mastodon
 
+/// https://docs.joinmastodon.org/methods/tags/
 public enum TagEndpoint {
     case get(name: String)
     case follow(name: String)
@@ -34,6 +35,15 @@ extension TagEndpoint: Endpoint {
             return .get
         case .follow, .unfollow:
             return .post
+        }
+    }
+
+    public var requires: APICapabilityRequirements? {
+        switch self {
+        case .follow, .unfollow:
+            return TagsEndpoint.followed.requires
+        default:
+            return nil
         }
     }
 }

@@ -2,6 +2,7 @@
 
 import Combine
 import Foundation
+import MastodonAPI
 import ServiceLayer
 
 public final class IdentityContext: ObservableObject {
@@ -25,4 +26,6 @@ public final class IdentityContext: ObservableObject {
                 .assign(to: &self.$authenticatedOtherIdentities)
         }
     }
+
+    public var apiCapabilities: APICapabilities { service.apiCapabilities }
 }

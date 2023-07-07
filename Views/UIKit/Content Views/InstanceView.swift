@@ -81,9 +81,9 @@ private extension InstanceView {
         imageView.autoPlayAnimatedImage = !UIAccessibility.isReduceMotionEnabled
 
         titleLabel.text = viewModel.instance.title
-        uriLabel.text = viewModel.instance.uri
+        uriLabel.text = viewModel.instance.domain
 
-        accessibilityLabel = viewModel.instance.title.appendingWithSeparator(viewModel.instance.uri)
+        accessibilityLabel = viewModel.instance.title.appendingWithSeparator(viewModel.instance.domain)
     }
 
     func setupAccessibility() {

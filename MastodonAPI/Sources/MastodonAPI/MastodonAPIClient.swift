@@ -6,11 +6,13 @@ import HTTP
 import Mastodon
 
 public final class MastodonAPIClient: HTTPClient {
-    public var instanceURL: URL
+    public let instanceURL: URL
     public var accessToken: String?
+    private let apiCapabilities: APICapabilities
 
-    public required init(session: URLSession, instanceURL: URL) {
+    public required init(session: URLSession, instanceURL: URL, apiCapabilities: APICapabilities) {
         self.instanceURL = instanceURL
+        self.apiCapabilities = apiCapabilities
         super.init(session: session, decoder: MastodonDecoder())
     }
 
@@ -31,7 +33,21 @@ public final class MastodonAPIClient: HTTPClient {
 
 extension MastodonAPIClient {
     public func request<E: Endpoint>(_ endpoint: E, progress: Progress? = nil) -> AnyPublisher<E.ResultType, Error> {
-        dataTaskPublisher(target(endpoint: endpoint), progress: progress)
+        guard endpoint.canCallWith(apiCapabilities) else {
+            if let fallback = endpoint.fallback {
+                return Just(fallback)
+                    .setFailureType(to: Error.self)
+                    .eraseToAnyPublisher()
+            } else {
+                return Fail(
+                    outputType: E.ResultType.self,
+                    failure: APIError.apiNotAvailable
+                )
+                .eraseToAnyPublisher()
+            }
+        }
+
+        return dataTaskPublisher(target(endpoint: endpoint), progress: progress)
             .map(\.data)
             .decode(type: E.ResultType.self, decoder: decoder)
             .eraseToAnyPublisher()
@@ -43,7 +59,27 @@ extension MastodonAPIClient {
         minId: String? = nil,
         sinceId: String? = nil,
         limit: Int? = nil,
-        progress: Progress? = nil) -> AnyPublisher<PagedResult<E.ResultType>, Error> {
+        progress: Progress? = nil
+    ) -> AnyPublisher<PagedResult<E.ResultType>, Error> {
+        guard endpoint.canCallWith(apiCapabilities) else {
+            if let fallback = endpoint.fallback {
+                return Just(
+                    PagedResult(
+                        result: fallback,
+                        info: .init(maxId: nil, minId: nil, sinceId: nil)
+                    )
+                )
+                .setFailureType(to: Error.self)
+                .eraseToAnyPublisher()
+            } else {
+                return Fail(
+                    outputType: PagedResult<E.ResultType>.self,
+                    failure: APIError.apiNotAvailable
+                )
+                .eraseToAnyPublisher()
+            }
+        }
+
         let pagedTarget = target(endpoint: Paged(endpoint, maxId: maxId, minId: minId, sinceId: sinceId, limit: limit))
         let dataTask = dataTaskPublisher(pagedTarget, progress: progress).share()
         let decoded = dataTask.map(\.data).decode(type: E.ResultType.self, decoder: decoder)

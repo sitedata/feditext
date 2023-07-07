@@ -12,6 +12,7 @@ public enum AccountsEndpoint {
     case accountsFollowers(id: Account.Id)
     case accountsFollowing(id: Account.Id)
     case followRequests
+    /// https://docs.joinmastodon.org/methods/directory/
     case directory(local: Bool)
 }
 
@@ -61,5 +62,17 @@ extension AccountsEndpoint: Endpoint {
 
     public var method: HTTPMethod {
         .get
+    }
+
+    public var requires: APICapabilityRequirements? {
+        switch self {
+        case .directory:
+            return [
+                .mastodon: "3.0.0",
+                .hometown: "3.0.0"
+            ]
+        default:
+            return nil
+        }
     }
 }

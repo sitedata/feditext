@@ -41,10 +41,26 @@ let db: IdentityDatabase = {
 let environment = AppEnvironment.mock(fixtureDatabase: db)
 let decoder = MastodonDecoder()
 
+extension NodeInfo {
+    static let preview = Self(
+        openRegistrations: false,
+        software: .init(
+            name: "mastodon",
+            version: "4.2.0"
+        )
+    )
+}
+
+extension APICapabilities {
+    static let preview = Self(nodeInfo: .preview)
+}
+
 extension MastodonAPIClient {
     static let preview = MastodonAPIClient(
         session: URLSession(configuration: .stubbing),
-        instanceURL: .previewInstanceURL)
+        instanceURL: .previewInstanceURL,
+        apiCapabilities: .preview
+    )
 }
 
 extension ContentDatabase {
@@ -154,5 +170,10 @@ public extension NavigationViewModel {
         environment: .preview
     )
 }
+
+public extension APICapabilitiesViewModel {
+    static let preview = Self(apiCapabilities: .preview)
+}
+
 
 // swiftlint:enable force_try

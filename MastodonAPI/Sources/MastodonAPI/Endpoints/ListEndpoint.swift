@@ -35,4 +35,6 @@ extension ListEndpoint: Endpoint {
             return .post
         }
     }
+
+    public var requires: APICapabilityRequirements? { ListsEndpoint.lists.requires }
 }

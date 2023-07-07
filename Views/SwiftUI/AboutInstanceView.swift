@@ -5,10 +5,12 @@ import Mastodon
 import SwiftUI
 import ViewModels
 
+// TODO: (Vyr) display the instance banner, admin contact info, etc.
 /// Display instance description and rules.
 struct AboutInstanceView: View {
     let viewModel: InstanceViewModel
     let navigationViewModel: NavigationViewModel
+    let apiCapabilitiesViewModel: APICapabilitiesViewModel
 
     @Environment(\.dismiss) private var dismiss
 
@@ -35,7 +37,24 @@ struct AboutInstanceView: View {
                 )
             }
             Section("instance.version") {
-                Text(verbatim: viewModel.instance.version)
+                if let localizedName = apiCapabilitiesViewModel.localizedName {
+                    if let homepage = apiCapabilitiesViewModel.homepage {
+                        Button {
+                            navigationViewModel.navigateToURL(homepage)
+                        } label: {
+                            Label {
+                                Text(localizedName).foregroundColor(.primary)
+                            } icon: {
+                                Image(systemName: "info.circle")
+                            }
+                        }
+                    } else {
+                        Text(localizedName)
+                    }
+                }
+                if let version = apiCapabilitiesViewModel.version {
+                    Text(verbatim: version)
+                }
             }
             Section("instance.registration") {
                 Text(
@@ -96,7 +115,8 @@ struct AboutInstanceView_Previews: PreviewProvider {
     static var previews: some View {
         AboutInstanceView(
             viewModel: .preview,
-            navigationViewModel: .preview
+            navigationViewModel: .preview,
+            apiCapabilitiesViewModel: .preview
         )
     }
 }

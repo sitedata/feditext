@@ -5,7 +5,9 @@ import HTTP
 import Mastodon
 
 public enum TagsEndpoint {
+    /// https://docs.joinmastodon.org/methods/trends/#tags
     case trends(limit: Int? = nil, offset: Int? = nil)
+    /// https://docs.joinmastodon.org/methods/followed_tags/#get
     case followed
 }
 
@@ -33,4 +35,21 @@ extension TagsEndpoint: Endpoint {
             return []
         }
     }
+
+    public var requires: APICapabilityRequirements? {
+        switch self {
+        case .trends:
+            return [
+                .mastodon: "3.5.0",
+                .hometown: "3.5.0"
+            ]
+        case .followed:
+            return [
+                .mastodon: "4.0.0",
+                .hometown: "4.0.0"
+            ]
+        }
+    }
+
+    public var fallback: [Tag]? { [] }
 }

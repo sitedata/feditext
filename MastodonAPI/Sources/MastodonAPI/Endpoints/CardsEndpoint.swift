@@ -5,6 +5,7 @@ import HTTP
 import Mastodon
 
 public enum CardsEndpoint {
+    /// https://docs.joinmastodon.org/methods/trends/#links
     case trends(limit: Int? = nil, offset: Int? = nil)
 }
 
@@ -29,4 +30,16 @@ extension CardsEndpoint: Endpoint {
             return queryParameters(limit, offset)
         }
     }
+
+    public var requires: APICapabilityRequirements? {
+        switch self {
+        case .trends:
+            return [
+                .mastodon: "3.5.0",
+                .hometown: "3.5.0"
+            ]
+        }
+    }
+
+    public var fallback: [Card]? { [] }
 }
