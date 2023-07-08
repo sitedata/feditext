@@ -391,6 +391,19 @@ public extension ContentDatabase {
         databaseWriter.mutatingPublisher { try TimelineRecord(timeline: Timeline.list(list)).save($0) }
     }
 
+    func updateList(_ list: List) -> AnyPublisher<Never, Error> {
+        databaseWriter.mutatingPublisher {
+            try TimelineRecord
+                .filter(TimelineRecord.Columns.listId == list.id)
+                .updateAll(
+                    $0,
+                    TimelineRecord.Columns.listTitle.set(to: list.title),
+                    TimelineRecord.Columns.listRepliesPolicy.set(to: list.repliesPolicy?.rawValue),
+                    TimelineRecord.Columns.listExclusive.set(to: list.exclusive)
+                )
+        }
+    }
+
     func deleteList(id: List.Id) -> AnyPublisher<Never, Error> {
         databaseWriter.mutatingPublisher(updates: TimelineRecord.filter(TimelineRecord.Columns.listId == id).deleteAll)
     }

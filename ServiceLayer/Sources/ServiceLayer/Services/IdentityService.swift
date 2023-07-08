@@ -136,10 +136,33 @@ public extension IdentityService {
             .eraseToAnyPublisher()
     }
 
-    func createList(title: String) -> AnyPublisher<Never, Error> {
-        mastodonAPIClient.request(ListEndpoint.create(title: title))
-            .flatMap(contentDatabase.createList(_:))
-            .eraseToAnyPublisher()
+    func createList(
+        title: String,
+        repliesPolicy: List.RepliesPolicy?,
+        exclusive: Bool?
+    ) -> AnyPublisher<List, Error> {
+        mastodonAPIClient.request(
+            ListEndpoint.create(
+                title: title,
+                repliesPolicy: repliesPolicy,
+                exclusive: exclusive
+            )
+        )
+        .andAlso(contentDatabase.createList(_:))
+        .eraseToAnyPublisher()
+    }
+
+    func updateList(_ list: List) -> AnyPublisher<List, Error> {
+        mastodonAPIClient.request(
+            ListEndpoint.update(
+                id: list.id,
+                title: list.title,
+                repliesPolicy: list.repliesPolicy,
+                exclusive: list.exclusive
+            )
+        )
+        .andAlso(contentDatabase.updateList(_:))
+        .eraseToAnyPublisher()
     }
 
     func deleteList(id: List.Id) -> AnyPublisher<Never, Error> {

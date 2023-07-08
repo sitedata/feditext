@@ -5,7 +5,10 @@ import HTTP
 import Mastodon
 
 public enum ListEndpoint {
-    case create(title: String)
+    /// https://docs.joinmastodon.org/methods/lists/#create
+    case create(title: String, repliesPolicy: List.RepliesPolicy?, exclusive: Bool?)
+    /// https://docs.joinmastodon.org/methods/lists/#update
+    case update(id: List.Id, title: String, repliesPolicy: List.RepliesPolicy?, exclusive: Bool?)
 }
 
 extension ListEndpoint: Endpoint {
@@ -19,13 +22,27 @@ extension ListEndpoint: Endpoint {
         switch self {
         case .create:
             return []
+        case let .update(id, _, _, _):
+            return [id]
         }
     }
 
     public var jsonBody: [String: Any]? {
         switch self {
-        case let .create(title):
-            return ["title": title]
+        case let .create(title, repliesPolicy, exclusive),
+            let .update(_, title, repliesPolicy, exclusive):
+
+            var body: [String: Any] = ["title": title]
+
+            if let repliesPolicy = repliesPolicy {
+                body["replies_policy"] = repliesPolicy.rawValue
+            }
+
+            if let exclusive = exclusive {
+                body["exclusive"] = exclusive
+            }
+
+            return body
         }
     }
 
@@ -33,8 +50,35 @@ extension ListEndpoint: Endpoint {
         switch self {
         case .create:
             return .post
+        case .update:
+            return .put
         }
     }
 
-    public var requires: APICapabilityRequirements? { ListsEndpoint.lists.requires }
+    public var requires: APICapabilityRequirements? {
+        switch self {
+        case .create(title: _, repliesPolicy: nil, exclusive: nil),
+                .update(id: _, title: _, repliesPolicy: nil, exclusive: nil):
+            return ListsEndpoint.lists.requires
+        case .create(title: _, repliesPolicy: _, exclusive: nil),
+                .update(id: _, title: _, repliesPolicy: _, exclusive: nil):
+            return [
+                .mastodon: "3.3.0",
+                .hometown: "3.3.0",
+                .gotosocial: "0.10.0-0"
+            ]
+        case .create(title: _, repliesPolicy: nil, exclusive: _),
+                .update(id: _, title: _, repliesPolicy: nil, exclusive: _):
+            return [
+                .mastodon: "4.2.0",
+                /// https://github.com/hometown-fork/hometown/releases/tag/v1.0.0%2B2.9.3
+                .hometown: "2.9.3"
+            ]
+        case .create, .update:
+            return [
+                .mastodon: "4.2.0",
+                .hometown: "3.3.0"
+            ]
+        }
+    }
 }

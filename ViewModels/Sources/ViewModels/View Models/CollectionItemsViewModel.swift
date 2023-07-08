@@ -9,7 +9,7 @@ public class CollectionItemsViewModel: ObservableObject {
     public let identityContext: IdentityContext
     @Published public var alertItem: AlertItem?
     public private(set) var nextPageMaxId: String?
-    public let timelineActionViewModel: TimelineActionViewModel?
+    public private(set) var timelineActionViewModel: TimelineActionViewModel?
 
     @Published private var lastUpdate = CollectionUpdate.empty
     private let collectionService: CollectionService
@@ -29,12 +29,6 @@ public class CollectionItemsViewModel: ObservableObject {
     public init(collectionService: CollectionService, identityContext: IdentityContext) {
         self.collectionService = collectionService
         self.identityContext = identityContext
-        self.timelineActionViewModel = collectionService.positionTimeline.flatMap {
-            TimelineActionViewModel.from(
-                timeline: $0,
-                identityContext: identityContext
-            )
-        }
 
         expandAllSubject = CurrentValueSubject(
             collectionService is ContextService && !identityContext.identity.preferences.readingExpandSpoilers
@@ -94,6 +88,14 @@ public class CollectionItemsViewModel: ObservableObject {
                 .flatMap { identityContext.service.setLocalLastReadId($0, timeline: timeline) }
                 .sink { _ in } receiveValue: { _ in }
                 .store(in: &cancellables)
+        }
+
+        timelineActionViewModel = collectionService.positionTimeline.flatMap {
+            TimelineActionViewModel.from(
+                timeline: $0,
+                identityContext: identityContext,
+                collectionItemsViewModel: self
+            )
         }
     }
 

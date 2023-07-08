@@ -938,10 +938,10 @@ private extension TableViewController {
     func setupTimelineActionBarButtonItem(_ timelineActionViewModel: TimelineActionViewModel) {
         switch timelineActionViewModel {
         case let .tag(tagTimelineActionViewModel):
-            tagTimelineActionViewModel.tag
+            tagTimelineActionViewModel.$tag
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] tag in
-                    switch tag?.following {
+                    switch tag.following {
                     case nil:
                         self?.navigationItem.rightBarButtonItem = nil
                     case .some(false):
@@ -969,6 +969,24 @@ private extension TableViewController {
                     }
                 }
                 .store(in: &cancellables)
+        case let .list(listTimelineActionViewModel):
+            self.navigationItem.rightBarButtonItem = .init(
+                title: NSLocalizedString(
+                    "lists.edit-list.button",
+                    comment: ""
+                ),
+                image: .init(systemName: "gearshape"),
+                primaryAction: .init { [weak self, weak listTimelineActionViewModel] _ in
+                    guard let self = self,
+                          let listTimelineActionViewModel = listTimelineActionViewModel
+                    else { return }
+
+                    let hostingController = UIHostingController(
+                        rootView: EditListView(viewModel: listTimelineActionViewModel.editListViewModel)
+                    )
+                    present(hostingController, animated: true)
+                }
+            )
         }
     }
 }

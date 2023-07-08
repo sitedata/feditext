@@ -391,6 +391,13 @@ extension ContentDatabase {
             }
         }
 
+        migrator.registerMigration("1.7.4-list-settings") { db in
+            try db.alter(table: "timelineRecord") { t in
+                t.add(column: "listRepliesPolicy", .text)
+                t.add(column: "listExclusive", .boolean)
+            }
+        }
+
         return migrator
     }
 }

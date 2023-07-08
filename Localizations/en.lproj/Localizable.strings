@@ -245,6 +245,15 @@
 "language.extended.name.zba" = "Balaibalan";
 "language.bcp-47-tag-%@" = "BCP 47 tag %@";
 "lists.new-list-title" = "New List Title";
+"lists.edit-list.button" = "Edit List";
+"lists.edit-list.view-title-%@" = "Settings for %@";
+"lists.edit-list.title" = "List Title";
+"lists.edit-list.replies-policy" = "Replies";
+"lists.edit-list.replies-policy.followed" = "Show replies to anyone you follow";
+"lists.edit-list.replies-policy.list" = "Show replies to list members";
+"lists.edit-list.replies-policy.none" = "Don't show replies";
+"lists.edit-list.replies-policy.unknown" = "Unknown reply policy";
+"lists.edit-list.exclusive" = "Hide posts from home timeline";
 "load-more" = "Load More";
 "load-more.above.accessibility.post" = "Load from post above";
 "load-more.above.accessibility.toot" = "Load from toot above";

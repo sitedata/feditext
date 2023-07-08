@@ -8,6 +8,8 @@ struct TimelineRecord: ContentDatabaseRecord, Hashable {
     let id: Timeline.Id
     let listId: List.Id?
     let listTitle: String?
+    let listRepliesPolicy: List.RepliesPolicy?
+    let listExclusive: Bool?
     let tag: String?
     let accountId: Account.Id?
     let profileCollection: ProfileCollection?
@@ -18,6 +20,8 @@ extension TimelineRecord {
         static let id = Column(CodingKeys.id)
         static let listId = Column(CodingKeys.listId)
         static let listTitle = Column(CodingKeys.listTitle)
+        static let listRepliesPolicy = Column(CodingKeys.listRepliesPolicy)
+        static let listExclusive = Column(CodingKeys.listExclusive)
         static let tag = Column(CodingKeys.tag)
         static let accountId = Column(CodingKeys.accountId)
         static let profileCollection = Column(CodingKeys.profileCollection)
@@ -55,24 +59,32 @@ extension TimelineRecord {
         case .home, .local, .federated, .favorites, .bookmarks:
             listId = nil
             listTitle = nil
+            listRepliesPolicy = nil
+            listExclusive = nil
             tag = nil
             accountId = nil
             profileCollection = nil
         case let .list(list):
             listId = list.id
             listTitle = list.title
+            listRepliesPolicy = list.repliesPolicy
+            listExclusive = list.exclusive
             tag = nil
             accountId = nil
             profileCollection = nil
         case let .tag(tag):
             listId = nil
             listTitle = nil
+            listRepliesPolicy = nil
+            listExclusive = nil
             self.tag = tag
             accountId = nil
             profileCollection = nil
         case let .profile(accountId, profileCollection):
             listId = nil
             listTitle = nil
+            listRepliesPolicy = nil
+            listExclusive = nil
             tag = nil
             self.accountId = accountId
             self.profileCollection = profileCollection

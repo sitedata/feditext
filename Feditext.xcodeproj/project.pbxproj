@@ -32,6 +32,9 @@
 		94E6C24D2991ABDF003771D1 /* UserPreferencesSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E6C24C2991ABDF003771D1 /* UserPreferencesSection.swift */; };
 		94E6C24F2991AE99003771D1 /* AppPreferencesSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E6C24E2991AE99003771D1 /* AppPreferencesSection.swift */; };
 		94E6C2512996E9C7003771D1 /* FollowedTagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E6C2502996E9C7003771D1 /* FollowedTagsView.swift */; };
+		94E7B18B2A5A0F7000A1F1DA /* List.RepliesPolicy+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E7B18A2A5A0F7000A1F1DA /* List.RepliesPolicy+Extensions.swift */; };
+		94E7B18D2A5A1B1A00A1F1DA /* EditListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E7B18C2A5A1B1A00A1F1DA /* EditListView.swift */; };
+		94E7B18F2A5A271B00A1F1DA /* CloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E7B18E2A5A271B00A1F1DA /* CloseButton.swift */; };
 		94EE2E0B2A3FD23D00CBB9A8 /* CardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94EE2E0A2A3FD23D00CBB9A8 /* CardTableViewCell.swift */; };
 		94EE2E0D2A3FD26100CBB9A8 /* CardContentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94EE2E0C2A3FD26100CBB9A8 /* CardContentConfiguration.swift */; };
 		94EE2E0F2A3FD47400CBB9A8 /* CardCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94EE2E0E2A3FD47400CBB9A8 /* CardCollectionViewCell.swift */; };
@@ -383,6 +386,9 @@
 		94E6C24C2991ABDF003771D1 /* UserPreferencesSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPreferencesSection.swift; sourceTree = "<group>"; };
 		94E6C24E2991AE99003771D1 /* AppPreferencesSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreferencesSection.swift; sourceTree = "<group>"; };
 		94E6C2502996E9C7003771D1 /* FollowedTagsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowedTagsView.swift; sourceTree = "<group>"; };
+		94E7B18A2A5A0F7000A1F1DA /* List.RepliesPolicy+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "List.RepliesPolicy+Extensions.swift"; sourceTree = "<group>"; };
+		94E7B18C2A5A1B1A00A1F1DA /* EditListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditListView.swift; sourceTree = "<group>"; };
+		94E7B18E2A5A271B00A1F1DA /* CloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseButton.swift; sourceTree = "<group>"; };
 		94EE2E0A2A3FD23D00CBB9A8 /* CardTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardTableViewCell.swift; sourceTree = "<group>"; };
 		94EE2E0C2A3FD26100CBB9A8 /* CardContentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardContentConfiguration.swift; sourceTree = "<group>"; };
 		94EE2E0E2A3FD47400CBB9A8 /* CardCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -747,6 +753,8 @@
 				D0D4302C25F0904D00BE5504 /* AppIconPreferencesView.swift */,
 				D08E52602579D2E100FA2C5F /* DomainBlocksView.swift */,
 				D0BEB21024FA2A90001B0F04 /* EditFilterView.swift */,
+				94E7B18C2A5A1B1A00A1F1DA /* EditListView.swift */,
+				947E728E29A9618900155DD2 /* EditNoteView.swift */,
 				D0BEB20424FA1107001B0F04 /* FiltersView.swift */,
 				94E6C2502996E9C7003771D1 /* FollowedTagsView.swift */,
 				D0BEB1FE24F9E5BB001B0F04 /* ListsView.swift */,
@@ -759,7 +767,7 @@
 				D0C7D42924F76169001EBDBB /* SecondaryNavigationView.swift */,
 				94B0BCD229859B750075E234 /* StatusEditHistoryView.swift */,
 				D021A66925C3E19D008A0C0D /* View Controller Representables */,
-				947E728E29A9618900155DD2 /* EditNoteView.swift */,
+				94E7B18E2A5A271B00A1F1DA /* CloseButton.swift */,
 			);
 			path = SwiftUI;
 			sourceTree = "<group>";
@@ -1030,6 +1038,7 @@
 				D0F0B135251AA12700942152 /* CollectionItem+Extensions.swift */,
 				D0D2AC3825BBEC0F003D5DF2 /* CollectionSection+Extensions.swift */,
 				D052DBE225EAFDE800FFB628 /* HTTPError+Extensions.swift */,
+				94E7B18A2A5A0F7000A1F1DA /* List.RepliesPolicy+Extensions.swift */,
 				94979DA32A3E37ED00542793 /* MastodonNotification.NotificationType+Extensions.swift */,
 				D035F88625B8016000DC75ED /* NavigationViewModel+Extensions.swift */,
 				D0C7D46B24F76169001EBDBB /* NSMutableAttributedString+Extensions.swift */,
@@ -1465,11 +1474,14 @@
 				D03D87F425C23C44004DCBB2 /* SecondaryNavigationTitleView.swift in Sources */,
 				D07EC7F225B13E57006DF726 /* EmojiView.swift in Sources */,
 				D05936CF25A8D79800754FDF /* EditAttachmentViewController.swift in Sources */,
+				94E7B18B2A5A0F7000A1F1DA /* List.RepliesPolicy+Extensions.swift in Sources */,
 				D0C7D4A224F7616A001EBDBB /* NotificationTypesPreferencesView.swift in Sources */,
+				94E7B18F2A5A271B00A1F1DA /* CloseButton.swift in Sources */,
 				D09D970825C64522007E6394 /* InstanceView.swift in Sources */,
 				94EE2E112A3FD49800CBB9A8 /* StatusCollectionViewCell.swift in Sources */,
 				D021A62C25C38570008A0C0D /* AboutView.swift in Sources */,
 				D00702362555F4C500F38136 /* ConversationContentConfiguration.swift in Sources */,
+				94E7B18D2A5A1B1A00A1F1DA /* EditListView.swift in Sources */,
 				D0BEB1F724F9A84B001B0F04 /* LoadingTableFooterView.swift in Sources */,
 				D052DBE325EAFDE800FFB628 /* HTTPError+Extensions.swift in Sources */,
 				D021A61425C36BFB008A0C0D /* IdentityView.swift in Sources */,

@@ -4,6 +4,7 @@ import Mastodon
 import SwiftUI
 import ViewModels
 
+/// Shows all of the user's followed tags and lets them add or remove tags.
 struct FollowedTagsView: View {
     @StateObject var viewModel: FollowedTagsViewModel
     @EnvironmentObject var rootViewModel: RootViewModel
@@ -23,7 +24,7 @@ struct FollowedTagsView: View {
                     Button {
                         viewModel.create(name: newName.trimmingCharacters(in: .whitespacesAndNewlines))
                     } label: {
-                        Label("add", systemImage: "plus.circle")
+                        Label("add", systemImage: "plus.circle.fill")
                     }
                     .disabled(newName.isEmpty || newName.hasPrefix("#"))
                 }

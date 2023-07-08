@@ -5,6 +5,11 @@ import Foundation
 public struct UnicodeURL {
     public let raw: String
     public let url: URL
+
+    public init(url: URL) {
+        self.raw = url.absoluteString
+        self.url = url
+    }
 }
 
 extension UnicodeURL: Hashable {

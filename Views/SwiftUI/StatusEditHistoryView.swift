@@ -43,14 +43,9 @@ public struct StatusEditHistoryView: View {
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
-                            Button {
+                            CloseButton {
                                 dismiss()
-                            } label: {
-                                Label("dismiss", systemImage: "xmark.circle.fill")
-                                    .symbolRenderingMode(.hierarchical)
                             }
-                            .labelStyle(.iconOnly)
-                            .buttonStyle(.plain)
                         }
                     }
                 }
@@ -111,14 +106,9 @@ public struct StatusEditHistoryView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
-                        Button {
+                        CloseButton {
                             dismiss()
-                        } label: {
-                            Label("dismiss", systemImage: "xmark.circle.fill")
-                                .symbolRenderingMode(.hierarchical)
                         }
-                        .labelStyle(.iconOnly)
-                        .buttonStyle(.plain)
                     }
                 }
             }

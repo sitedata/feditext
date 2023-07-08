@@ -3,6 +3,7 @@
 import Combine
 import Foundation
 import Mastodon
+import MastodonAPI
 import ServiceLayer
 
 public final class ListsViewModel: ObservableObject {
@@ -30,6 +31,18 @@ public final class ListsViewModel: ObservableObject {
 }
 
 public extension ListsViewModel {
+    /// Does this instance support replies policies?
+    var canUseRepliesPolicy: Bool {
+        ListEndpoint.create(title: "", repliesPolicy: .unknown, exclusive: nil)
+            .canCallWith(identityContext.apiCapabilities)
+    }
+
+    /// Does this instance support exclusive lists?
+    var canUseExclusive: Bool {
+        ListEndpoint.create(title: "", repliesPolicy: nil, exclusive: true)
+            .canCallWith(identityContext.apiCapabilities)
+    }
+
     func refreshLists() {
         identityContext.service.refreshLists()
             .assignErrorsToAlertItem(to: \.alertItem, on: self)
@@ -37,8 +50,23 @@ public extension ListsViewModel {
             .store(in: &cancellables)
     }
 
-    func createList(title: String) {
-        identityContext.service.createList(title: title)
+    func createList(title: String, repliesPolicy: List.RepliesPolicy, exclusive: Bool) {
+        identityContext.service
+            .createList(
+                title: title,
+                repliesPolicy: canUseRepliesPolicy ? repliesPolicy : nil,
+                exclusive: canUseExclusive ? exclusive : nil
+            )
+            .assignErrorsToAlertItem(to: \.alertItem, on: self)
+            .handleEvents(
+                receiveSubscription: { [weak self] _ in self?.creatingList = true },
+                receiveCompletion: { [weak self] _ in self?.creatingList = false })
+            .sink { _ in }
+            .store(in: &cancellables)
+    }
+
+    func update(list: List) {
+        identityContext.service.updateList(list)
             .assignErrorsToAlertItem(to: \.alertItem, on: self)
             .handleEvents(
                 receiveSubscription: { [weak self] _ in self?.creatingList = true },
