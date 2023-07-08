@@ -2,10 +2,17 @@
 
 import Foundation
 
-/// Parse or construct `feditext:` URLs, used by the action extension and for some internal navigation.
+/// Parse or construct `feditext:` URLs, used by OAuth callbacks, the action extension, and internal navigation.
 /// `feditext:` URLs should never appear in HTML unless we put them there post-HTML-parsing.
 public enum AppUrl {
-    private static let scheme: String = "feditext"
+    public static let scheme: String = "feditext"
+
+    public static let website = URL(string: "https://github.com/feditext/feditext")!
+
+    /// - Note: this particular URL needs an authority part, without which Mastodon's Doorkeeper OAuth gem
+    ///     chokes on it with the message `Validation failed: redirect URL must specify a scheme.`
+    ///     Other app URLs do not have an authority part, just a path.
+    public static let oauthCallback = URL(string: "\(scheme)://oauth.callback")!
 
     case search(_ searchUrl: URL)
     private static let searchPath: String = "search"

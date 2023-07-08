@@ -6,7 +6,7 @@ import XCTest
 final class AppUrlsTests: XCTestCase {
     func testMakeTagTimeline() throws {
         XCTAssertEqual(
-            AppUrl.makeTagTimeline(name: "hashtag").absoluteString,
+            AppUrl.tagTimeline("hashtag").url.absoluteString,
             "feditext:timeline?tag=hashtag"
         )
     }

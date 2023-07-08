@@ -1,5 +1,6 @@
 // Copyright © 2020 Metabolist. All rights reserved.
 
+import AppUrls
 import Combine
 import Foundation
 import Mastodon
@@ -26,7 +27,7 @@ struct AuthenticationService {
 
 extension AuthenticationService {
     func authenticate() -> AnyPublisher<(AppAuthorization, AccessToken), Error> {
-        let authorization = appAuthorization(redirectURI: OAuth.authorizationCallbackURL).share()
+        let authorization = appAuthorization(redirectURI: AppUrl.oauthCallback).share()
 
         return authorization
             .zip(authorization.flatMap(authenticate(appAuthorization:)))
@@ -35,7 +36,7 @@ extension AuthenticationService {
 
     func register(_ registration: Registration,
                   id: Identity.Id) -> AnyPublisher<(AppAuthorization, AccessToken), Error> {
-        let redirectURI = OAuth.registrationCallbackURL.appendingPathComponent(id.uuidString)
+        let redirectURI = AppUrl.oauthCallback.appendingPathComponent(id.uuidString)
         let authorization = appAuthorization(redirectURI: redirectURI)
             .share()
 
@@ -67,10 +68,6 @@ private extension AuthenticationService {
         static let codeCallbackQueryItemName = "code"
         static let authorizationCodeGrantType = "authorization_code"
         static let registrationGrantType = "client_credentials"
-        static let callbackURLScheme = "metatext"
-        static let authorizationCallbackURL = URL(string: "\(callbackURLScheme)://oauth.callback")!
-        static let registrationCallbackURL = URL(string: "https://metatext.link/confirmation")!
-        static let website = URL(string: "https://metabolist.org/metatext")!
     }
 
     enum OAuthError: Error {
@@ -95,7 +92,7 @@ private extension AuthenticationService {
                 clientName: OAuth.clientName,
                 redirectURI: redirectURI.absoluteString,
                 scopes: OAuth.scopes,
-                website: OAuth.website))
+                website: AppUrl.website))
     }
 
     func authorizationURL(appAuthorization: AppAuthorization) throws -> URL {
@@ -109,7 +106,7 @@ private extension AuthenticationService {
             .init(name: "client_id", value: appAuthorization.clientId),
             .init(name: "scope", value: OAuth.scopes),
             .init(name: "response_type", value: "code"),
-            .init(name: "redirect_uri", value: OAuth.authorizationCallbackURL.absoluteString)
+            .init(name: "redirect_uri", value: AppUrl.oauthCallback.absoluteString)
         ]
 
         guard let authorizationURL = authorizationURLComponents.url else {
@@ -125,7 +122,7 @@ private extension AuthenticationService {
             .flatMap {
                 webAuthSessionType.publisher(
                     url: $0,
-                    callbackURLScheme: OAuth.callbackURLScheme,
+                    callbackURLScheme: AppUrl.scheme,
                     presentationContextProvider: webAuthSessionContextProvider)
             }
             .mapError { error -> Error in
@@ -144,7 +141,7 @@ private extension AuthenticationService {
                         grantType: OAuth.authorizationCodeGrantType,
                         scopes: OAuth.scopes,
                         code: $0,
-                        redirectURI: OAuth.authorizationCallbackURL.absoluteString))
+                        redirectURI: AppUrl.oauthCallback.absoluteString))
             }
             .eraseToAnyPublisher()
     }

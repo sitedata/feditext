@@ -1,5 +1,6 @@
 // Copyright © 2021 Metabolist. All rights reserved.
 
+import AppUrls
 import SwiftUI
 import ViewModels
 
@@ -60,7 +61,7 @@ struct AboutView: View {
 }
 
 private extension AboutView {
-    static let sourceCodeAndIssueTrackerURL = URL(string: "https://github.com/bdube/metatext")!
+    static let sourceCodeAndIssueTrackerURL = AppUrl.website
 
     struct Maintainer: Identifiable {
         let name: String
