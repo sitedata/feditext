@@ -41,7 +41,7 @@ extension ListsEndpoint: Endpoint {
             .hometown: "2.1.0",
             .pleroma: APICapabilityRequirements.assumeAvailable,
             .akkoma: APICapabilityRequirements.assumeAvailable,
-            .gotosocial: "0.10.0"
+            .gotosocial: "0.10.0-0"
         ]
     }
 
