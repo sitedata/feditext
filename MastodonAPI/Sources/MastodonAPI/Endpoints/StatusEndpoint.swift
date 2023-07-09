@@ -155,4 +155,18 @@ extension StatusEndpoint: Endpoint {
             return .post
         }
     }
+
+    public var requires: APICapabilityRequirements? {
+        switch self {
+        case .put:
+            return [
+                .mastodon: "3.5.0",
+                .hometown: "3.5.0",
+                .pleroma: APICapabilityRequirements.assumeAvailable,
+                .akkoma: APICapabilityRequirements.assumeAvailable
+            ]
+        default:
+            return nil
+        }
+    }
 }

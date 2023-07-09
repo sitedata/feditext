@@ -728,19 +728,27 @@ private extension StatusView {
         var secondSectionItems = [UIAction]()
 
         if viewModel.isMine {
-            secondSectionItems += [
+            secondSectionItems.append(
                 UIAction(
                     title: viewModel.muted
                         ? NSLocalizedString("status.unmute", comment: "")
                         : NSLocalizedString("status.mute", comment: ""),
                     image: UIImage(systemName: viewModel.muted ? "speaker" : "speaker.slash")) { _ in
                     viewModel.toggleMuted()
-                },
-                UIAction(
-                    title: NSLocalizedString("status.edit", comment: ""),
-                    image: UIImage(systemName: "pencil")) { _ in
-                    viewModel.edit()
-                },
+                }
+            )
+
+            if viewModel.canEditStatuses {
+                secondSectionItems.append(
+                    UIAction(
+                        title: NSLocalizedString("status.edit", comment: ""),
+                        image: UIImage(systemName: "pencil")) { _ in
+                        viewModel.edit()
+                    }
+                )
+            }
+
+            secondSectionItems += [
                 UIAction(
                     title: NSLocalizedString("status.delete", comment: ""),
                     image: UIImage(systemName: "trash"),

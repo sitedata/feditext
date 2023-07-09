@@ -5,6 +5,7 @@ import Combine
 import DB
 import Foundation
 import Mastodon
+import MastodonAPI
 import ServiceLayer
 
 public final class StatusViewModel: AttachmentsRenderingViewModel, ObservableObject {
@@ -61,6 +62,26 @@ public final class StatusViewModel: AttachmentsRenderingViewModel, ObservableObj
 
 public extension StatusViewModel {
     var isMine: Bool { statusService.status.displayStatus.account.id == identityContext.identity.account?.id }
+
+    /// Does this instance support editing statuses?
+    var canEditStatuses: Bool {
+        StatusEndpoint.put(
+            id: "",
+            .init(
+                inReplyToId: nil,
+                text: "",
+                spoilerText: "",
+                mediaIds: [],
+                visibility: nil,
+                language: nil,
+                sensitive: false,
+                pollOptions: [],
+                pollExpiresIn: 0,
+                pollMultipleChoice: false
+            )
+        )
+        .canCallWith(identityContext.apiCapabilities)
+    }
 
     var showContentToggled: Bool {
         configuration.showContentToggled
