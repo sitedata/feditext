@@ -42,18 +42,32 @@ extension SearchService: CollectionService {
         return mastodonAPIClient.request(ResultsEndpoint.search(search))
             .flatMap { results in contentDatabase.insert(results: results).collect().map { _ in results } }
             .flatMap { results in
-                mastodonAPIClient
-                    .request(RelationshipsEndpoint.relationships(ids: results.accounts.map { $0.id }))
-                    .flatMap(contentDatabase.insert(relationships:))
-                    .collect()
-                    .map { _ in results }
+                if !results.accounts.isEmpty {
+                    return mastodonAPIClient
+                        .request(RelationshipsEndpoint.relationships(ids: results.accounts.map { $0.id }))
+                        .flatMap(contentDatabase.insert(relationships:))
+                        .collect()
+                        .map { _ in results }
+                        .eraseToAnyPublisher()
+                } else {
+                    return Just(results)
+                        .setFailureType(to: Error.self)
+                        .eraseToAnyPublisher()
+                }
             }
             .flatMap { results in
-                mastodonAPIClient
-                    .request(FamiliarFollowersEndpoint.familiarFollowers(ids: results.accounts.map { $0.id }))
-                    .flatMap(contentDatabase.insert(familiarFollowers:))
-                    .collect()
-                    .map { _ in results }
+                if !results.accounts.isEmpty {
+                    return mastodonAPIClient
+                        .request(FamiliarFollowersEndpoint.familiarFollowers(ids: results.accounts.map { $0.id }))
+                        .flatMap(contentDatabase.insert(familiarFollowers:))
+                        .collect()
+                        .map { _ in results }
+                        .eraseToAnyPublisher()
+                } else {
+                    return Just(results)
+                        .setFailureType(to: Error.self)
+                        .eraseToAnyPublisher()
+                }
             }
             .handleEvents(receiveOutput: { resultsSubject.send(($0, search)) })
             .ignoreOutput()
