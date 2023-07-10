@@ -3,6 +3,7 @@
 import Combine
 import Foundation
 import Mastodon
+import MastodonAPI
 import ServiceLayer
 
 public final class NavigationViewModel: ObservableObject {
@@ -44,14 +45,6 @@ public extension NavigationViewModel {
         case explore
         case notifications
         case messages
-    }
-
-    var tabs: [Tab] {
-        if identityContext.identity.authenticated {
-            return Tab.allCases
-        } else {
-            return [.timelines, .explore]
-        }
     }
 
     var timelines: [Timeline] {
@@ -210,6 +203,10 @@ public extension NavigationViewModel {
         }
 
         return viewModel
+    }
+
+    var canListConversations: Bool {
+        ConversationsEndpoint.conversations.canCallWith(identityContext.apiCapabilities)
     }
 
     func conversationsViewModel() -> CollectionViewModel {

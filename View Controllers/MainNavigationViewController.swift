@@ -122,14 +122,16 @@ private extension MainNavigationViewController {
                                                      rootViewModel: rootViewModel))
             controllers.append(NotificationsViewController(viewModel: viewModel, rootViewModel: rootViewModel))
 
-            let conversationsViewController = TableViewController(
-                viewModel: viewModel.conversationsViewModel(),
-                rootViewModel: rootViewModel)
+            if viewModel.canListConversations {
+                let conversationsViewController = TableViewController(
+                    viewModel: viewModel.conversationsViewModel(),
+                    rootViewModel: rootViewModel)
 
-            conversationsViewController.tabBarItem = NavigationViewModel.Tab.messages.tabBarItem
-            conversationsViewController.navigationItem.title = NavigationViewModel.Tab.messages.title
+                conversationsViewController.tabBarItem = NavigationViewModel.Tab.messages.tabBarItem
+                conversationsViewController.navigationItem.title = NavigationViewModel.Tab.messages.title
 
-            controllers.append(conversationsViewController)
+                controllers.append(conversationsViewController)
+            }
 
             setupNewStatusButton()
         } else {
