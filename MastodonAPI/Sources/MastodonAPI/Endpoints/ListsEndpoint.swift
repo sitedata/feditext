@@ -39,8 +39,8 @@ extension ListsEndpoint: Endpoint {
         [
             .mastodon: "2.1.0",
             .hometown: "2.1.0",
-            .pleroma: APICapabilityRequirements.assumeAvailable,
-            .akkoma: APICapabilityRequirements.assumeAvailable,
+            .pleroma: .assumeAvailable,
+            .akkoma: .assumeAvailable,
             .gotosocial: "0.10.0-0"
         ]
     }

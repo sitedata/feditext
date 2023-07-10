@@ -17,23 +17,33 @@ struct UserPreferencesSection: View {
                 NavigationLink("preferences.filters",
                                destination: FiltersView(
                                 viewModel: .init(identityContext: viewModel.identityContext)))
+
                 if viewModel.shouldShowNotificationTypePreferences {
                     NavigationLink("preferences.notifications",
                                    destination: NotificationTypesPreferencesView(
                                     viewModel: .init(identityContext: viewModel.identityContext)))
                 }
-                Button("preferences.muted-users") {
-                    rootViewModel.navigationViewModel?.navigateToMutedUsers()
+
+                if viewModel.canListMutedUsers {
+                    Button("preferences.muted-users") {
+                        rootViewModel.navigationViewModel?.navigateToMutedUsers()
+                    }
+                    .foregroundColor(.primary)
                 }
-                .foregroundColor(.primary)
+
                 Button("preferences.blocked-users") {
                     rootViewModel.navigationViewModel?.navigateToBlockedUsers()
                 }
                 .foregroundColor(.primary)
-                NavigationLink("preferences.blocked-domains",
-                               destination: DomainBlocksView(viewModel: viewModel.domainBlocksViewModel()))
+
+                if viewModel.canListMutedUsers {
+                    NavigationLink("preferences.blocked-domains",
+                                   destination: DomainBlocksView(viewModel: viewModel.domainBlocksViewModel()))
+                }
+
                 Toggle("preferences.use-preferences-from-server",
                        isOn: $viewModel.preferences.useServerPostingReadingPreferences)
+
                 Group {
                     Picker("preferences.posting-default-visibility",
                            selection: $viewModel.preferences.postingDefaultVisibility) {

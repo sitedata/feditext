@@ -36,4 +36,15 @@ extension StatusEditsEndpoint: Endpoint {
             return .get
         }
     }
+
+    public var requires: APICapabilityRequirements? {
+        return [
+            .mastodon: "3.5.0",
+            .hometown: "3.5.0",
+            .pleroma: .assumeAvailable,
+            .akkoma: .assumeAvailable
+        ]
+    }
+
+    public var fallback: [StatusEdit]? { [] }
 }

@@ -5,6 +5,7 @@ import HTTP
 import Mastodon
 
 public enum RulesEndpoint {
+    /// https://docs.joinmastodon.org/methods/instance/#rules
     case rules
 }
 
@@ -28,4 +29,13 @@ extension RulesEndpoint: Endpoint {
             return .get
         }
     }
+
+    public var requires: APICapabilityRequirements? {
+        [
+            .mastodon: "3.4.0",
+            .hometown: "3.4.0"
+        ]
+    }
+
+    public var fallback: [Rule]? { [] }
 }

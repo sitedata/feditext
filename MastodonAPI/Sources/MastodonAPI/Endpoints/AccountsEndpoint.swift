@@ -7,6 +7,7 @@ import Mastodon
 public enum AccountsEndpoint {
     case rebloggedBy(id: Status.Id)
     case favouritedBy(id: Status.Id)
+    /// https://docs.joinmastodon.org/methods/mutes/
     case mutes
     case blocks
     case accountsFollowers(id: Account.Id)
@@ -70,6 +71,13 @@ extension AccountsEndpoint: Endpoint {
             return [
                 .mastodon: "3.0.0",
                 .hometown: "3.0.0"
+            ]
+        case .mutes:
+            return [
+                .mastodon: .assumeAvailable,
+                .hometown: .assumeAvailable,
+                .pleroma: .assumeAvailable,
+                .calckey: .assumeAvailable
             ]
         default:
             return nil

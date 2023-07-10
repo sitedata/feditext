@@ -1148,20 +1148,22 @@ private extension StatusView {
                 ]
             } else {
                 if let relationship = viewModel.accountViewModel.relationship {
-                    if relationship.muting {
-                        actions.append(UIAccessibilityCustomAction(
-                            name: NSLocalizedString("account.unmute", comment: "")) { _ in
-                            viewModel.accountViewModel.confirmUnmute()
+                    if viewModel.accountViewModel.canMute {
+                        if relationship.muting {
+                            actions.append(UIAccessibilityCustomAction(
+                                name: NSLocalizedString("account.unmute", comment: "")) { _ in
+                                    viewModel.accountViewModel.confirmUnmute()
 
-                            return true
-                        })
-                    } else {
-                        actions.append(UIAccessibilityCustomAction(
-                            name: NSLocalizedString("account.mute", comment: "")) { _ in
-                            viewModel.accountViewModel.confirmMute()
+                                    return true
+                                })
+                        } else {
+                            actions.append(UIAccessibilityCustomAction(
+                                name: NSLocalizedString("account.mute", comment: "")) { _ in
+                                    viewModel.accountViewModel.confirmMute()
 
-                            return true
-                        })
+                                    return true
+                                })
+                        }
                     }
 
                     if relationship.blocking {
@@ -1187,7 +1189,8 @@ private extension StatusView {
                     return true
                 })
 
-                if !viewModel.accountViewModel.isLocal,
+                if viewModel.accountViewModel.canBlockDomains,
+                   !viewModel.accountViewModel.isLocal,
                    let domain = viewModel.accountViewModel.domain,
                    let relationship = viewModel.accountViewModel.relationship {
 

@@ -6,6 +6,7 @@ import Mastodon
 
 public enum StatusSourceEndpoint {
     /// https://docs.joinmastodon.org/methods/statuses/#source
+    /// https://api.pleroma.social/#operation/StatusController.show_source
     case source(id: Status.Id)
 }
 
@@ -35,5 +36,14 @@ extension StatusSourceEndpoint: Endpoint {
         case .source:
             return .get
         }
+    }
+
+    public var requires: APICapabilityRequirements? {
+        [
+            .mastodon: "3.5.0",
+            .hometown: "3.5.0",
+            .pleroma: .assumeAvailable,
+            .akkoma: .assumeAvailable
+        ]
     }
 }

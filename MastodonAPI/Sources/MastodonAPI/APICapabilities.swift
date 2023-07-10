@@ -41,9 +41,6 @@ public struct APICapabilityRequirements {
         }
         return version >= minVersion
     }
-
-    /// We don't know which version added this, but assume it's available.
-    public static let assumeAvailable: Semver = "0.0.0"
 }
 
 extension APICapabilityRequirements: ExpressibleByDictionaryLiteral {
@@ -53,4 +50,9 @@ extension APICapabilityRequirements: ExpressibleByDictionaryLiteral {
     public init(dictionaryLiteral elements: (APIFlavor, Semver)...) {
         minVersions = .init(uniqueKeysWithValues: elements)
     }
+}
+
+public extension Semver {
+    /// We don't know which version added this, but assume it's available.
+    static let assumeAvailable: Semver = "0.0.0"
 }

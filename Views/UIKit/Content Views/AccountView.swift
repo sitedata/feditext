@@ -5,7 +5,6 @@ import SDWebImage
 import UIKit
 import ViewModels
 
-// TODO: (Vyr) support follow/reject buttons for suggested follows
 final class AccountView: UIView {
     let avatarImageView = SDAnimatedImageView()
     let displayNameLabel = AnimatedAttachmentLabel()

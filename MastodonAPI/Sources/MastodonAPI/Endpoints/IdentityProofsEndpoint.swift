@@ -4,7 +4,9 @@ import Foundation
 import HTTP
 import Mastodon
 
+// TODO: (Vyr) remove identity proofs: Deprecated everywhere and our UI doesn't use them anyway.
 public enum IdentityProofsEndpoint {
+    /// https://docs.joinmastodon.org/methods/accounts/#identity_proofs
     case identityProofs(id: Account.Id)
 }
 
@@ -28,4 +30,7 @@ extension IdentityProofsEndpoint: Endpoint {
             return .get
         }
     }
+
+    public var requires: APICapabilityRequirements? { [:] }
+    public var fallback: [IdentityProof]? { [] }
 }

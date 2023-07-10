@@ -28,4 +28,8 @@ extension ConversationEndpoint: Endpoint {
             return .post
         }
     }
+
+    public var requires: APICapabilityRequirements? {
+        ConversationsEndpoint.conversations.requires
+    }
 }

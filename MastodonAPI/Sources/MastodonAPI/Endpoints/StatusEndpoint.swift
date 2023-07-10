@@ -159,12 +159,7 @@ extension StatusEndpoint: Endpoint {
     public var requires: APICapabilityRequirements? {
         switch self {
         case .put:
-            return [
-                .mastodon: "3.5.0",
-                .hometown: "3.5.0",
-                .pleroma: APICapabilityRequirements.assumeAvailable,
-                .akkoma: APICapabilityRequirements.assumeAvailable
-            ]
+            return StatusEditsEndpoint.history(id: "").requires
         default:
             return nil
         }

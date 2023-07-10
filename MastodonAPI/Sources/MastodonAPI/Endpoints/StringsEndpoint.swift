@@ -5,6 +5,7 @@ import HTTP
 import Mastodon
 
 public enum StringsEndpoint {
+    /// https://docs.joinmastodon.org/methods/domain_blocks/#get
     case domainBlocks
 }
 
@@ -24,4 +25,18 @@ extension StringsEndpoint: Endpoint {
             return .get
         }
     }
+
+    public var requires: APICapabilityRequirements? {
+        switch self {
+        case .domainBlocks:
+            return [
+                .mastodon: "1.4.0",
+                .hometown: "1.4.0",
+                .pleroma: .assumeAvailable,
+                .akkoma: .assumeAvailable
+            ]
+        }
+    }
+
+    public var fallback: [String]? { [] }
 }

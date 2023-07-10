@@ -4,6 +4,7 @@ import Foundation
 import HTTP
 import Mastodon
 
+/// https://docs.joinmastodon.org/methods/markers/
 public enum MarkersEndpoint {
     case get(Set<Marker.Timeline>)
     case post([Marker.Timeline: String])
@@ -42,4 +43,15 @@ extension MarkersEndpoint: Endpoint {
             return .post
         }
     }
+
+    public var requires: APICapabilityRequirements? {
+        [
+            .mastodon: "3.0.0",
+            .hometown: "3.0.0",
+            .pleroma: .assumeAvailable,
+            .akkoma: .assumeAvailable
+        ]
+    }
+
+    public var fallback: [String: Marker]? { [:] }
 }

@@ -99,9 +99,11 @@ extension RelationshipEndpoint: Endpoint {
             return [
                 .mastodon: "3.0.0",
                 .hometown: "3.0.0",
-                .pleroma: APICapabilityRequirements.assumeAvailable,
-                .akkoma: APICapabilityRequirements.assumeAvailable
+                .pleroma: .assumeAvailable,
+                .akkoma: .assumeAvailable
             ]
+        case .accountsMute, .accountsUnmute:
+            return AccountsEndpoint.mutes.requires
         default:
             return nil
         }

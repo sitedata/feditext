@@ -10,7 +10,9 @@ public enum EmptyEndpoint {
     case removeAccountsFromList(id: List.Id, accountIds: Set<Account.Id>)
     case deleteList(id: List.Id)
     case deleteFilter(id: Filter.Id)
+    /// https://docs.joinmastodon.org/methods/domain_blocks/#block
     case blockDomain(String)
+    /// https://docs.joinmastodon.org/methods/domain_blocks/#unblock
     case unblockDomain(String)
     case dismissAnnouncement(id: Announcement.Id)
     case addAnnouncementReaction(id: Announcement.Id, name: String)
@@ -87,6 +89,21 @@ extension EmptyEndpoint: Endpoint {
                 .addAnnouncementReaction,
                 .removeAnnouncementReaction,
                 .removeFollowSuggestion:
+            return nil
+        }
+    }
+
+    public var requires: APICapabilityRequirements? {
+        switch self {
+        case .dismissAnnouncement, .addAnnouncementReaction, .removeAnnouncementReaction:
+            return AnnouncementsEndpoint.announcements.requires
+        case .blockDomain, .unblockDomain:
+            return StringsEndpoint.domainBlocks.requires
+        case .removeFollowSuggestion:
+            return SuggestionsEndpoint.suggestions().requires
+        case .addAccountsToList, .removeAccountsFromList, .deleteList:
+            return ListsEndpoint.lists.requires
+        default:
             return nil
         }
     }

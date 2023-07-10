@@ -5,6 +5,7 @@ import Combine
 import DB
 import Foundation
 import Mastodon
+import MastodonAPI
 import ServiceLayer
 
 public final class AccountViewModel: ObservableObject {
@@ -186,6 +187,10 @@ public extension AccountViewModel {
         MuteViewModel(accountService: accountService, identityContext: identityContext)
     }
 
+    var canAddToList: Bool {
+        EmptyEndpoint.addAccountsToList(id: "", accountIds: []).canCallWith(identityContext.apiCapabilities)
+    }
+
     func lists() -> AnyPublisher<[List], Error> {
         accountService.lists()
     }
@@ -256,6 +261,10 @@ public extension AccountViewModel {
         ignorableOutputEvent(accountService.unblock())
     }
 
+    var canMute: Bool {
+        RelationshipEndpoint.accountsMute(id: "").canCallWith(identityContext.apiCapabilities)
+    }
+
     func confirmMute() {
         eventsSubject.send(Just(.confirmMute(self)).setFailureType(to: Error.self).eraseToAnyPublisher())
     }
@@ -276,6 +285,10 @@ public extension AccountViewModel {
         ignorableOutputEvent(accountService.unpin())
     }
 
+    var canEditNotes: Bool {
+        RelationshipEndpoint.note("", id: "").canCallWith(identityContext.apiCapabilities)
+    }
+
     func editNote() {
         eventsSubject.send(Just(.editNote(self)).setFailureType(to: Error.self).eraseToAnyPublisher())
     }
@@ -294,6 +307,10 @@ public extension AccountViewModel {
 
     func removeFollowSuggestion() {
         accountListEdit(accountService.removeFollowSuggestion(), event: .removeFollowSuggestion)
+    }
+
+    var canBlockDomains: Bool {
+        EmptyEndpoint.blockDomain("").canCallWith(identityContext.apiCapabilities)
     }
 
     func confirmDomainBlock(domain: String) {

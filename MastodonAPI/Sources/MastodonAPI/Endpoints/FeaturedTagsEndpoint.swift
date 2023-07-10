@@ -4,6 +4,7 @@ import Foundation
 import HTTP
 import Mastodon
 
+/// https://docs.joinmastodon.org/methods/featured_tags/
 public enum FeaturedTagsEndpoint {
     case featuredTags(id: Account.Id)
 }
@@ -32,4 +33,15 @@ extension FeaturedTagsEndpoint: Endpoint {
             return .get
         }
     }
+
+    public var requires: APICapabilityRequirements? {
+        [
+            .mastodon: "3.0.0",
+            .hometown: "3.0.0",
+            .pleroma: .assumeAvailable,
+            .akkoma: .assumeAvailable
+        ]
+    }
+
+    public var fallback: [FeaturedTag]? { [] }
 }

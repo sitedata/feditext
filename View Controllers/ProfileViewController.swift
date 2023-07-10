@@ -2,7 +2,6 @@
 
 import Combine
 import Mastodon
-import MastodonAPI
 import SwiftUI
 import ViewModels
 
@@ -85,7 +84,7 @@ private extension ProfileViewController {
         }]
 
         if relationship.following {
-            if ListsEndpoint.lists.canCallWith(identityContext.apiCapabilities) {
+            if accountViewModel.canAddToList {
                 actions.append(UIAction(
                     title: NSLocalizedString("account.add-remove-lists", comment: ""),
                     image: UIImage(systemName: "scroll")) { [weak self] _ in
@@ -108,7 +107,7 @@ private extension ProfileViewController {
             }
         }
 
-        if RelationshipEndpoint.note("", id: "").canCallWith(identityContext.apiCapabilities) {
+        if accountViewModel.canEditNotes {
             if relationship.note.isEmpty {
                 actions.append(UIAction(
                     title: NSLocalizedString("account.note.add", comment: ""),
@@ -124,18 +123,20 @@ private extension ProfileViewController {
             }
         }
 
-        if relationship.muting {
-            actions.append(UIAction(
-                title: NSLocalizedString("account.unmute", comment: ""),
-                image: UIImage(systemName: "speaker")) { _ in
-                accountViewModel.confirmUnmute()
-            })
-        } else {
-            actions.append(UIAction(
-                title: NSLocalizedString("account.mute", comment: ""),
-                image: UIImage(systemName: "speaker.slash")) { _ in
-                accountViewModel.confirmMute()
-            })
+        if accountViewModel.canMute {
+            if relationship.muting {
+                actions.append(UIAction(
+                    title: NSLocalizedString("account.unmute", comment: ""),
+                    image: UIImage(systemName: "speaker")) { _ in
+                        accountViewModel.confirmUnmute()
+                    })
+            } else {
+                actions.append(UIAction(
+                    title: NSLocalizedString("account.mute", comment: ""),
+                    image: UIImage(systemName: "speaker.slash")) { _ in
+                        accountViewModel.confirmMute()
+                    })
+            }
         }
 
         if relationship.blocking {
@@ -165,7 +166,7 @@ private extension ProfileViewController {
             self.report(reportViewModel: reportViewModel)
         })
 
-        if !accountViewModel.isLocal, let domain = accountViewModel.domain {
+        if accountViewModel.canBlockDomains, !accountViewModel.isLocal, let domain = accountViewModel.domain {
             if relationship.domainBlocking {
                 actions.append(UIAction(
                     title: String.localizedStringWithFormat(

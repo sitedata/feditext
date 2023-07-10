@@ -1,7 +1,9 @@
 // Copyright © 2020 Metabolist. All rights reserved.
 
 import Combine
+import DB
 import Foundation
+import MastodonAPI
 import ServiceLayer
 
 public final class PreferencesViewModel: ObservableObject {
@@ -38,6 +40,10 @@ public final class PreferencesViewModel: ObservableObject {
 }
 
 public extension PreferencesViewModel {
+    var canListMutedUsers: Bool {
+        AccountsEndpoint.mutes.canCallWith(identityContext.apiCapabilities)
+    }
+
     func mutedUsersViewModel() -> CollectionViewModel {
         CollectionItemsViewModel(
             collectionService: identityContext.service.service(accountList: .mutes),
@@ -48,6 +54,10 @@ public extension PreferencesViewModel {
         CollectionItemsViewModel(
             collectionService: identityContext.service.service(accountList: .blocks),
             identityContext: identityContext)
+    }
+
+    var canListDomainBlocks: Bool {
+        StringsEndpoint.domainBlocks.canCallWith(identityContext.apiCapabilities)
     }
 
     func domainBlocksViewModel() -> DomainBlocksViewModel {
