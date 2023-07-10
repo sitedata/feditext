@@ -12,14 +12,14 @@ public struct CardViewModel {
 }
 
 public extension CardViewModel {
-    var url: URL { card.url.url }
+    var url: URL? { card.url.url }
 
     var displayHost: String? {
-        if let host = url.host, host.hasPrefix("www."),
+        if let host = url?.host, host.hasPrefix("www."),
            let withoutWww = host.components(separatedBy: "www.").last {
             return withoutWww
         } else {
-            return url.host
+            return url?.host
         }
     }
 

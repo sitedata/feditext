@@ -138,7 +138,12 @@ public extension ExploreViewModel {
             )
 
         case let .link(card):
-            eventsSubject.send(.navigation(.url(card.url.url)))
+            guard let url = card.url.url else {
+                assertionFailure("Link card doesn't have a valid URL")
+                return
+            }
+
+            eventsSubject.send(.navigation(.url(url)))
 
         case let .status(status):
             eventsSubject.send(

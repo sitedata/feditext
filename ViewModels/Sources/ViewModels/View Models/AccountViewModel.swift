@@ -32,7 +32,7 @@ public final class AccountViewModel: ObservableObject {
 public extension AccountViewModel {
     var id: Account.Id { accountService.account.id }
 
-    var headerURL: URL {
+    var headerURL: URL? {
         if identityContext.appPreferences.animateHeaders {
             return accountService.account.header.url
         } else {
@@ -98,7 +98,7 @@ public extension AccountViewModel {
         }
     }
 
-    func avatarURL(profile: Bool = false) -> URL {
+    func avatarURL(profile: Bool = false) -> URL? {
         if identityContext.appPreferences.animateAvatars == .everywhere
             || (identityContext.appPreferences.animateAvatars == .profiles && profile) {
             return accountService.account.avatar.url

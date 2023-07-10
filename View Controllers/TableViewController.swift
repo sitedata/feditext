@@ -657,10 +657,15 @@ private extension TableViewController {
             let playerViewController = AVPlayerViewController()
             let player: AVPlayer
 
+            guard let url = attachmentViewModel.attachment.url.url else {
+                assertionFailure("Attachment doesn't have a valid URL")
+                return
+            }
+
             if attachmentViewModel.attachment.type == .video {
-                player = PlayerCache.shared.player(url: attachmentViewModel.attachment.url.url)
+                player = PlayerCache.shared.player(url: url)
             } else {
-                player = AVPlayer(url: attachmentViewModel.attachment.url.url)
+                player = AVPlayer(url: url)
             }
 
             playerViewController.delegate = self

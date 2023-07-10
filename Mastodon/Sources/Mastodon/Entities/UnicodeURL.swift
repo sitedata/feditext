@@ -4,7 +4,12 @@ import Foundation
 
 public struct UnicodeURL {
     public let raw: String
-    public let url: URL
+    public let url: URL?
+
+    public init(raw: String) {
+        self.raw = raw
+        self.url = URL(unicodeString: raw)
+    }
 
     public init(url: URL) {
         self.raw = url.absoluteString
@@ -21,14 +26,7 @@ extension UnicodeURL: Hashable {
 extension UnicodeURL: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-
-        raw = try container.decode(String.self)
-
-        if let url = URL(unicodeString: raw) {
-            self.url = url
-        } else {
-            throw URLError(.badURL)
-        }
+        self.init(raw: try container.decode(String.self))
     }
 
     public func encode(to encoder: Encoder) throws {

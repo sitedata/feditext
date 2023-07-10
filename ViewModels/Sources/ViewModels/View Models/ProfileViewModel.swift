@@ -64,15 +64,15 @@ final public class ProfileViewModel {
 
 public extension ProfileViewModel {
     func presentHeader() {
-        guard let accountViewModel = accountViewModel else { return }
+        guard let headerURL = accountViewModel?.headerURL else { return }
 
-        imagePresentationsSubject.send(accountViewModel.headerURL)
+        imagePresentationsSubject.send(headerURL)
     }
 
     func presentAvatar() {
-        guard let accountViewModel = accountViewModel else { return }
+        guard let avatarURL = accountViewModel?.avatarURL(profile: true) else { return }
 
-        imagePresentationsSubject.send(accountViewModel.avatarURL(profile: true))
+        imagePresentationsSubject.send(avatarURL)
     }
 
     func fetchProfile() -> AnyPublisher<Never, Never> {

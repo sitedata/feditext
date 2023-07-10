@@ -457,9 +457,14 @@ extension CollectionItemsViewModel: CollectionViewModel {
             )
 
         case let .link(card):
+            guard let url = card.url.url else {
+                assertionFailure("Link card doesn't have a valid URL")
+                return
+            }
+
             send(
                 event: .navigation(
-                    .url(card.url.url)
+                    .url(url)
                 )
             )
 

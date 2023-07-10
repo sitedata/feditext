@@ -120,14 +120,18 @@ extension CollectionItem {
 
 private extension Account {
     func mediaPrefetchURLs(identityContext: IdentityContext) -> Set<URL> {
-        var urls = Set(emojis.map {
+        var urls = Set(emojis.compactMap {
             (identityContext.appPreferences.animateCustomEmojis ? $0.url : $0.staticUrl).url
         })
 
         if identityContext.appPreferences.animateAvatars == .everywhere {
-            urls.insert(avatar.url)
+            if let url = avatar.url {
+                urls.insert(url)
+            }
         } else {
-            urls.insert(avatarStatic.url)
+            if let url = avatarStatic.url {
+                urls.insert(url)
+            }
         }
 
         return urls
@@ -138,7 +142,7 @@ private extension Status {
     func mediaPrefetchURLs(identityContext: IdentityContext) -> Set<URL> {
         displayStatus.account.mediaPrefetchURLs(identityContext: identityContext)
             .union(displayStatus.mediaAttachments.compactMap(\.previewUrl?.url))
-            .union(displayStatus.emojis.map {
+            .union(displayStatus.emojis.compactMap {
                 (identityContext.appPreferences.animateCustomEmojis ? $0.url : $0.staticUrl).url
             })
     }

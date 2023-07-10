@@ -54,7 +54,12 @@ final class NotificationService: UNNotificationServiceExtension {
             bestAttemptContent.subtitle = handle
         }
 
-        Self.attachment(imageURL: pushNotification.icon.url)
+        guard let imageURL = pushNotification.icon.url else {
+            assertionFailure("Push notification icon doesn't have a valid URL")
+            return
+        }
+
+        Self.attachment(imageURL: imageURL)
             .map { [$0] }
             .replaceError(with: [])
             .handleEvents(receiveOutput: { bestAttemptContent.attachments = $0 })

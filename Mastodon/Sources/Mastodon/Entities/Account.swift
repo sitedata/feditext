@@ -18,8 +18,8 @@ public final class Account: Codable, Identifiable {
     public let avatarStatic: UnicodeURL
     public let header: UnicodeURL
     public let headerStatic: UnicodeURL
-    public let fields: [Field]
-    public let emojis: [Emoji]
+    @DecodableDefault.EmptyList public private(set) var fields: [Field]
+    @DecodableDefault.EmptyList public private(set) var emojis: [Emoji]
     @DecodableDefault.False public private(set) var bot: Bool
     @DecodableDefault.False public private(set) var group: Bool
     @DecodableDefault.False public private(set) var discoverable: Bool

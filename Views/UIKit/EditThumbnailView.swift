@@ -154,7 +154,13 @@ private extension EditThumbnailView {
             imageView.sd_setImage(with: viewModel.attachment.previewUrl?.url, placeholderImage: placeholderImage)
         case .gifv:
             imageView.isHidden = true
-            let player = PlayerCache.shared.player(url: viewModel.attachment.url.url)
+
+            guard let url = viewModel.attachment.url.url else {
+                assertionFailure("Attachment doesn't have a valid URL")
+                return
+            }
+
+            let player = PlayerCache.shared.player(url: url)
 
             player.isMuted = true
 

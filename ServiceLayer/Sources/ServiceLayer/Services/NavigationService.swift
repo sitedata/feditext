@@ -184,7 +184,7 @@ public extension NavigationService {
 
 private extension NavigationService {
     func tag(url: URL) -> String? {
-        if status?.tags.first(where: { $0.url.url.path.lowercased() == url.path.lowercased() }) != nil {
+        if status?.tags.first(where: { $0.url.url?.path.lowercased() == url.path.lowercased() }) != nil {
             return url.lastPathComponent
         } else if
             mastodonAPIClient.instanceURL.host == url.host {
@@ -196,7 +196,7 @@ private extension NavigationService {
 
     func accountId(url: URL) -> String? {
         if let mentionId = status?.mentions.first(where: {
-            $0.url.url.path.lowercased() == url.path.lowercased()
+            $0.url.url?.path.lowercased() == url.path.lowercased()
         })?.id {
             return mentionId
         } else if

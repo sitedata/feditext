@@ -12,7 +12,7 @@ extension NSMutableAttributedString {
 
             while let tokenRange = string.range(of: token) {
                 let attachment = AnimatedTextAttachment()
-                let imageURL: URL
+                let imageURL: URL?
 
                 if identityContext.appPreferences.animateCustomEmojis {
                     imageURL = emoji.url.url

@@ -127,7 +127,7 @@ final class ImageViewController: UIViewController {
                 playerView.isHidden = true
 
                 let placeholderImage: UIImage?
-                let cachedImageKey = viewModel.attachment.previewUrl?.url.absoluteString
+                let cachedImageKey = viewModel.attachment.previewUrl?.url?.absoluteString
                 let cachedImage = SDImageCache.shared.imageFromCache(forKey: cachedImageKey)
 
                 if cachedImage != nil {
@@ -150,7 +150,13 @@ final class ImageViewController: UIViewController {
             case .gifv:
                 playerView.tag = viewModel.tag
                 imageView.isHidden = true
-                let player = PlayerCache.shared.player(url: viewModel.attachment.url.url)
+
+                guard let url = viewModel.attachment.url.url else {
+                    assertionFailure("Attachment doesn't have a valid URL")
+                    return
+                }
+
+                let player = PlayerCache.shared.player(url: url)
 
                 player.isMuted = true
 

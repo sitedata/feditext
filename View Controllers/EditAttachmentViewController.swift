@@ -51,10 +51,15 @@ final class EditAttachmentViewController: UIViewController {
             let playerViewController = AVPlayerViewController()
             let player: AVPlayer
 
+            guard let url = viewModel.attachment.url.url else {
+                assertionFailure("Attachment doesn't have a valid URL")
+                return
+            }
+
             if viewModel.attachment.type == .video {
-                player = PlayerCache.shared.player(url: viewModel.attachment.url.url)
+                player = PlayerCache.shared.player(url: url)
             } else {
-                player = AVPlayer(url: viewModel.attachment.url.url)
+                player = AVPlayer(url: url)
             }
 
             player.isMuted = false

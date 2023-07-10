@@ -136,9 +136,11 @@ final class AttachmentView: UIView {
 
 extension AttachmentView {
     func play() {
-        guard let viewModel = viewModel else { return }
+        guard let viewModel = viewModel,
+              let url = viewModel.attachment.url.url
+        else { return }
 
-        let player = PlayerCache.shared.player(url: viewModel.attachment.url.url)
+        let player = PlayerCache.shared.player(url: url)
 
         playerCancellable = NotificationCenter.default.publisher(
             for: .AVPlayerItemDidPlayToEndTime,

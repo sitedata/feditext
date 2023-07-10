@@ -161,7 +161,7 @@ public extension StatusViewModel {
 
     var accountName: String { "@".appending(statusService.status.displayStatus.account.acct) }
 
-    var avatarURL: URL {
+    var avatarURL: URL? {
         if identityContext.appPreferences.animateAvatars == .everywhere {
             return statusService.status.displayStatus.account.avatar.url
         } else {
@@ -169,7 +169,7 @@ public extension StatusViewModel {
         }
     }
 
-    var rebloggerAvatarURL: URL {
+    var rebloggerAvatarURL: URL? {
         if identityContext.appPreferences.animateAvatars == .everywhere {
             return statusService.status.account.avatar.url
         } else {
@@ -473,8 +473,8 @@ public extension StatusViewModel {
     }
 
     func attachmentSelected(viewModel: AttachmentViewModel) {
-        if viewModel.attachment.type == .unknown, let remoteUrl = viewModel.attachment.remoteUrl {
-            urlSelected(remoteUrl.url)
+        if viewModel.attachment.type == .unknown, let remoteUrl = viewModel.attachment.remoteUrl?.url {
+            urlSelected(remoteUrl)
         } else {
             eventsSubject.send(Just(.attachment(viewModel, self)).setFailureType(to: Error.self).eraseToAnyPublisher())
         }
