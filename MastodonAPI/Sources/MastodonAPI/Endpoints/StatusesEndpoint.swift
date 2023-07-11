@@ -5,9 +5,13 @@ import HTTP
 import Mastodon
 
 public enum StatusesEndpoint {
+    /// https://docs.joinmastodon.org/methods/timelines/#public
     case timelinesPublic(local: Bool)
+    /// https://docs.joinmastodon.org/methods/timelines/#tag
     case timelinesTag(String)
+    /// https://docs.joinmastodon.org/methods/timelines/#home
     case timelinesHome
+    /// https://docs.joinmastodon.org/methods/timelines/#list
     case timelinesList(id: List.Id)
     case accountsStatuses(id: Account.Id, excludeReplies: Bool, excludeReblogs: Bool, onlyMedia: Bool, pinned: Bool)
     case favourites
@@ -75,6 +79,13 @@ extension StatusesEndpoint: Endpoint {
             return [
                 .mastodon: "3.5.0",
                 .hometown: "3.5.0"
+            ]
+        case .timelinesTag:
+            return [
+                .mastodon: .assumeAvailable,
+                .hometown: .assumeAvailable,
+                .pleroma: .assumeAvailable,
+                .akkoma: .assumeAvailable
             ]
         default:
             return nil
