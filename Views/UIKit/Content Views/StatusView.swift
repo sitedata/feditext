@@ -705,7 +705,7 @@ private extension StatusView {
             }
         ]
 
-        if let pinned = viewModel.pinned {
+        if viewModel.isMine, let pinned = viewModel.pinned {
             firstSectionItems.append(UIAction(
                 title: pinned
                     ? NSLocalizedString("status.unpin", comment: "")
@@ -715,7 +715,7 @@ private extension StatusView {
             })
         }
 
-        if viewModel.edited {
+        if viewModel.canViewEditHistory, viewModel.edited {
             firstSectionItems.append(UIAction(
                 title: NSLocalizedString("status.edit-history.view", comment: ""),
                 image: UIImage(systemName: "calendar.day.timeline.left")) { _ in
@@ -766,18 +766,20 @@ private extension StatusView {
             sections.append(UIMenu(options: .displayInline, children: secondSectionItems))
         } else {
             if let relationship = viewModel.accountViewModel.relationship {
-                if relationship.muting {
-                    secondSectionItems.append(UIAction(
-                        title: NSLocalizedString("account.unmute", comment: ""),
-                        image: UIImage(systemName: "speaker")) { _ in
-                        viewModel.accountViewModel.confirmUnmute()
-                    })
-                } else {
-                    secondSectionItems.append(UIAction(
-                        title: NSLocalizedString("account.mute", comment: ""),
-                        image: UIImage(systemName: "speaker.slash")) { _ in
-                        viewModel.accountViewModel.confirmMute()
-                    })
+                if viewModel.accountViewModel.canMute {
+                    if relationship.muting {
+                        secondSectionItems.append(UIAction(
+                            title: NSLocalizedString("account.unmute", comment: ""),
+                            image: UIImage(systemName: "speaker")) { _ in
+                                viewModel.accountViewModel.confirmUnmute()
+                            })
+                    } else {
+                        secondSectionItems.append(UIAction(
+                            title: NSLocalizedString("account.mute", comment: ""),
+                            image: UIImage(systemName: "speaker.slash")) { _ in
+                                viewModel.accountViewModel.confirmMute()
+                            })
+                    }
                 }
 
                 if relationship.blocking {
@@ -806,7 +808,8 @@ private extension StatusView {
 
             sections.append(UIMenu(options: .displayInline, children: secondSectionItems))
 
-            if !viewModel.accountViewModel.isLocal,
+            if viewModel.accountViewModel.canBlockDomains,
+               !viewModel.accountViewModel.isLocal,
                let domain = viewModel.accountViewModel.domain,
                let relationship = viewModel.accountViewModel.relationship {
                 let domainBlockAction: UIAction

@@ -181,6 +181,10 @@ public extension StatusViewModel {
 
     var accessibilityTime: String? { statusService.status.displayStatus.lastModified.accessibilityTimeAgo }
 
+    var canViewEditHistory: Bool {
+        StatusEditsEndpoint.history(id: "").canCallWith(identityContext.apiCapabilities)
+    }
+
     var edited: Bool { statusService.status.displayStatus.edited }
 
     var contextParentTime: String {
