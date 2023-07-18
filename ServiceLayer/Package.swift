@@ -1,11 +1,11 @@
-// swift-tools-version:5.3
+// swift-tools-version: 5.8
 
 import PackageDescription
 
 let package = Package(
     name: "ServiceLayer",
     platforms: [
-        .iOS(.v14),
+        .iOS(.v15),
         .macOS(.v11)
     ],
     products: [
@@ -18,9 +18,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/groue/CombineExpectations.git", .upToNextMajor(from: "0.7.0")),
-        .package(name: "CodableBloomFilter",
-                 url: "https://github.com/metabolist/codable-bloom-filter.git",
-                 .upToNextMajor(from: "1.0.0")),
+        .package(url: "https://github.com/metabolist/codable-bloom-filter.git", .upToNextMajor(from: "1.0.0")),
         .package(path: "DB"),
         .package(path: "Keychain"),
         .package(path: "MastodonAPI"),
@@ -29,7 +27,11 @@ let package = Package(
     targets: [
         .target(
             name: "ServiceLayer",
-            dependencies: ["CodableBloomFilter", "DB", "MastodonAPI", "Secrets"],
+            dependencies: [
+                "DB",
+                "MastodonAPI",
+                "Secrets",
+                .product(name: "CodableBloomFilter", package: "codable-bloom-filter")],
             resources: [.process("Resources")]),
         .target(
             name: "ServiceLayerMocks",

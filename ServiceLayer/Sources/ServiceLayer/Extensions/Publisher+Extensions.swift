@@ -25,4 +25,19 @@ extension Publisher {
                 .append(then())
                 .eraseToAnyPublisher()
     }
+
+    func asyncMap<T>(_ transform: @Sendable @escaping (Output) async -> T) -> AnyPublisher<T, Failure> {
+        flatMap { output in
+            Future<T, Failure> { await transform(output) }
+        }
+        .eraseToAnyPublisher()
+    }
+
+    func asyncTryMap<T>(_ transform: @Sendable @escaping (Output) async throws -> T) -> AnyPublisher<T, Error> {
+        mapError { $0 }
+            .flatMap { output in
+                Future { try await transform(output) }
+            }
+            .eraseToAnyPublisher()
+    }
 }

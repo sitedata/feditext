@@ -57,6 +57,8 @@ struct AppPreferencesSection: View {
                     )
                 }
                 Group {
+                    Toggle("preferences.use-media-description-metadata",
+                           isOn: $identityContext.appPreferences.useMediaDescriptionMetadata)
                     Toggle("preferences.show-reblog-and-favorite-counts",
                            isOn: $identityContext.appPreferences.showReblogAndFavoriteCounts)
                     Toggle("preferences.require-double-tap-to-reblog",

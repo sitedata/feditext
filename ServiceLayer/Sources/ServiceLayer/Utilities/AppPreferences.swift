@@ -241,6 +241,11 @@ public extension AppPreferences {
         set { self[.foldTrailingHashtags] = newValue }
     }
 
+    var useMediaDescriptionMetadata: Bool {
+        get { self[.useMediaDescriptionMetadata] ?? true }
+        set { self[.useMediaDescriptionMetadata] = newValue }
+    }
+
     var postingLanguages: [PrefsLanguage.Tag] {
         get {
             self[.postingLanguages]
@@ -275,6 +280,7 @@ private extension AppPreferences {
         case hideContentWarningButton
         case foldLongPosts
         case foldTrailingHashtags
+        case useMediaDescriptionMetadata
         case postingLanguages
     }
 

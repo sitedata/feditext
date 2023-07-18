@@ -2,6 +2,7 @@
 
 import AVFoundation
 import BlurHash
+import CoreGraphics
 import Mastodon
 import SDWebImage
 import UIKit
@@ -9,6 +10,7 @@ import ViewModels
 
 enum ImageError: Error {
     case unableToLoad
+    case unableToWriteWithDescription
 }
 
 extension ImageError: LocalizedError {
@@ -16,6 +18,9 @@ extension ImageError: LocalizedError {
         switch self {
         case .unableToLoad:
             return NSLocalizedString("image-error.unable-to-load", comment: "")
+        case .unableToWriteWithDescription:
+            // Should not be shown to the end user, since we recover by saving without the description.
+            return nil
         }
     }
 }
@@ -204,7 +209,15 @@ extension ImageViewController {
                 .appendingPathComponent(url.lastPathComponent)
 
             do {
-                try imageData.write(to: tempURL)
+                if let description = viewModel?.attachment.description {
+                    do {
+                        try Self.write(imageData, description: description, to: tempURL)
+                    } catch {
+                        try imageData.write(to: tempURL)
+                    }
+                } else {
+                    try imageData.write(to: tempURL)
+                }
 
                 let activityViewController = UIActivityViewController(
                     activityItems: [tempURL],
@@ -243,6 +256,37 @@ extension ImageViewController {
                     }
                 }
             }
+        }
+    }
+
+    /// Save an image, adding Mastodon alt text as a comment.
+    private static func write(_ data: Data, description: String, to url: URL) throws {
+        guard let src = CGImageSourceCreateWithData(data as CFData, nil),
+              let typeIdentifier = CGImageSourceGetType(src) else {
+            throw ImageError.unableToWriteWithDescription
+        }
+
+        let count = CGImageSourceGetCount(src)
+        let primary = CGImageSourceGetPrimaryImageIndex(src)
+
+        guard let dst = CGImageDestinationCreateWithURL(url as CFURL, typeIdentifier, count, nil) else {
+            throw ImageError.unableToWriteWithDescription
+        }
+
+        for i in 0..<count {
+            var properties: CFMutableDictionary?
+            if i == primary {
+                let iptc = NSMutableDictionary()
+                iptc[kCGImagePropertyIPTCCaptionAbstract] = description as CFString
+                let dict = NSMutableDictionary()
+                dict[kCGImagePropertyIPTCDictionary] = iptc
+                properties = dict
+            }
+            CGImageDestinationAddImageFromSource(dst, src, i, properties)
+        }
+
+        guard CGImageDestinationFinalize(dst) else {
+            throw ImageError.unableToWriteWithDescription
         }
     }
 }

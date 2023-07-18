@@ -30,18 +30,19 @@ public final class CompositionViewModel: AttachmentsRenderingViewModel, Observab
     @Published public private(set) var remainingCharacters = CompositionViewModel.defaultMaxCharacters
     public let canRemoveAttachments = true
 
+    private let identityContext: IdentityContext
     private let eventsSubject: PassthroughSubject<Event, Never>
     @Published private var maxCharacters: Int
     private var cancellables = Set<AnyCancellable>()
 
     init(
         eventsSubject: PassthroughSubject<Event, Never>,
-        maxCharacters: Int?,
-        language: PrefsLanguage.Tag?
+        identityContext: IdentityContext
     ) {
         self.eventsSubject = eventsSubject
-        self.maxCharacters = maxCharacters ?? Self.defaultMaxCharacters
-        self.language = language
+        self.identityContext = identityContext
+        self.maxCharacters = identityContext.identity.instance?.maxTootChars ?? Self.defaultMaxCharacters
+        self.language = identityContext.identity.preferences.postingDefaultLanguage
 
         $text.map { !$0.isEmpty }
             .removeDuplicates()
@@ -141,9 +142,10 @@ public extension CompositionViewModel {
     convenience init(eventsSubject: PassthroughSubject<Event, Never>,
                      redraft: Status,
                      identityContext: IdentityContext) {
-        self.init(eventsSubject: eventsSubject,
-                  maxCharacters: identityContext.identity.instance?.maxTootChars,
-                  language: identityContext.identity.preferences.postingDefaultLanguage)
+        self.init(
+            eventsSubject: eventsSubject,
+            identityContext: identityContext
+        )
 
         if let text = redraft.text {
             self.text = text
@@ -166,9 +168,10 @@ public extension CompositionViewModel {
     convenience init(eventsSubject: PassthroughSubject<Event, Never>,
                      extensionContext: NSExtensionContext,
                      parentViewModel: ComposeStatusViewModel) {
-        self.init(eventsSubject: eventsSubject,
-                  maxCharacters: parentViewModel.identityContext.identity.instance?.maxTootChars,
-                  language: parentViewModel.identityContext.identity.preferences.postingDefaultLanguage)
+        self.init(
+            eventsSubject: eventsSubject,
+            identityContext: parentViewModel.identityContext
+        )
 
         guard let inputItem = extensionContext.inputItems.first as? NSExtensionItem else { return }
 
@@ -223,13 +226,24 @@ public extension CompositionViewModel {
     func attach(itemProviders: [NSItemProvider], parentViewModel: ComposeStatusViewModel) {
         Publishers.MergeMany(itemProviders.map {
             MediaProcessingService.dataAndMimeType(itemProvider: $0)
+                .zip(
+                    identityContext.appPreferences.useMediaDescriptionMetadata
+                        ? MediaProcessingService.description(itemProvider: $0)
+                            .setFailureType(to: Error.self)
+                            .eraseToAnyPublisher()
+                        : Just(nil)
+                            .setFailureType(to: Error.self)
+                            .eraseToAnyPublisher()
+                )
                 .receive(on: DispatchQueue.main)
                 .assignErrorsToAlertItem(to: \.alertItem, on: parentViewModel)
-                .map { result in
+                .map { result, description in
                     AttachmentUploadViewModel(
                         data: result.data,
                         mimeType: result.mimeType,
-                        parentViewModel: parentViewModel)
+                        description: description,
+                        parentViewModel: parentViewModel
+                    )
                 }
         })
         .collect()

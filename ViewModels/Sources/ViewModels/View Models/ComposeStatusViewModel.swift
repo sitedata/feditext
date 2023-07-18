@@ -87,8 +87,7 @@ public final class ComposeStatusViewModel: ObservableObject {
         } else {
             compositionViewModel = CompositionViewModel(
                 eventsSubject: compositionEventsSubject,
-                maxCharacters: identityContext.identity.instance?.maxTootChars,
-                language: identityContext.identity.preferences.postingDefaultLanguage
+                identityContext: identityContext
             )
         }
 
@@ -199,9 +198,10 @@ public extension ComposeStatusViewModel {
         guard let index = compositionViewModels.firstIndex(where: { $0 === after })
         else { return }
 
-        let newViewModel = CompositionViewModel(eventsSubject: compositionEventsSubject,
-                                                maxCharacters: identityContext.identity.instance?.maxTootChars,
-                                                language: identityContext.identity.preferences.postingDefaultLanguage)
+        let newViewModel = CompositionViewModel(
+            eventsSubject: compositionEventsSubject,
+            identityContext: identityContext
+        )
 
         newViewModel.contentWarning = after.contentWarning
         newViewModel.displayContentWarning = after.displayContentWarning
