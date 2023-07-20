@@ -17,6 +17,8 @@ final class StatusBodyView: UIView {
     /// Show this many lines of a folded post as a preview.
     static let numLinesFoldedPreview: Int = 2
 
+    /// Don't fold hashtags when there are this many or fewer, and they follow post text without an intervening newline.
+
     var viewModel: StatusViewModel? {
         didSet {
             guard let viewModel = viewModel else { return }
@@ -426,7 +428,7 @@ private extension StatusBodyView {
             )
         )
 
-        return tagPairs
+        return tagPairs.reversed()
     }
 
     /// Returns text with tappable hashtag links for each trailing or out-of-text tag.
