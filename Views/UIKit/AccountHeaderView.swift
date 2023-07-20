@@ -56,12 +56,16 @@ final class AccountHeaderView: UIView {
                         self?.headerButton.isEnabled = true
                     }
                 }
-                headerImageView.tag = accountViewModel.headerURL.hashValue
+                if let headerURL = accountViewModel.headerURL {
+                    headerImageView.tag = headerURL.hashValue
+                }
                 headerButton.accessibilityLabel = String.localizedStringWithFormat(
                     NSLocalizedString("account.header.accessibility-label-%@", comment: ""),
                     accountViewModel.displayName)
                 avatarImageView.sd_setImage(with: accountViewModel.avatarURL(profile: true))
-                avatarImageView.tag = accountViewModel.avatarURL(profile: true).hashValue
+                if let avatarURL = accountViewModel.avatarURL(profile: true) {
+                    avatarImageView.tag = avatarURL.hashValue
+                }
                 avatarButton.accessibilityLabel = String.localizedStringWithFormat(
                     NSLocalizedString("account.avatar.accessibility-label-%@", comment: ""),
                     accountViewModel.displayName)
