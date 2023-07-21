@@ -12,8 +12,8 @@ public struct APINotAvailableError: Error, LocalizedError, Encodable {
     public let apiCapabilities: APICapabilities
 
     public init(
-        method: String,
-        url: URL,
+        method: String?,
+        url: URL?,
         requestLocation: DebugLocation,
         apiCapabilities: APICapabilities
     ) {
@@ -29,10 +29,12 @@ public struct APINotAvailableError: Error, LocalizedError, Encodable {
         apiCapabilities: APICapabilities
     ) {
         let request = target.urlRequest()
-        self.method = request.httpMethod
-        self.url = request.url
-        self.requestLocation = requestLocation
-        self.apiCapabilities = apiCapabilities
+        self.init(
+            method: request.httpMethod,
+            url: request.url,
+            requestLocation: requestLocation,
+            apiCapabilities: apiCapabilities
+        )
     }
 
     public var errorDescription: String? {

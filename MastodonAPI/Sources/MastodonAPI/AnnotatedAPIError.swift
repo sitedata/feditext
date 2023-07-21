@@ -4,7 +4,7 @@ import Foundation
 import HTTP
 import Mastodon
 
-/// Thrown when an API is not available according to detected server software and version.
+/// Thrown when an API call fails but returns a decodable Mastodon API error instead of a lower-level one.
 public struct AnnotatedAPIError: Error, LocalizedError, Encodable {
     public let apiError: APIError
     public let method: String
@@ -36,14 +36,16 @@ public struct AnnotatedAPIError: Error, LocalizedError, Encodable {
         requestLocation: DebugLocation,
         apiCapabilities: APICapabilities
     ) {
-        self.apiError = apiError
         let request = target.urlRequest()
         guard let method = request.httpMethod, let url = request.url else { return nil }
-        self.method = method
-        self.url = url
-        self.statusCode = response.statusCode
-        self.requestLocation = requestLocation
-        self.apiCapabilities = apiCapabilities
+        self.init(
+            apiError: apiError,
+            method: method,
+            url: url,
+            statusCode: response.statusCode,
+            requestLocation: requestLocation,
+            apiCapabilities: apiCapabilities
+        )
     }
 
     public var errorDescription: String? {

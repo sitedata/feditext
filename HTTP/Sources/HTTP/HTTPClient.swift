@@ -30,6 +30,15 @@ open class HTTPClient {
         }
 
         return session.dataTaskPublisher(for: target.urlRequest(), progress: progress)
+            .mapError { error in
+                if let urlError = error as? URLError,
+                   let annotatedUrlError = AnnotatedURLError(
+                    urlError: urlError, target: target, requestLocation: requestLocation
+                   ) {
+                    return annotatedUrlError as Error
+                }
+                return error
+            }
             .tryMap { data, response in
                 guard let httpResponse = response as? HTTPURLResponse else {
                     throw HTTPError.nonHTTPURLResponse(data: data, response: response)
