@@ -80,6 +80,19 @@ public extension ContentDatabase {
                 }
             }
 
+            // Remove statuses from the timeline that are in the ID range covered by the inserted statuses,
+            // but not in the inserted statuses. Do not remove the actual statuses, since they may still exist
+            // in other timelines.
+            let statusIDs = statuses.map(\.id)
+            if let minStatusID = statusIDs.min(),
+               let maxStatusID = statusIDs.max() {
+                try TimelineStatusJoin
+                    .filter(TimelineStatusJoin.Columns.timelineId == timeline.id)
+                    .filter((minStatusID...maxStatusID).contains(TimelineStatusJoin.Columns.statusId))
+                    .filter(!statusIDs.contains(TimelineStatusJoin.Columns.statusId))
+                    .deleteAll($0)
+            }
+
             if let maxIdPresent = maxIdPresent,
                let minIdInserted = statuses.map(\.id).min(),
                minIdInserted > maxIdPresent {
