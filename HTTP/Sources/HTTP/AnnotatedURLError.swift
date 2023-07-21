@@ -1,7 +1,6 @@
 // Copyright © 2023 Vyr Cossont. All rights reserved.
 
 import Foundation
-import Mastodon
 
 /// Thrown when an API call fails and returns a low-level error.
 public struct AnnotatedURLError: Error, LocalizedError, Encodable {
