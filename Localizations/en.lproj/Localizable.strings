@@ -359,6 +359,9 @@
 "preferences.status-word" = "Status word";
 "preferences.trailing-hashtags.fold" = "Visually de-emphasize trailing hashtags";
 "preferences.use-media-description-metadata" = "Send description metadata as alt text on media you upload";
+"preferences.visibility-icon-colors" = "Colorize visibility icons";
+"preferences.visibility-icon-colors.off" = "Off:";
+"preferences.visibility-icon-colors.on" = "On:";
 "preferences.hide-content-warning-button" = "Hide \"Show Less\" content warning button";
 "preferences.keyboard-type" = "Keyboard";
 "preferences.keyboard-type.twitter" = "With hash key";

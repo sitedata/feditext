@@ -2,6 +2,7 @@
 
 import Foundation
 import Mastodon
+import UIKit
 
 extension Status.Visibility {
     var systemImageName: String {
@@ -16,6 +17,34 @@ extension Status.Visibility {
             return "envelope"
         case .unknown:
             return "questionmark"
+        }
+    }
+
+    var systemImageNameForVisibilityIconColors: String {
+        switch self {
+        case .unlisted:
+            return "lock.open.fill"
+        case .private:
+            return "lock.fill"
+        case .direct:
+            return "envelope.fill"
+        default:
+            return systemImageName
+        }
+    }
+
+    var tintColor: UIColor? {
+        switch self {
+        case .public:
+            return .systemBlue
+        case .unlisted:
+            return .systemGreen
+        case .private:
+            return .systemYellow
+        case .direct:
+            return .systemRed
+        case .unknown:
+            return nil
         }
     }
 

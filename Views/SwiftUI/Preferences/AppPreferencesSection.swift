@@ -103,6 +103,26 @@ struct AppPreferencesSection: View {
                 Toggle("preferences.trailing-hashtags.fold",
                        isOn: $identityContext.appPreferences.foldTrailingHashtags)
             }
+            Group {
+                Toggle("preferences.visibility-icon-colors",
+                       isOn: $identityContext.appPreferences.visibilityIconColors)
+                HStack {
+                    Text("preferences.visibility-icon-colors.off")
+                    ForEach(Status.Visibility.allCasesExceptUnknown) { visibility in
+                        Image(systemName: visibility.systemImageName)
+                            .foregroundColor(Color(uiColor: .secondaryLabel))
+                    }
+
+                    Spacer()
+
+                    Text("preferences.visibility-icon-colors.on")
+                    ForEach(Status.Visibility.allCasesExceptUnknown) { visibility in
+                        Image(systemName: visibility.systemImageNameForVisibilityIconColors)
+                            .renderingMode(.template)
+                            .foregroundColor(visibility.tintColor.map(Color.init(uiColor:)))
+                    }
+                }
+            }
             if viewModel.identityContext.identity.authenticated
                 && !viewModel.identityContext.identity.pending {
                 Picker("preferences.home-timeline-position-on-startup",

@@ -246,6 +246,11 @@ public extension AppPreferences {
         set { self[.useMediaDescriptionMetadata] = newValue }
     }
 
+    var visibilityIconColors: Bool {
+        get { self[.visibilityIconColors] ?? true }
+        set { self[.visibilityIconColors] = newValue }
+    }
+
     var postingLanguages: [PrefsLanguage.Tag] {
         get {
             self[.postingLanguages]
@@ -281,6 +286,7 @@ private extension AppPreferences {
         case foldLongPosts
         case foldTrailingHashtags
         case useMediaDescriptionMetadata
+        case visibilityIconColors
         case postingLanguages
     }
 

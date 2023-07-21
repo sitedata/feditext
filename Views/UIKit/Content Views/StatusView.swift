@@ -19,12 +19,13 @@ final class StatusView: UIView {
     let nameButton = UIButton()
     let timeLabel = UILabel()
     let editedImageView = UIImageView()
+    let visibilityImageView = UIImageView()
     let bodyView = StatusBodyView()
     let showThreadIndicator = UIButton(type: .system)
     let contextParentTimeLabel = UILabel()
     let contextParentEditedImageView = UIImageView()
     let contextParentEditedTimeLabel = UILabel()
-    let visibilityImageView = UIImageView()
+    let contextParentVisibilityImageView = UIImageView()
     let applicationButton = UIButton(type: .system)
     let rebloggedByButton = UIButton()
     let favoritedByButton = UIButton()
@@ -232,6 +233,12 @@ private extension StatusView {
         editedImageView.accessibilityLabel = NSLocalizedString("status.edited", comment: "")
         nameAccountTimeStackView.addArrangedSubview(editedImageView)
 
+        visibilityImageView.preferredSymbolConfiguration = .init(textStyle: .subheadline)
+        visibilityImageView.contentMode = .scaleAspectFit
+        visibilityImageView.setContentHuggingPriority(.required, for: .horizontal)
+        visibilityImageView.isAccessibilityElement = true
+        nameAccountTimeStackView.addArrangedSubview(visibilityImageView)
+
         timeLabel.font = .preferredFont(forTextStyle: .subheadline)
         timeLabel.adjustsFontForContentSizeCategory = true
         timeLabel.textColor = .secondaryLabel
@@ -316,10 +323,9 @@ private extension StatusView {
 
         contextParentTimeApplicationStackView.addArrangedSubview(editedTimeVisibilityDividerLabel)
 
-        contextParentTimeApplicationStackView.addArrangedSubview(visibilityImageView)
-        visibilityImageView.contentMode = .scaleAspectFit
-        visibilityImageView.tintColor = .secondaryLabel
-        visibilityImageView.isAccessibilityElement = true
+        contextParentTimeApplicationStackView.addArrangedSubview(contextParentVisibilityImageView)
+        contextParentVisibilityImageView.contentMode = .scaleAspectFit
+        contextParentVisibilityImageView.isAccessibilityElement = true
 
         contextParentTimeApplicationStackView.addArrangedSubview(visibilityApplicationDividerLabel)
 
@@ -606,6 +612,20 @@ private extension StatusView {
 
         editedImageView.isHidden = !viewModel.edited || isContextParent
 
+        visibilityImageView.isHidden = isContextParent
+        if viewModel.identityContext.appPreferences.visibilityIconColors {
+            visibilityImageView.image = UIImage(
+                systemName: viewModel.visibility.systemImageNameForVisibilityIconColors
+            )
+            visibilityImageView.tintColor = viewModel.visibility.tintColor
+        } else {
+            visibilityImageView.image = UIImage(systemName: viewModel.visibility.systemImageName)
+            visibilityImageView.tintColor = .secondaryLabel
+        }
+        visibilityImageView.setContentHuggingPriority(.required, for: .horizontal)
+        visibilityImageView.isAccessibilityElement = true
+        visibilityImageView.accessibilityLabel = viewModel.visibility.description
+
         bodyView.viewModel = viewModel
 
         showThreadIndicator.isHidden = !viewModel.configuration.isReplyOutOfContext
@@ -617,8 +637,16 @@ private extension StatusView {
         contextParentEditedTimeLabel.text = viewModel.contextParentEditedTime
         contextParentEditedTimeLabel.accessibilityLabel = viewModel.accessibilityContextParentEditedTime
         contextParentEditedTimeLabel.isHidden = !viewModel.edited
-        visibilityImageView.image = UIImage(systemName: viewModel.visibility.systemImageName)
-        visibilityImageView.accessibilityLabel = viewModel.visibility.title
+        contextParentVisibilityImageView.accessibilityLabel = viewModel.visibility.title
+        if viewModel.identityContext.appPreferences.visibilityIconColors {
+            contextParentVisibilityImageView.image = UIImage(
+                systemName: viewModel.visibility.systemImageNameForVisibilityIconColors
+            )
+            contextParentVisibilityImageView.tintColor = viewModel.visibility.tintColor
+        } else {
+            contextParentVisibilityImageView.image = UIImage(systemName: viewModel.visibility.systemImageName)
+            contextParentVisibilityImageView.tintColor = .secondaryLabel
+        }
         visibilityApplicationDividerLabel.isHidden = viewModel.applicationName == nil
         applicationButton.isHidden = viewModel.applicationName == nil
         applicationButton.setTitle(viewModel.applicationName, for: .normal)

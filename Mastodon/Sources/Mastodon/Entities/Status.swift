@@ -3,7 +3,7 @@
 import Foundation
 
 public final class Status: Codable, Identifiable {
-    public enum Visibility: String, Codable, Unknowable {
+    public enum Visibility: String, Codable, Unknowable, Identifiable {
         case `public`
         case unlisted
         case `private`
@@ -11,6 +11,8 @@ public final class Status: Codable, Identifiable {
         case unknown
 
         public static var unknownCase: Self { .unknown }
+
+        public var id: Self { self }
     }
 
     public let id: Status.Id
