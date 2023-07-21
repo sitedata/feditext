@@ -15,9 +15,9 @@ extension JRDTarget: Target {
     var pathComponents: [String] { [".well-known", "nodeinfo"] }
     var method: HTTP.HTTPMethod { .get }
     var queryParameters: [URLQueryItem] { [] }
-    var jsonBody: [String : Any]? { nil }
-    var multipartFormData: [String : HTTP.MultipartFormValue]? { nil }
-    var headers: [String : String]? { ["Accept": "application/json"] }
+    var jsonBody: [String: Any]? { nil }
+    var multipartFormData: [String: HTTP.MultipartFormValue]? { nil }
+    var headers: [String: String]? { ["Accept": "application/json"] }
 }
 
 extension JRDTarget: DecodableTarget {

@@ -5,25 +5,37 @@ import Mastodon
 import Semver
 
 /// Capabilities of the exact server we're talking to, taking into account API flavor and version.
-public struct APICapabilities {
+public struct APICapabilities: Encodable {
     public let flavor: APIFlavor?
     public let version: Semver?
+    private let nodeinfoSoftware: NodeInfo.Software
 
-    public init(flavor: APIFlavor? = nil, version: Semver? = nil) {
+    public init(
+        flavor: APIFlavor? = nil,
+        version: Semver? = nil,
+        nodeinfoSoftware: NodeInfo.Software
+    ) {
         self.flavor = flavor
         self.version = version
+        self.nodeinfoSoftware = nodeinfoSoftware
     }
 
-    public init(softwareName: String, softwareVersion: String) {
-        let version = softwareVersion
+    /// Init from the mandatory software object of a NodeInfo doc.
+    public init(nodeinfoSoftware: NodeInfo.Software) {
+        let version = nodeinfoSoftware.version
             .split(separator: " ", maxSplits: 1)
             .first
             .flatMap { Semver(String($0)) }
-        self.init(flavor: .init(rawValue: softwareName), version: version)
+        self.init(
+            flavor: .init(rawValue: nodeinfoSoftware.name),
+            version: version,
+            nodeinfoSoftware: nodeinfoSoftware
+        )
     }
 
+    /// Init from a NodeInfo doc.
     public init(nodeInfo: NodeInfo) {
-        self.init(softwareName: nodeInfo.software.name, softwareVersion: nodeInfo.software.version)
+        self.init(nodeinfoSoftware: nodeInfo.software)
     }
 }
 

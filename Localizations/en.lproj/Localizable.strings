@@ -188,6 +188,8 @@
 "explore.suggested-accounts.source.global" = "Suggested based on popularity";
 "explore.suggested-accounts.source.unknown" = "Suggested for unknown reason";
 "error" = "Error";
+"error.alert.copy-json" = "Copy JSON";
+"error.alert.copy-text" = "Copy text";
 "favorites" = "Favorites";
 "flavor.mastodon.name" = "Mastodon";
 "flavor.hometown.name" = "Hometown";

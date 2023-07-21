@@ -207,7 +207,7 @@ private extension StatusService {
         return client
             .request(ResultsEndpoint.search(.init(query: status.displayStatus.uri, limit: 1)))
             .tryMap {
-                guard let status = $0.statuses.first else { throw APIError.unableToFetchRemoteStatus }
+                guard let status = $0.statuses.first else { throw StatusServiceError.unableToFetchRemoteStatus }
 
                 return status
             }
@@ -229,5 +229,16 @@ private extension StatusService {
             .flatMap { _ in mastodonAPIClient.request(StatusEndpoint.status(id: status.displayStatus.id)) }
             .flatMap(contentDatabase.insert(status:))
             .eraseToAnyPublisher()
+    }
+}
+
+public enum StatusServiceError: Error, LocalizedError, Codable {
+    case unableToFetchRemoteStatus
+
+    public var errorDescription: String? {
+        switch self {
+        case .unableToFetchRemoteStatus:
+            return NSLocalizedString("api-error.unable-to-fetch-remote-status", comment: "")
+        }
     }
 }

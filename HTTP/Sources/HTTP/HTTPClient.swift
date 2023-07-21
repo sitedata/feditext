@@ -19,7 +19,10 @@ open class HTTPClient {
     }
 
     open func dataTaskPublisher<T: DecodableTarget>(
-        _ target: T, progress: Progress? = nil) -> AnyPublisher<(data: Data, response: HTTPURLResponse), Error> {
+        _ target: T,
+        progress: Progress? = nil,
+        requestLocation: DebugLocation
+    ) -> AnyPublisher<(data: Data, response: HTTPURLResponse), Error> {
         if let protocolClasses = session.configuration.protocolClasses {
             for protocolClass in protocolClasses {
                 (protocolClass as? TargetProcessing.Type)?.process(target: target)
@@ -41,8 +44,18 @@ open class HTTPClient {
             .eraseToAnyPublisher()
     }
 
-    open func request<T: DecodableTarget>(_ target: T, progress: Progress? = nil) -> AnyPublisher<T.ResultType, Error> {
-        dataTaskPublisher(target, progress: progress)
+    open func request<T: DecodableTarget>(
+        _ target: T,
+        progress: Progress? = nil,
+        file: String = #fileID,
+        line: Int = #line,
+        function: String = #function
+    ) -> AnyPublisher<T.ResultType, Error> {
+        dataTaskPublisher(
+            target,
+            progress: progress,
+            requestLocation: .init(file: file, line: line, function: function)
+        )
             .map(\.data)
             .decode(type: T.ResultType.self, decoder: decoder)
             .eraseToAnyPublisher()
