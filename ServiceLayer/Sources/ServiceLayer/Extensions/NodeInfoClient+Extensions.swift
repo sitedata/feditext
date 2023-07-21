@@ -11,7 +11,10 @@ extension NodeInfoClient {
     func refreshAPICapabilities(secrets: Secrets) -> AnyPublisher<APICapabilities, Error> {
         nodeInfo()
             .flatMap { nodeInfo in
-                let apiCapabilities = APICapabilities(nodeInfo: nodeInfo)
+                let apiCapabilities = APICapabilities(
+                    nodeInfo: nodeInfo,
+                    compatibilityMode: secrets.getAPICompatibilityMode()
+                )
                 do {
                     try secrets.setAPICapabilities(apiCapabilities)
                 } catch {

@@ -197,6 +197,7 @@
 "flavor.akkoma.name" = "Akkoma";
 "flavor.gotosocial.name" = "GotoSocial";
 "flavor.calckey.name" = "Calckey";
+"flavor.firefish.name" = "Firefish";
 "followed-tags.new-tag-title" = "Hashtag (without #)";
 "follow-requests" = "Follow Requests";
 "instance.about-instance-title-%@" = "About %@";
@@ -283,7 +284,13 @@
 "post.noun" = "Post";
 "post.action" = "Post";
 "preferences" = "Preferences";
+"preferences.api-compatibility-mode" = "API compatibility mode";
+"preferences.api-compatibility-mode.apply" = "Apply new compatibility mode";
+"preferences.api-compatibility-mode.off" = "Off";
+"preferences.api-compatibility-mode.fallback-on-errors" = "Enable all API calls, attempt error recovery";
+"preferences.api-compatibility-mode.fail-on-errors" = "Enable all API calls, fail on errors";
 "preferences.app" = "App Preferences";
+"preferences.app.advanced" = "Advanced";
 "preferences.app-icon" = "App Icon";
 "preferences.app.color-scheme" = "Appearance";
 "preferences.app.color-scheme.dark" = "Dark";

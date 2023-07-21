@@ -28,4 +28,6 @@ extension FiltersEndpoint: Endpoint {
             return .get
         }
     }
+
+    public var fallback: [Filter]? { [] }
 }

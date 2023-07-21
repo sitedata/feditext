@@ -27,5 +27,16 @@ public final class IdentityContext: ObservableObject {
         }
     }
 
+    // These are stored outside normal app preferences because they have to be available everywhere an API client is.
+
     public var apiCapabilities: APICapabilities { service.apiCapabilities }
+
+    public func getAPICompatibilityMode() -> APICompatibilityMode? {
+        service.getAPICompatibilityMode()
+    }
+
+    /// Does not update existing API clients.
+    public func setAPICompatibilityMode(_ newValue: APICompatibilityMode?) throws {
+        try service.setAPICompatibilityMode(newValue)
+    }
 }

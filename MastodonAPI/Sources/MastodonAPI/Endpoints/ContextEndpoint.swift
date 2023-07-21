@@ -23,4 +23,6 @@ extension ContextEndpoint: Endpoint {
     }
 
     public var method: HTTPMethod { .get }
+
+    public var fallback: Context? { .init(ancestors: [], descendants: []) }
 }

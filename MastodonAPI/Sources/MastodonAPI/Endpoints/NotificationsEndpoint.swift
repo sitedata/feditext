@@ -28,4 +28,6 @@ extension NotificationsEndpoint: Endpoint {
             return .get
         }
     }
+
+    public var fallback: [MastodonNotification]? { [] }
 }

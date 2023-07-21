@@ -8,20 +8,26 @@ import Semver
 public struct APICapabilities: Encodable {
     public let flavor: APIFlavor?
     public let version: Semver?
+    public let compatibilityMode: APICompatibilityMode?
     private let nodeinfoSoftware: NodeInfo.Software
 
     public init(
         flavor: APIFlavor? = nil,
         version: Semver? = nil,
+        compatibilityMode: APICompatibilityMode? = nil,
         nodeinfoSoftware: NodeInfo.Software
     ) {
         self.flavor = flavor
         self.version = version
+        self.compatibilityMode = compatibilityMode
         self.nodeinfoSoftware = nodeinfoSoftware
     }
 
     /// Init from the mandatory software object of a NodeInfo doc.
-    public init(nodeinfoSoftware: NodeInfo.Software) {
+    public init(
+        nodeinfoSoftware: NodeInfo.Software,
+        compatibilityMode: APICompatibilityMode? = nil
+    ) {
         let version = nodeinfoSoftware.version
             .split(separator: " ", maxSplits: 1)
             .first
@@ -29,13 +35,20 @@ public struct APICapabilities: Encodable {
         self.init(
             flavor: .init(rawValue: nodeinfoSoftware.name),
             version: version,
+            compatibilityMode: compatibilityMode,
             nodeinfoSoftware: nodeinfoSoftware
         )
     }
 
     /// Init from a NodeInfo doc.
-    public init(nodeInfo: NodeInfo) {
-        self.init(nodeinfoSoftware: nodeInfo.software)
+    public init(
+        nodeInfo: NodeInfo,
+        compatibilityMode: APICompatibilityMode? = nil
+    ) {
+        self.init(
+            nodeinfoSoftware: nodeInfo.software,
+            compatibilityMode: compatibilityMode
+        )
     }
 }
 

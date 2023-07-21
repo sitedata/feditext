@@ -28,4 +28,6 @@ extension RelationshipsEndpoint: Endpoint {
             return .get
         }
     }
+
+    public var fallback: [Relationship]? { [] }
 }

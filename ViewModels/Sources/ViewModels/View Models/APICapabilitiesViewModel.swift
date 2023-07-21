@@ -26,6 +26,8 @@ public struct APICapabilitiesViewModel {
             return "flavor.gotosocial.name"
         case .calckey:
             return "flavor.calckey.name"
+        case .firefish:
+            return "flavor.firefish.name"
         }
     }
 
@@ -45,6 +47,8 @@ public struct APICapabilitiesViewModel {
             return URL(string: "https://gotosocial.org/")
         case .calckey:
             return URL(string: "https://calckey.org/")
+        case .firefish:
+            return URL(string: "https://joinfirefish.org/")
         }
     }
 

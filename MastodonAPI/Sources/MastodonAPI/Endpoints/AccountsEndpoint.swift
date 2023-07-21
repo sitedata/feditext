@@ -83,4 +83,6 @@ extension AccountsEndpoint: Endpoint {
             return nil
         }
     }
+
+    public var fallback: [Account]? { [] }
 }

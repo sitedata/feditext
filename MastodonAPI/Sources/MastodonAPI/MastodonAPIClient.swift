@@ -70,9 +70,16 @@ extension MastodonAPIClient {
             }
         }
 
+        let compatibilityMode = apiCapabilities.compatibilityMode
         return dataTaskPublisher(target, progress: progress, requestLocation: requestLocation)
             .map(\.data)
             .decode(type: E.ResultType.self, decoder: decoder)
+            .tryCatch { error in
+                if compatibilityMode == .fallbackOnErrors, let fallback = endpoint.fallback {
+                    return Just(fallback).setFailureType(to: Error.self)
+                }
+                throw error
+            }
             .eraseToAnyPublisher()
     }
 
@@ -139,7 +146,23 @@ extension MastodonAPIClient {
             return PagedResult.Info(maxId: maxId, minId: minId, sinceId: sinceId)
         }
 
-        return decoded.zip(info).map(PagedResult.init(result:info:)).eraseToAnyPublisher()
+        let compatibilityMode = apiCapabilities.compatibilityMode
+        return decoded
+            .zip(info)
+            .map(PagedResult.init(result:info:))
+            .tryCatch { error in
+                if compatibilityMode == .fallbackOnErrors, let fallback = endpoint.fallback {
+                    return Just(
+                        PagedResult(
+                            result: fallback,
+                            info: .init(maxId: nil, minId: nil, sinceId: nil)
+                        )
+                    )
+                    .setFailureType(to: Error.self)
+                }
+                throw error
+            }
+            .eraseToAnyPublisher()
     }
 }
 

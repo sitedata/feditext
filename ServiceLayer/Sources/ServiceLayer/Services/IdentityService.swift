@@ -63,6 +63,15 @@ public extension IdentityService {
             .eraseToAnyPublisher()
     }
 
+    func getAPICompatibilityMode() -> APICompatibilityMode? {
+        secrets.getAPICompatibilityMode()
+    }
+
+    /// Does not update existing API clients.
+    func setAPICompatibilityMode(_ newValue: APICompatibilityMode?) throws {
+        try secrets.setAPICompatibilityMode(newValue)
+    }
+
     func updateLastUse() -> AnyPublisher<Never, Error> {
         identityDatabase.updateLastUsedAt(id: id)
     }

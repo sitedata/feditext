@@ -11,7 +11,8 @@ extension Secrets {
                 nodeinfoSoftware: .init(
                     name: try getSoftwareName(),
                     version: try getSoftwareVersion()
-                )
+                ),
+                compatibilityMode: getAPICompatibilityMode()
             )
         } catch {
             // This should only happen with old versions of the secret store that predate NodeInfo detection.
@@ -29,5 +30,18 @@ extension Secrets {
     func setAPICapabilities(_ apiCapabilities: APICapabilities) throws {
         try setSoftwareName(apiCapabilities.flavor?.rawValue ?? "")
         try setSoftwareVersion(apiCapabilities.version?.description ?? "")
+        try setAPICompatibilityMode(apiCapabilities.compatibilityMode)
+    }
+
+    func getAPICompatibilityMode() -> APICompatibilityMode? {
+        do {
+            return .init(rawValue: try getAPICompatibilityModeRawValue())
+        } catch {
+            return nil
+        }
+    }
+
+    func setAPICompatibilityMode(_ apiCompatibilityMode: APICompatibilityMode?) throws {
+        try setAPICompatibilityModeRawValue(apiCompatibilityMode?.rawValue ?? "")
     }
 }

@@ -18,4 +18,6 @@ extension EmojisEndpoint: Endpoint {
     public var method: HTTPMethod {
         .get
     }
+
+    public var fallback: [Emoji]? { [] }
 }

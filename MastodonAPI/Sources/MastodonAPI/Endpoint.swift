@@ -48,7 +48,7 @@ public extension Endpoint {
 
     /// We only have to satisfy requirements if they exist.
     func canCallWith(_ apiCapabilities: APICapabilities) -> Bool {
-        requires?.satisfiedBy(apiCapabilities) ?? true
+        apiCapabilities.compatibilityMode != nil || requires?.satisfiedBy(apiCapabilities) ?? true
     }
 }
 

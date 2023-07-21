@@ -1,6 +1,7 @@
 // Copyright © 2020 Metabolist. All rights reserved.
 
 import Mastodon
+import MastodonAPI
 import SwiftUI
 import ViewModels
 
@@ -8,6 +9,9 @@ import ViewModels
 struct AppPreferencesSection: View {
     @ObservedObject var viewModel: PreferencesViewModel
     @ObservedObject var identityContext: IdentityContext
+    @EnvironmentObject var rootViewModel: RootViewModel
+
+    @State var apiCompatibilityModeChanged: Bool = false
 
     var body: some View {
         Section(header: Text("preferences.app")) {
@@ -132,6 +136,49 @@ struct AppPreferencesSection: View {
                     }
                 }
             }
+        }
+        Section(header: Text("preferences.app.advanced")) {
+            Picker("preferences.api-compatibility-mode", selection: Binding<APICompatibilityMode?>(
+                get: { identityContext.getAPICompatibilityMode() },
+                set: {
+                    do {
+                        try identityContext.setAPICompatibilityMode($0)
+                        apiCompatibilityModeChanged = true
+                    } catch {
+                        viewModel.alertItem = .init(error: error)
+                    }
+                }
+            )) {
+                Text("preferences.api-compatibility-mode.off").tag(Optional<APICompatibilityMode>.none)
+                ForEach(APICompatibilityMode.allCases) { apiCompatibilityMode in
+                    Text(apiCompatibilityMode.localizedStringKey).tag(Optional(apiCompatibilityMode.id))
+                }
+            }
+            .pickerStyle(.menu)
+            Button(role: .destructive) {
+                // Force all views and API clients to update.
+                rootViewModel.identitySelected(id: nil)
+                rootViewModel.identitySelected(id: identityContext.identity.id)
+            } label: {
+                Label {
+                    Text("preferences.api-compatibility-mode.apply")
+                } icon: {
+                    Image(systemName: "arrow.clockwise.circle")
+                        .foregroundColor(apiCompatibilityModeChanged ? .red : .gray)
+                }
+            }
+            .disabled(!apiCompatibilityModeChanged)
+        }
+    }
+}
+
+extension APICompatibilityMode {
+    var localizedStringKey: LocalizedStringKey {
+        switch self {
+        case .fallbackOnErrors:
+            return "preferences.api-compatibility-mode.fallback-on-errors"
+        case .failOnErrors:
+            return "preferences.api-compatibility-mode.fail-on-errors"
         }
     }
 }

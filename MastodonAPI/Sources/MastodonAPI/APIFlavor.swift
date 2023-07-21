@@ -10,7 +10,7 @@ import Foundation
 /// - https://docs.akkoma.dev/stable/development/API/differences_in_mastoapi_responses/
 /// - https://docs.gotosocial.org/en/latest/api/swagger/
 /// - https://calckey.social/api-doc (not clear if this lists Mastodon-compatible API methods yet)
-public enum APIFlavor: String, Codable, Hashable {
+public enum APIFlavor: String, Codable, Hashable, Identifiable, CaseIterable {
     case mastodon
     case hometown
 
@@ -20,4 +20,7 @@ public enum APIFlavor: String, Codable, Hashable {
     case gotosocial
 
     case calckey
+    case firefish
+
+    public var id: Self { self }
 }

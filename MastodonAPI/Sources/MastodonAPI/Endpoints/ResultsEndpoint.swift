@@ -100,4 +100,6 @@ extension ResultsEndpoint: Endpoint {
             return params
         }
     }
+
+    public var fallback: Results? { Results.empty }
 }
