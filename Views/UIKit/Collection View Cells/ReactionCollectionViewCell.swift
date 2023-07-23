@@ -3,13 +3,11 @@
 import UIKit
 import ViewModels
 
-final class AnnouncementReactionCollectionViewCell: UICollectionViewCell {
-    var viewModel: AnnouncementReactionViewModel?
+final class ReactionCollectionViewCell: UICollectionViewCell {
+    var viewModel: ReactionViewModel?
 
     override func updateConfiguration(using state: UICellConfigurationState) {
-        guard let viewModel = viewModel else { return }
-
-        contentConfiguration = AnnouncementReactionContentConfiguration(viewModel: viewModel)
+        contentConfiguration = ReactionContentConfiguration(viewModel: viewModel)
 
         var backgroundConfiguration = UIBackgroundConfiguration.listPlainCell().updated(for: state)
 

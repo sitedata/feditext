@@ -2,8 +2,7 @@
 
 import UIKit
 
-final class AnnouncementReactionsCollectionView: UICollectionView {
-
+class ReactionsCollectionView: UICollectionView {
     init() {
         super.init(frame: .zero, collectionViewLayout: Self.layout())
 
@@ -31,7 +30,7 @@ final class AnnouncementReactionsCollectionView: UICollectionView {
     }
 }
 
-private extension AnnouncementReactionsCollectionView {
+private extension ReactionsCollectionView {
     static func layout() -> UICollectionViewLayout {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .estimated(.minimumButtonDimension),

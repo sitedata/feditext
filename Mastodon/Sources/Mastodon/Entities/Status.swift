@@ -45,6 +45,11 @@ public final class Status: Codable, Identifiable {
     @DecodableDefault.False public private(set) var muted: Bool
     @DecodableDefault.False public private(set) var bookmarked: Bool
     public let pinned: Bool?
+    /// Used by Glitch PR #2221 and future Firefish.
+    @DecodableDefault.EmptyList public private(set) var reactions: [Reaction]
+    // TODO: (Vyr) reactions: clean this up after Firefish patch
+    /// Used by 2023-07-22 Firefish.
+    @DecodableDefault.EmptyList public private(set) var emojiReactions: [Reaction]
 
     public init(
         id: Status.Id,
@@ -76,7 +81,8 @@ public final class Status: Codable, Identifiable {
         reblogged: Bool,
         muted: Bool,
         bookmarked: Bool,
-        pinned: Bool?
+        pinned: Bool?,
+        reactions: [Reaction]
     ) {
         self.id = id
         self.uri = uri
@@ -108,6 +114,7 @@ public final class Status: Codable, Identifiable {
         self.reblogged = reblogged
         self.muted = muted
         self.bookmarked = bookmarked
+        self.reactions = reactions
     }
 }
 
@@ -161,7 +168,8 @@ public extension Status {
             reblogged: self.reblogged,
             muted: self.muted,
             bookmarked: self.bookmarked,
-            pinned: self.pinned
+            pinned: self.pinned,
+            reactions: self.reactions
         )
     }
 }

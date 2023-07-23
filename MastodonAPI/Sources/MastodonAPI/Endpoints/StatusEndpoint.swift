@@ -19,6 +19,8 @@ public enum StatusEndpoint {
     case delete(id: Status.Id)
     case post(Components)
     case put(id: Status.Id, Components)
+    case react(id: Status.Id, name: String)
+    case unreact(id: Status.Id, name: String)
 }
 
 public extension StatusEndpoint {
@@ -129,6 +131,10 @@ extension StatusEndpoint: Endpoint {
             return [id, "mute"]
         case let .unmute(id):
             return [id, "unmute"]
+        case let .react(id, name):
+            return [id, "react", name]
+        case let .unreact(id, name):
+            return [id, "unreact", name]
         case .post:
             return []
         }
@@ -160,6 +166,9 @@ extension StatusEndpoint: Endpoint {
         switch self {
         case .put:
             return StatusEditsEndpoint.history(id: "").requires
+        case .react, .unreact:
+            // TODO: (Vyr) reactions: Glitch PR #2221/Firefish issue #10537 only
+            return [:]
         default:
             return nil
         }

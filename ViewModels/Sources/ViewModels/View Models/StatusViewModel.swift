@@ -535,6 +535,51 @@ public extension StatusViewModel {
                 .eraseToAnyPublisher()
         )
     }
+
+    /// Emoji reactions.
+    var reactions: [Reaction] { statusService.status.displayStatus.reactions + statusService.status.displayStatus.emojiReactions }
+
+    var canEditReactions: Bool {
+        StatusEndpoint.react(id: "", name: "").canCallWith(identityContext.apiCapabilities)
+    }
+
+    /// Pick an emoji reaction to add.
+    func presentEmojiPicker(sourceViewTag: Int) {
+        eventsSubject.send(
+            Just(
+                .presentEmojiPicker(
+                    sourceViewTag: sourceViewTag,
+                    selectionAction: { [weak self] in
+                        // TODO: (Vyr) emoji picker calls our `addReaction` but doesn't display an AlertItem on failure
+                        // The AlertItem is created and set but never actually shows up on screen.
+                        self?.addReaction(name: $0)
+                    }
+                )
+            )
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+        )
+    }
+
+    /// Add an emoji reaction.
+    func addReaction(name: String) {
+        eventsSubject.send(
+            statusService
+                .addReaction(name: name)
+                .map { _ in .ignorableOutput }
+                .eraseToAnyPublisher()
+        )
+    }
+
+    /// Remove an emoji reaction.
+    func removeReaction(name: String) {
+        eventsSubject.send(
+            statusService
+                .removeReaction(name: name)
+                .map { _ in .ignorableOutput }
+                .eraseToAnyPublisher()
+        )
+    }
 }
 
 private extension StatusViewModel {

@@ -4,10 +4,13 @@ import Mastodon
 import UIKit
 import ViewModels
 
+// TODO: (Vyr) reactions: update this to share the new add button used by `StatusReactionsView`
+/// Show an announcment with emoji reactions.
+/// - See: ``StatusReactionsView`` (derived from this)
 final class AnnouncementView: UIView {
     private let contentTextView = TouchFallthroughTextView()
     private let reactionButton = UIButton()
-    private let reactionsCollectionView = AnnouncementReactionsCollectionView()
+    private let reactionsCollectionView = ReactionsCollectionView()
     private var announcementConfiguration: AnnouncementContentConfiguration
 
     init(configuration: AnnouncementContentConfiguration) {
@@ -24,18 +27,20 @@ final class AnnouncementView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private lazy var dataSource: UICollectionViewDiffableDataSource<Int, AnnouncementReaction> = {
+    private lazy var dataSource: UICollectionViewDiffableDataSource<Int, Reaction> = {
         let cellRegistration = UICollectionView.CellRegistration
-        <AnnouncementReactionCollectionViewCell, AnnouncementReaction> { [weak self] in
+        <ReactionCollectionViewCell, Reaction> { [weak self] in
             guard let self = self else { return }
 
-            $0.viewModel = AnnouncementReactionViewModel(
-                announcementReaction: $2,
-                identityContext: self.announcementConfiguration.viewModel.identityContext)
+            $0.viewModel = ReactionViewModel(
+                reaction: $2,
+                emojis: self.announcementConfiguration.viewModel.announcement.emojis,
+                identityContext: self.announcementConfiguration.viewModel.identityContext
+            )
         }
 
         let dataSource = UICollectionViewDiffableDataSource
-        <Int, AnnouncementReaction>(collectionView: reactionsCollectionView) {
+        <Int, Reaction>(collectionView: reactionsCollectionView) {
             $0.dequeueConfiguredReusableCell(using: cellRegistration, for: $1, item: $2)
         }
 
@@ -163,7 +168,7 @@ private extension AnnouncementView {
         mutableContent.resizeAttachments(toLineHeight: contentFont.lineHeight)
         contentTextView.attributedText = mutableContent
 
-        var snapshot = NSDiffableDataSourceSnapshot<Int, AnnouncementReaction>()
+        var snapshot = NSDiffableDataSourceSnapshot<Int, Reaction>()
 
         snapshot.appendSections([0])
         snapshot.appendItems(viewModel.announcement.reactions, toSection: 0)

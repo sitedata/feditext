@@ -4,19 +4,19 @@ import SDWebImage
 import UIKit
 import ViewModels
 
-final class AnnouncementReactionView: UIView {
+final class ReactionView: UIView {
     private let nameLabel = UILabel()
     private let imageView = SDAnimatedImageView()
     private let countLabel = UILabel()
-    private var announcementReactionConfiguration: AnnouncementReactionContentConfiguration
+    private var reactionConfiguration: ReactionContentConfiguration
 
-    init(configuration: AnnouncementReactionContentConfiguration) {
-        announcementReactionConfiguration = configuration
+    init(configuration: ReactionContentConfiguration) {
+        reactionConfiguration = configuration
 
         super.init(frame: .zero)
 
         initialSetup()
-        applyAnnouncementReactionConfiguration()
+        applyReactionConfiguration()
     }
 
     @available(*, unavailable)
@@ -25,22 +25,22 @@ final class AnnouncementReactionView: UIView {
     }
 }
 
-extension AnnouncementReactionView: UIContentView {
+extension ReactionView: UIContentView {
     var configuration: UIContentConfiguration {
-        get { announcementReactionConfiguration }
+        get { reactionConfiguration }
         set {
-            guard let announcementReactionConfiguration = newValue as? AnnouncementReactionContentConfiguration else {
+            guard let reactionConfiguration = newValue as? ReactionContentConfiguration else {
                 return
             }
 
-            self.announcementReactionConfiguration = announcementReactionConfiguration
+            self.reactionConfiguration = reactionConfiguration
 
-            applyAnnouncementReactionConfiguration()
+            applyReactionConfiguration()
         }
     }
 }
 
-private extension AnnouncementReactionView {
+private extension ReactionView {
     static let meBackgroundColor = UIColor.link.withAlphaComponent(0.5)
     static let backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.5)
     func initialSetup() {
@@ -80,19 +80,37 @@ private extension AnnouncementReactionView {
         isAccessibilityElement = true
     }
 
-    func applyAnnouncementReactionConfiguration() {
-        let viewModel = announcementReactionConfiguration.viewModel
+    func applyReactionConfiguration() {
+        if let viewModel = reactionConfiguration.viewModel {
+            backgroundColor = viewModel.me ? Self.meBackgroundColor : Self.backgroundColor
 
-        backgroundColor = viewModel.me ? Self.meBackgroundColor : Self.backgroundColor
+            nameLabel.text = viewModel.name
+            nameLabel.isHidden = viewModel.url != nil
 
-        nameLabel.text = viewModel.name
-        nameLabel.isHidden = viewModel.url != nil
+            imageView.sd_setImage(with: viewModel.url)
+            imageView.isHidden = viewModel.url == nil
 
-        imageView.sd_setImage(with: viewModel.url)
-        imageView.isHidden = viewModel.url == nil
+            countLabel.text = String(viewModel.count)
+            countLabel.isHidden = false
 
-        countLabel.text = String(viewModel.count)
+            accessibilityLabel = viewModel.name.appendingWithSeparator(String(viewModel.count))
+        } else {
+            // This is the add reaction button, not a reaction.
+            backgroundColor = Self.backgroundColor
 
-        accessibilityLabel = viewModel.name.appendingWithSeparator(String(viewModel.count))
+            nameLabel.text = nil
+            nameLabel.isHidden = true
+
+            imageView.image = .init(
+                systemName: "plus",
+                withConfiguration: UIImage.SymbolConfiguration(scale: .large)
+            )
+            imageView.isHidden = false
+
+            countLabel.text = nil
+            countLabel.isHidden = true
+
+            accessibilityLabel = NSLocalizedString("announcement.insert-emoji", comment: "")
+        }
     }
 }

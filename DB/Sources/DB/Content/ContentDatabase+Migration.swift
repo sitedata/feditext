@@ -398,6 +398,12 @@ extension ContentDatabase {
             }
         }
 
+        migrator.registerMigration("1.7.4-reactions") { db in
+            try db.alter(table: "statusRecord") { t in
+                t.add(column: "reactions", .blob)
+            }
+        }
+
         return migrator
     }
 }

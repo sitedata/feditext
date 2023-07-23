@@ -35,6 +35,7 @@ struct StatusRecord: ContentDatabaseRecord, Hashable {
     let muted: Bool
     let bookmarked: Bool
     let pinned: Bool?
+    let reactions: [Reaction]?
 }
 
 extension StatusRecord {
@@ -69,6 +70,7 @@ extension StatusRecord {
         static let muted = Column(CodingKeys.muted)
         static let bookmarked = Column(CodingKeys.bookmarked)
         static let pinned = Column(CodingKeys.pinned)
+        static let reactions = Column(CodingKeys.reactions)
     }
 }
 
@@ -159,5 +161,6 @@ extension StatusRecord {
         muted = status.muted
         bookmarked = status.bookmarked
         pinned = status.pinned
+        reactions = status.reactions + status.emojiReactions
     }
 }

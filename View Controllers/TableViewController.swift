@@ -449,7 +449,13 @@ private extension TableViewController {
         viewModel.alertItems
             .compactMap { $0 }
             .sink { [weak self] in
-                guard let self = self, self.isVisible, self.presentedViewController == nil else { return }
+                // The emoji picker is a known special case that it's okay to present over.
+                guard let self = self,
+                      self.isVisible,
+                      self.presentedViewController == nil
+                        || (self.presentedViewController as? UINavigationController)?
+                            .topViewController is EmojiPickerViewController
+                else { return }
 
                 self.present(alertItem: $0)
             }

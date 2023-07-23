@@ -49,6 +49,8 @@ final class StatusView: UIView {
     private let visibilityApplicationDividerLabel = UILabel()
     private let contextParentTopNameAccountSpacingView = UIView()
     private let contextParentBottomNameAccountSpacingView = UIView()
+    private let reactionsDividerView = UIView()
+    private let reactionsView = StatusReactionsView()
     private let interactionsDividerView = UIView()
     private let interactionsStackView = UIStackView()
     private let buttonsDividerView = UIView()
@@ -349,13 +351,17 @@ private extension StatusView {
         contextParentTimeApplicationStackView.spacing = .compactSpacing
         mainStackView.addArrangedSubview(contextParentTimeApplicationStackView)
 
-        for view in [interactionsDividerView, buttonsDividerView] {
+        for view in [reactionsDividerView, interactionsDividerView, buttonsDividerView] {
             view.backgroundColor = .opaqueSeparator
             view.heightAnchor.constraint(equalToConstant: .hairline).isActive = true
         }
 
+        mainStackView.addArrangedSubview(reactionsDividerView)
+        mainStackView.addArrangedSubview(reactionsView)
+
         mainStackView.addArrangedSubview(interactionsDividerView)
         mainStackView.addArrangedSubview(interactionsStackView)
+
         mainStackView.addArrangedSubview(buttonsDividerView)
 
         rebloggedByButton.contentHorizontalAlignment = .leading
@@ -652,6 +658,11 @@ private extension StatusView {
         applicationButton.setTitle(viewModel.applicationName, for: .normal)
         applicationButton.isEnabled = viewModel.applicationURL != nil
         contextParentTimeApplicationStackView.isHidden = !isContextParent
+
+        let noReactions = viewModel.reactions.isEmpty
+        reactionsDividerView.isHidden = noReactions
+        reactionsView.isHidden = noReactions
+        reactionsView.viewModel = viewModel
 
         let noReblogs = viewModel.reblogsCount == 0
         let noFavorites = viewModel.favoritesCount == 0

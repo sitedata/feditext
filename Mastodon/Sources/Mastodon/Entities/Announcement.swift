@@ -14,7 +14,7 @@ public struct Announcement: Codable {
     public let mentions: [Mention]
     public let tags: [Tag]
     public let emojis: [Emoji]
-    public let reactions: [AnnouncementReaction]
+    public let reactions: [Reaction]
 }
 
 public extension Announcement {

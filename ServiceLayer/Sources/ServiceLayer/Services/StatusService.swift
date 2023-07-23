@@ -179,6 +179,18 @@ public extension StatusService {
             .eraseToAnyPublisher()
     }
 
+    func addReaction(name: String) -> AnyPublisher<Never, Error> {
+        return mastodonAPIClient.request(StatusEndpoint.react(id: status.id, name: name))
+            .flatMap(contentDatabase.insert(status:))
+            .eraseToAnyPublisher()
+    }
+
+    func removeReaction(name: String) -> AnyPublisher<Never, Error> {
+        return mastodonAPIClient.request(StatusEndpoint.unreact(id: status.id, name: name))
+            .flatMap(contentDatabase.insert(status:))
+            .eraseToAnyPublisher()
+    }
+
     func asIdentity(id: Identity.Id) -> AnyPublisher<Self, Error> {
         fetchAs(identityId: id).tryMap {
             Self(environment: environment,
