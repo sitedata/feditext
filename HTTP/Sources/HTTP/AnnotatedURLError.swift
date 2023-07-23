@@ -3,7 +3,7 @@
 import Foundation
 
 /// Thrown when an API call fails and returns a low-level error.
-public struct AnnotatedURLError: Error, LocalizedError, Encodable {
+public struct AnnotatedURLError: Error, AnnotatedError, LocalizedError, Encodable {
     public let code: Int
     public let name: Name?
     public let backgroundTaskCancelledReason: BackgroundTaskCancelledReason?

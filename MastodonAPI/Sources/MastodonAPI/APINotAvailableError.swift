@@ -5,7 +5,7 @@ import HTTP
 import Mastodon
 
 /// Thrown when an API is not available according to detected server software and version.
-public struct APINotAvailableError: Error, LocalizedError, Encodable {
+public struct APINotAvailableError: Error, AnnotatedError, LocalizedError, Encodable {
     public let method: String?
     public let url: URL?
     public let requestLocation: DebugLocation
@@ -38,8 +38,9 @@ public struct APINotAvailableError: Error, LocalizedError, Encodable {
     }
 
     public var errorDescription: String? {
-        guard let method = method, let url = url else { return nil }
+        let explanation = NSLocalizedString("api-error.api-not-available.description", comment: "")
+        guard let method = method, let url = url else { return explanation }
 
-        return "\(method) \(url.absoluteString)"
+        return "\(explanation)\n\n\(method) \(url.absoluteString)"
     }
 }

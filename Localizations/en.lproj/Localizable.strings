@@ -92,6 +92,7 @@
 "add" = "Add";
 "announcement.insert-emoji" = "Insert emoji";
 "api-error.api-not-available" = "API not available on this instance";
+"api-error.api-not-available.description" = "Your instance software isn't known to support whatever you just tried to do. If you're using a development instance, try turning on API compatibility mode in the preferences. Otherwise, please report this error to the Feditext developers.";
 "api-error.unable-to-fetch-remote-status" = "Unable to fetch remote status";
 "apns-default-message" = "New notification";
 "app-icon.brutalist" = "Brutalist";
@@ -105,7 +106,7 @@
 "add-identity.browse" = "Browse";
 "add-identity.instance-not-supported" = "In order to provide a safe experience to all users and comply with the App Store Review Guidelines, this instance is not supported.";
 "add-identity.join" = "Join";
-"add-identity.prompt" = "Enter the URL of the Mastodon instance you wish to connect to:";
+"add-identity.prompt" = "Enter the URL of the instance you wish to connect to:";
 "add-identity.request-invite" = "Request an invite";
 "add-identity.unable-to-connect-to-instance" = "Unable to connect to instance";
 "add-identity.welcome" = "Welcome to Feditext";

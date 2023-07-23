@@ -60,13 +60,26 @@ open class HTTPClient {
         line: Int = #line,
         function: String = #function
     ) -> AnyPublisher<T.ResultType, Error> {
-        dataTaskPublisher(
+        let requestLocation = DebugLocation(file: file, line: line, function: function)
+
+        return dataTaskPublisher(
             target,
             progress: progress,
-            requestLocation: .init(file: file, line: line, function: function)
+            requestLocation: requestLocation
         )
             .map(\.data)
             .decode(type: T.ResultType.self, decoder: decoder)
+            .mapError { error in
+                if let decodingError = error as? DecodingError,
+                   let annotatedDecodingError = AnnotatedDecodingError(
+                    decodingError: decodingError,
+                    target: target,
+                    requestLocation: requestLocation
+                   ) {
+                    return annotatedDecodingError as Error
+                }
+                return error
+            }
             .eraseToAnyPublisher()
     }
 }

@@ -74,6 +74,17 @@ extension MastodonAPIClient {
         return dataTaskPublisher(target, progress: progress, requestLocation: requestLocation)
             .map(\.data)
             .decode(type: E.ResultType.self, decoder: decoder)
+            .mapError { error in
+                if let decodingError = error as? DecodingError,
+                   let annotatedDecodingError = AnnotatedDecodingError(
+                    decodingError: decodingError,
+                    target: target,
+                    requestLocation: requestLocation
+                   ) {
+                    return annotatedDecodingError as Error
+                }
+                return error
+            }
             .tryCatch { error in
                 if compatibilityMode == .fallbackOnErrors, let fallback = endpoint.fallback {
                     return Just(fallback).setFailureType(to: Error.self)
@@ -121,7 +132,20 @@ extension MastodonAPIClient {
         }
 
         let dataTask = dataTaskPublisher(pagedTarget, progress: progress, requestLocation: requestLocation).share()
-        let decoded = dataTask.map(\.data).decode(type: E.ResultType.self, decoder: decoder)
+        let decoded = dataTask
+            .map(\.data)
+            .decode(type: E.ResultType.self, decoder: decoder)
+            .mapError { error in
+                if let decodingError = error as? DecodingError,
+                   let annotatedDecodingError = AnnotatedDecodingError(
+                    decodingError: decodingError,
+                    target: pagedTarget,
+                    requestLocation: requestLocation
+                   ) {
+                    return annotatedDecodingError as Error
+                }
+                return error
+            }
         let info = dataTask.map { _, response -> PagedResult<E.ResultType>.Info in
             var maxId: String?
             var minId: String?

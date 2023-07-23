@@ -5,7 +5,7 @@ import HTTP
 import Mastodon
 
 /// Thrown when an API call fails but returns a decodable Mastodon API error instead of a lower-level one.
-public struct AnnotatedAPIError: Error, LocalizedError, Encodable {
+public struct AnnotatedAPIError: Error, AnnotatedError, LocalizedError, Encodable {
     public let apiError: APIError
     public let method: String
     public let url: URL
