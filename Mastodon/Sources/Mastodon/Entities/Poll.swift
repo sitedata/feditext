@@ -17,7 +17,7 @@ public struct Poll: Codable {
     @DecodableDefault.False public private(set) var voted: Bool
     @DecodableDefault.EmptyList public private(set) var ownVotes: [Int]
     public let options: [Option]
-    public let emojis: [Emoji]
+    @DecodableDefault.EmptyList public private(set) var emojis: [Emoji]
 }
 
 extension Poll: Hashable {
