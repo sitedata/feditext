@@ -24,6 +24,16 @@ final class ExploreViewController: UICollectionViewController {
             title: NSLocalizedString("main-navigation.explore", comment: ""),
             image: UIImage(systemName: "magnifyingglass"),
             selectedImage: nil)
+
+        viewModel.$announcementCount
+            .sink { [weak self] (_, unread) in
+                if unread > 0 {
+                    self?.tabBarItem.badgeValue = String(describing: unread)
+                } else {
+                    self?.tabBarItem.badgeValue = nil
+                }
+            }
+            .store(in: &cancellables)
     }
 
     @available(*, unavailable)
