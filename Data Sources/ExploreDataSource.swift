@@ -38,6 +38,16 @@ final class ExploreDataSource: UICollectionViewDiffableDataSource<ExploreViewMod
             var configuration = $0.defaultContentConfiguration()
 
             switch $2 {
+            case let .announcements(_, unread):
+                configuration.text = NSLocalizedString("main-navigation.announcements", comment: "")
+                if unread > 0 {
+                    configuration.image = UIImage(systemName: "\(unread).circle.fill")
+                        ?? UIImage(systemName: "megaphone.fill")
+                    configuration.imageProperties.tintColor = .systemRed
+                } else {
+                    configuration.image = UIImage(systemName: "megaphone")
+                    configuration.imageProperties.tintColor = nil
+                }
             case .profileDirectory:
                 configuration.text = NSLocalizedString("explore.profile-directory", comment: "")
                 configuration.image = UIImage(systemName: "person.crop.square.fill.and.at.rectangle")
@@ -89,8 +99,25 @@ final class ExploreDataSource: UICollectionViewDiffableDataSource<ExploreViewMod
             $0.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: $2)
         }
 
-        viewModel.$instanceViewModel.combineLatest(viewModel.$tags, viewModel.$links, viewModel.$statuses)
-            .sink { [weak self] in self?.update(instanceViewModel: $0, tags: $1, links: $2, statuses: $3) }
+        viewModel.$instanceViewModel
+            .combineLatest(
+                viewModel.$announcementCount
+            )
+            .combineLatest(
+                viewModel.$tags,
+                viewModel.$links,
+                viewModel.$statuses
+            )
+            .sink { [weak self] instanceAndAnnouncement, tags, links, statuses in
+                let (instanceViewModel, announcementCount) = instanceAndAnnouncement
+                self?.update(
+                    instanceViewModel: instanceViewModel,
+                    announcementCount: announcementCount,
+                    tags: tags,
+                    links: links,
+                    statuses: statuses
+                )
+            }
             .store(in: &cancellables)
     }
 
@@ -104,11 +131,26 @@ final class ExploreDataSource: UICollectionViewDiffableDataSource<ExploreViewMod
 }
 
 private extension ExploreDataSource {
-    func update(instanceViewModel: InstanceViewModel?, tags: [Tag], links: [Card], statuses: [Status]) {
+    func update(
+        instanceViewModel: InstanceViewModel?,
+        announcementCount: (total: Int, unread: Int),
+        tags: [Tag],
+        links: [Card],
+        statuses: [Status]
+    ) {
         var newsnapshot = NSDiffableDataSourceSnapshot<ExploreViewModel.Section, ExploreViewModel.Item>()
 
         // TODO: (Vyr) move directory and suggetions to their own tab or secondary nav.
         var instanceSectionItems = [ExploreViewModel.Item]()
+
+        if announcementCount.total > 0 {
+            instanceSectionItems.append(
+                .announcements(
+                    total: announcementCount.total,
+                    unread: announcementCount.unread
+                )
+            )
+        }
 
         if AccountsEndpoint.directory(local: false).canCallWith(identityContext.apiCapabilities) {
             instanceSectionItems.append(.profileDirectory)

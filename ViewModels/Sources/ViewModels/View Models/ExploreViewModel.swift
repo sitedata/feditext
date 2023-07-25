@@ -9,6 +9,7 @@ public final class ExploreViewModel: ObservableObject {
     public let searchViewModel: SearchViewModel
     public let events: AnyPublisher<Event, Never>
     @Published public var instanceViewModel: InstanceViewModel?
+    @Published public var announcementCount: (total: Int, unread: Int) = (0, 0)
     @Published public var tags = [Tag]()
     @Published public var links = [Card]()
     @Published public var statuses = [Status]()
@@ -33,6 +34,11 @@ public final class ExploreViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .assignErrorsToAlertItem(to: \.alertItem, on: self)
             .assign(to: &$instanceViewModel)
+
+        identityContext.service.announcementCountPublisher()
+            .receive(on: DispatchQueue.main)
+            .assignErrorsToAlertItem(to: \.alertItem, on: self)
+            .assign(to: &$announcementCount)
 
         // Forward collection navigation events to our events subject.
         statusEventsSubject
@@ -69,12 +75,15 @@ public extension ExploreViewModel {
         case link(Card)
         case status(Status)
         case instance
+        case announcements(total: Int, unread: Int)
         case profileDirectory
         case suggestedAccounts
     }
 
     func refresh() {
         let refreshInstance = identityContext.service.refreshInstance()
+
+        let refreshAnnouncements = identityContext.service.refreshAnnouncements()
 
         let refreshTags = exploreService.fetchTrendingTags()
             .handleEvents(receiveOutput: { [weak self] tags in
@@ -100,7 +109,7 @@ public extension ExploreViewModel {
             })
             .ignoreOutput()
 
-        refreshInstance.merge(with: refreshTags, refreshLinks, refreshStatuses)
+        refreshInstance.merge(with: refreshAnnouncements, refreshTags, refreshLinks, refreshStatuses)
             .receive(on: DispatchQueue.main)
             .handleEvents(receiveSubscription: { [weak self] _ in self?.loading = true },
                           receiveCompletion: { [weak self] _ in self?.loading = false })
@@ -158,6 +167,15 @@ public extension ExploreViewModel {
 
         case .instance:
             break
+
+        case .announcements:
+            eventsSubject.send(
+                .navigation(
+                    .collection(
+                        identityContext.service.announcementsService()
+                    )
+                )
+            )
 
         case .profileDirectory:
             eventsSubject.send(
