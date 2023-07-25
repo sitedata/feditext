@@ -3,6 +3,7 @@
 /// Encapsulates actions we can do that are related to a timeline
 /// and need to show UI for in a collection view.
 public enum TimelineActionViewModel {
+    case context(ContextTimelineActionViewModel)
     case tag(TagTimelineActionViewModel)
     case list(ListTimelineActionViewModel)
 

@@ -16,7 +16,6 @@ public class CollectionItemsViewModel: ObservableObject {
     private var viewModelCache = [CollectionItem: Any]()
     private let eventsSubject = PassthroughSubject<AnyPublisher<CollectionItemEvent, Error>, Never>()
     private let loadingSubject = PassthroughSubject<Bool, Never>()
-    private let expandAllSubject: CurrentValueSubject<ExpandAllState, Never>
     private let searchScopeChangesSubject = PassthroughSubject<SearchScope, Never>()
     private var topVisibleIndexPath = IndexPath(item: 0, section: 0)
     private let lastReadId = CurrentValueSubject<String?, Never>(nil)
@@ -29,10 +28,6 @@ public class CollectionItemsViewModel: ObservableObject {
     public init(collectionService: CollectionService, identityContext: IdentityContext) {
         self.collectionService = collectionService
         self.identityContext = identityContext
-
-        expandAllSubject = CurrentValueSubject(
-            collectionService is ContextService && !identityContext.identity.preferences.readingExpandSpoilers
-                ? .expand : .hidden)
 
         collectionService.sections
             .handleEvents(receiveOutput: { [weak self] in self?.process(sections: $0) })
@@ -88,14 +83,61 @@ public class CollectionItemsViewModel: ObservableObject {
                 .flatMap { identityContext.service.setLocalLastReadId($0, timeline: timeline) }
                 .sink { _ in } receiveValue: { _ in }
                 .store(in: &cancellables)
-        }
 
-        timelineActionViewModel = collectionService.positionTimeline.flatMap {
-            TimelineActionViewModel.from(
-                timeline: $0,
+            timelineActionViewModel = TimelineActionViewModel.from(
+                timeline: timeline,
                 identityContext: identityContext,
                 collectionItemsViewModel: self
             )
+        } else if let contextService = collectionService as? ContextService,
+                  !identityContext.identity.preferences.readingExpandSpoilers {
+            let contextTimelineActionViewModel = ContextTimelineActionViewModel()
+
+            contextTimelineActionViewModel.$expandAll
+                .sink(receiveValue: { [weak self] expandAll in
+                    guard let self = self else { return }
+
+                    let statusIds = Set(
+                        self.lastUpdate.sections
+                            .map(\.items)
+                            .reduce([], +)
+                            .compactMap { item -> Status.Id? in
+                                guard case let .status(status, _, _) = item else { return nil }
+
+                                return status.id
+                            }
+                    )
+
+                    switch expandAll {
+                    case .expanding:
+                        contextService.expand(ids: statusIds)
+                            .assignErrorsToAlertItem(to: \.alertItem, on: self)
+                            .sink(
+                                receiveCompletion: { _ in
+                                    contextTimelineActionViewModel.expandAll = .collapse
+                                },
+                                receiveValue: { _ in }
+                            )
+                            .store(in: &cancellables)
+                    case .collapsing:
+                        contextService.collapse(ids: statusIds)
+                            .assignErrorsToAlertItem(to: \.alertItem, on: self)
+                            .sink(
+                                receiveCompletion: { _ in
+                                    contextTimelineActionViewModel.expandAll = .expand
+                                },
+                                receiveValue: { _ in }
+                            )
+                            .store(in: &cancellables)
+                    case .collapse, .expand:
+                        return
+                    }
+                })
+                .store(in: &cancellables)
+
+            timelineActionViewModel = .context(contextTimelineActionViewModel)
+        } else {
+            timelineActionViewModel = nil
         }
     }
 
@@ -295,10 +337,6 @@ extension CollectionItemsViewModel: CollectionViewModel {
         collectionService.titleLocalizationComponents
     }
 
-    public var expandAll: AnyPublisher<ExpandAllState, Never> {
-        expandAllSubject.eraseToAnyPublisher()
-    }
-
     public var alertItems: AnyPublisher<AlertItem, Never> { $alertItem.compactMap { $0 }.eraseToAnyPublisher() }
 
     public var loading: AnyPublisher<Bool, Never> { loadingSubject.eraseToAnyPublisher() }
@@ -495,31 +533,6 @@ extension CollectionItemsViewModel: CollectionViewModel {
             return false
         default:
             return true
-        }
-    }
-
-    public func toggleExpandAll() {
-        let statusIds = Set(lastUpdate.sections.map(\.items).reduce([], +).compactMap { item -> Status.Id? in
-            guard case let .status(status, _, _) = item else { return nil }
-
-            return status.id
-        })
-
-        switch expandAllSubject.value {
-        case .hidden:
-            break
-        case .expand:
-            (collectionService as? ContextService)?.expand(ids: statusIds)
-                .assignErrorsToAlertItem(to: \.alertItem, on: self)
-                .collect()
-                .sink { [weak self] _ in self?.expandAllSubject.send(.collapse) }
-                .store(in: &cancellables)
-        case .collapse:
-            (collectionService as? ContextService)?.collapse(ids: statusIds)
-                .assignErrorsToAlertItem(to: \.alertItem, on: self)
-                .collect()
-                .sink { [weak self] _ in self?.expandAllSubject.send(.expand) }
-                .store(in: &cancellables)
         }
     }
 

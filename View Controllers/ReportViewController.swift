@@ -63,10 +63,6 @@ final class ReportViewController: TableViewController {
         }
     }
 
-    override func configureRightBarButtonItem(expandAllState: ExpandAllState) {
-        // no-op
-    }
-
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
 

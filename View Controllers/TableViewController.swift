@@ -185,25 +185,6 @@ class TableViewController: UITableViewController {
 
         sizeTableHeaderFooterViews()
     }
-
-    // TODO: (Vyr) can we subsume this into timeline actions?
-    /// Not used if `viewModel.timelineActionViewModel` exists because that takes precedence.
-    func configureRightBarButtonItem(expandAllState: ExpandAllState) {
-        switch expandAllState {
-        case .hidden:
-            navigationItem.rightBarButtonItem = nil
-        case .expand:
-            navigationItem.rightBarButtonItem = UIBarButtonItem(
-                title: NSLocalizedString("status.show-more-all-button.accessibility-label", comment: ""),
-                image: UIImage(systemName: "eye"),
-                primaryAction: UIAction { [weak self] _ in self?.viewModel.toggleExpandAll() })
-        case .collapse:
-            navigationItem.rightBarButtonItem = UIBarButtonItem(
-                title: NSLocalizedString("status.show-less-all-button.accessibility-label", comment: ""),
-                image: UIImage(systemName: "eye.slash"),
-                primaryAction: UIAction { [weak self] _ in self?.viewModel.toggleExpandAll() })
-        }
-    }
 }
 
 extension TableViewController {
@@ -419,10 +400,6 @@ private extension TableViewController {
 
         if let timelineActionViewModel = viewModel.timelineActionViewModel {
             setupTimelineActionBarButtonItem(timelineActionViewModel)
-        } else {
-            viewModel.expandAll.receive(on: DispatchQueue.main)
-                .sink { [weak self] in self?.configureRightBarButtonItem(expandAllState: $0) }
-                .store(in: &cancellables)
         }
 
         viewModel.loading.receive(on: DispatchQueue.main).assign(to: &$loading)
@@ -948,6 +925,33 @@ private extension TableViewController {
 
     func setupTimelineActionBarButtonItem(_ timelineActionViewModel: TimelineActionViewModel) {
         switch timelineActionViewModel {
+        case let .context(contextTimelineActionViewModel):
+            contextTimelineActionViewModel.$expandAll
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] expandAllState in
+                    switch expandAllState {
+                    case .expand:
+                        self?.navigationItem.rightBarButtonItem = UIBarButtonItem(
+                            title: NSLocalizedString("status.show-more-all-button.accessibility-label", comment: ""),
+                            image: UIImage(systemName: "eye"),
+                            primaryAction: UIAction { [weak contextTimelineActionViewModel] _ in
+                                contextTimelineActionViewModel?.toggle()
+                            }
+                        )
+                    case .collapse:
+                        self?.navigationItem.rightBarButtonItem = UIBarButtonItem(
+                            title: NSLocalizedString("status.show-less-all-button.accessibility-label", comment: ""),
+                            image: UIImage(systemName: "eye.slash"),
+                            primaryAction: UIAction { [weak contextTimelineActionViewModel] _ in
+                                contextTimelineActionViewModel?.toggle()
+                            }
+                        )
+                    case .collapsing, .expanding:
+                        return
+                    }
+                }
+                .store(in: &cancellables)
+
         case let .tag(tagTimelineActionViewModel):
             tagTimelineActionViewModel.$tag
                 .receive(on: DispatchQueue.main)
@@ -980,6 +984,7 @@ private extension TableViewController {
                     }
                 }
                 .store(in: &cancellables)
+
         case let .list(listTimelineActionViewModel):
             self.navigationItem.rightBarButtonItem = .init(
                 title: NSLocalizedString(
