@@ -63,6 +63,12 @@ public final class StatusViewModel: AttachmentsRenderingViewModel, ObservableObj
 public extension StatusViewModel {
     var isMine: Bool { statusService.status.displayStatus.account.id == identityContext.identity.account?.id }
 
+    var mentionsMe: Bool {
+        guard let myId = identityContext.identity.account?.id else { return false }
+
+        return statusService.status.displayStatus.mentions.contains { $0.id == myId }
+    }
+
     /// Does this instance support editing statuses?
     var canEditStatuses: Bool {
         StatusEndpoint.put(

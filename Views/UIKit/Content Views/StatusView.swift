@@ -766,17 +766,19 @@ private extension StatusView {
 
         var secondSectionItems = [UIAction]()
 
-        if viewModel.isMine {
+        if viewModel.isMine || viewModel.mentionsMe {
             secondSectionItems.append(
                 UIAction(
                     title: viewModel.muted
                         ? NSLocalizedString("status.unmute", comment: "")
                         : NSLocalizedString("status.mute", comment: ""),
-                    image: UIImage(systemName: viewModel.muted ? "speaker" : "speaker.slash")) { _ in
+                    image: UIImage(systemName: viewModel.muted ? "speaker.wave.2" : "speaker.slash")) { _ in
                     viewModel.toggleMuted()
                 }
             )
+        }
 
+        if viewModel.isMine {
             if viewModel.canEditStatuses {
                 secondSectionItems.append(
                     UIAction(
@@ -809,7 +811,7 @@ private extension StatusView {
                     if relationship.muting {
                         secondSectionItems.append(UIAction(
                             title: NSLocalizedString("account.unmute", comment: ""),
-                            image: UIImage(systemName: "speaker")) { _ in
+                            image: UIImage(systemName: "speaker.wave.2")) { _ in
                                 viewModel.accountViewModel.confirmUnmute()
                             })
                     } else {
@@ -1165,16 +1167,19 @@ private extension StatusView {
                 })
             }
 
+            if viewModel.isMine || viewModel.mentionsMe {
+                actions.append(UIAccessibilityCustomAction(
+                    name: viewModel.muted
+                        ? NSLocalizedString("status.unmute", comment: "")
+                        : NSLocalizedString("status.mute", comment: "")) { _ in
+                    viewModel.toggleMuted()
+
+                    return true
+                })
+            }
+
             if viewModel.isMine {
                 actions += [
-                    UIAccessibilityCustomAction(
-                        name: viewModel.muted
-                            ? NSLocalizedString("status.unmute", comment: "")
-                            : NSLocalizedString("status.mute", comment: "")) { _ in
-                        viewModel.toggleMuted()
-
-                        return true
-                    },
                     UIAccessibilityCustomAction(
                         name: NSLocalizedString("status.delete", comment: "")) { _ in
                         viewModel.confirmDelete(redraft: false)

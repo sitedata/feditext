@@ -127,7 +127,7 @@ private extension ProfileViewController {
             if relationship.muting {
                 actions.append(UIAction(
                     title: NSLocalizedString("account.unmute", comment: ""),
-                    image: UIImage(systemName: "speaker")) { _ in
+                    image: UIImage(systemName: "speaker.wave.2")) { _ in
                         accountViewModel.confirmUnmute()
                     })
             } else {
