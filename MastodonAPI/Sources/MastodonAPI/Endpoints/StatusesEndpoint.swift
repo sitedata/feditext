@@ -78,14 +78,25 @@ extension StatusesEndpoint: Endpoint {
         case .trends:
             return [
                 .mastodon: "3.5.0",
-                .hometown: "3.5.0"
+                .hometown: "3.5.0",
+                .firefish: "1.0.0"
             ]
         case .timelinesTag:
             return [
                 .mastodon: .assumeAvailable,
                 .hometown: .assumeAvailable,
                 .pleroma: .assumeAvailable,
-                .akkoma: .assumeAvailable
+                .akkoma: .assumeAvailable,
+                .firefish: "1.0.0"
+            ]
+        case .timelinesList:
+            return [
+                .mastodon: .assumeAvailable,
+                .hometown: .assumeAvailable,
+                .pleroma: .assumeAvailable,
+                .akkoma: .assumeAvailable,
+                .gotosocial: "0.10.0-0",
+                .firefish: "1.0.0"
             ]
         default:
             return nil

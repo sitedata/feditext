@@ -8,7 +8,7 @@ import Mastodon
 public final class MastodonAPIClient: HTTPClient {
     public let instanceURL: URL
     public var accessToken: String?
-    private let apiCapabilities: APICapabilities
+    public let apiCapabilities: APICapabilities
 
     public required init(session: URLSession, instanceURL: URL, apiCapabilities: APICapabilities) {
         self.instanceURL = instanceURL

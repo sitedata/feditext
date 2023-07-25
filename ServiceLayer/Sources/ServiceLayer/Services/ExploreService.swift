@@ -25,7 +25,11 @@ public struct ExploreService {
 
 public extension ExploreService {
     func fetchTrendingTags() -> AnyPublisher<[Tag], Error> {
-        mastodonAPIClient.request(TagsEndpoint.trends())
+        if TagsEndpoint.trends().canCallWith(mastodonAPIClient.apiCapabilities) {
+            return mastodonAPIClient.request(TagsEndpoint.trends())
+        } else {
+            return mastodonAPIClient.request(TagsEndpoint.trendsLegacy())
+        }
     }
 
     func fetchTrendingLinks() -> AnyPublisher<[Card], Error> {

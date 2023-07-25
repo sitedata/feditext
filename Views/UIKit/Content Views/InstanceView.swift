@@ -3,6 +3,8 @@
 import SDWebImage
 import UIKit
 
+/// Display the instance banner in the Explore tab.
+/// Not to be confused with ``AboutInstanceView``.
 final class InstanceView: UIView {
     private let imageView = SDAnimatedImageView()
     private let titleLabel = UILabel()
@@ -50,7 +52,7 @@ private extension InstanceView {
         stackView.addArrangedSubview(imageView)
         imageView.layer.cornerRadius = .defaultCornerRadius
         imageView.clipsToBounds = true
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleAspectFit
 
         stackView.addArrangedSubview(titleLabel)
         titleLabel.adjustsFontSizeToFitWidth = true

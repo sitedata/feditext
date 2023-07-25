@@ -22,7 +22,8 @@ extension ConversationsEndpoint: Endpoint {
             .mastodon: "3.0.0",
             .hometown: "3.0.0",
             .pleroma: .assumeAvailable,
-            .akkoma: .assumeAvailable
+            .akkoma: .assumeAvailable,
+            .firefish: "1.0.0"
         ]
     }
 

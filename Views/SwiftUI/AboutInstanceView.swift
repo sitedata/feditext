@@ -6,7 +6,8 @@ import SwiftUI
 import ViewModels
 
 // TODO: (Vyr) display the instance banner, admin contact info, etc.
-/// Display instance description and rules.
+/// Display instance description and rules in the secondary navigation area.
+/// Not to be confused with ``InstanceView``.
 struct AboutInstanceView: View {
     let viewModel: InstanceViewModel
     let navigationViewModel: NavigationViewModel

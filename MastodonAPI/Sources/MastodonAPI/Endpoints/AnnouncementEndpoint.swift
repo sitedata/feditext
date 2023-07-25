@@ -25,7 +25,8 @@ extension AnnouncementsEndpoint: Endpoint {
             .mastodon: "3.1.0",
             .hometown: "3.1.0",
             .pleroma: .assumeAvailable,
-            .akkoma: .assumeAvailable
+            .akkoma: .assumeAvailable,
+            .firefish: "1.0.0"
         ]
     }
 

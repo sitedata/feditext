@@ -3,11 +3,13 @@
 import Mastodon
 import UIKit
 
+/// Tag and optional history chart. Used in the explore tab.
 final class TagView: UIView {
     private let nameLabel = UILabel()
     private let accountsLabel = UILabel()
     private let usesLabel = UILabel()
     private let lineChartView = LineChartView()
+    private var lineChartConstraints = [NSLayoutConstraint]()
     private var tagConfiguration: TagContentConfiguration
 
     init(configuration: TagContentConfiguration) {
@@ -73,17 +75,19 @@ private extension TagView {
         stackView.addArrangedSubview(usesLabel)
         usesLabel.adjustsFontForContentSizeCategory = true
         usesLabel.font = .preferredFont(forTextStyle: .largeTitle)
-        usesLabel.setContentHuggingPriority(.required, for: .vertical)
 
         stackView.addArrangedSubview(lineChartView)
+
+        lineChartConstraints = [
+            lineChartView.heightAnchor.constraint(equalTo: usesLabel.heightAnchor),
+            lineChartView.widthAnchor.constraint(equalTo: lineChartView.heightAnchor, multiplier: 16 / 9)
+        ]
 
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(equalTo: readableContentGuide.leadingAnchor),
             stackView.topAnchor.constraint(equalTo: readableContentGuide.topAnchor),
             stackView.trailingAnchor.constraint(equalTo: readableContentGuide.trailingAnchor),
-            stackView.bottomAnchor.constraint(equalTo: readableContentGuide.bottomAnchor),
-            lineChartView.heightAnchor.constraint(equalTo: usesLabel.heightAnchor),
-            lineChartView.widthAnchor.constraint(equalTo: lineChartView.heightAnchor, multiplier: 16 / 9)
+            stackView.bottomAnchor.constraint(equalTo: readableContentGuide.bottomAnchor)
         ])
     }
 
@@ -115,6 +119,14 @@ private extension TagView {
 
         lineChartView.values = viewModel.usageHistory.reversed()
         lineChartView.isHidden = viewModel.usageHistory.isEmpty
+
+        if usesLabel.isHidden || lineChartView.isHidden {
+            usesLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
+            NSLayoutConstraint.deactivate(lineChartConstraints)
+        } else {
+            usesLabel.setContentHuggingPriority(.required, for: .vertical)
+            NSLayoutConstraint.activate(lineChartConstraints)
+        }
 
         self.accessibilityLabel = accessibilityLabel
 
