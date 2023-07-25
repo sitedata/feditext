@@ -235,12 +235,6 @@ private extension StatusView {
         editedImageView.accessibilityLabel = NSLocalizedString("status.edited", comment: "")
         nameAccountTimeStackView.addArrangedSubview(editedImageView)
 
-        visibilityImageView.preferredSymbolConfiguration = .init(textStyle: .subheadline)
-        visibilityImageView.contentMode = .scaleAspectFit
-        visibilityImageView.setContentHuggingPriority(.required, for: .horizontal)
-        visibilityImageView.isAccessibilityElement = true
-        nameAccountTimeStackView.addArrangedSubview(visibilityImageView)
-
         timeLabel.font = .preferredFont(forTextStyle: .subheadline)
         timeLabel.adjustsFontForContentSizeCategory = true
         timeLabel.textColor = .secondaryLabel
@@ -249,6 +243,12 @@ private extension StatusView {
         timeLabel.setContentHuggingPriority(.required, for: .horizontal)
         timeLabel.setContentHuggingPriority(.required, for: .vertical)
         nameAccountTimeStackView.addArrangedSubview(timeLabel)
+
+        visibilityImageView.preferredSymbolConfiguration = .init(textStyle: .subheadline)
+        visibilityImageView.contentMode = .scaleAspectFit
+        visibilityImageView.setContentHuggingPriority(.required, for: .horizontal)
+        visibilityImageView.isAccessibilityElement = true
+        nameAccountTimeStackView.addArrangedSubview(visibilityImageView)
 
         nameAccountContainerStackView.spacing = .defaultSpacing
         nameAccountContainerStackView.addArrangedSubview(nameAccountTimeStackView)
