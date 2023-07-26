@@ -44,6 +44,8 @@ public struct AnnotatedDecodingError: Error, AnnotatedError, LocalizedError, Enc
         }
     }
 
+    public var failQuietly: Bool { false }
+
     public enum EncodableDecodingError: Encodable {
         case dataCorrupted(context: EncodableContext)
         case keyNotFound(codingKey: String, context: EncodableContext)

@@ -43,4 +43,6 @@ public struct APINotAvailableError: Error, AnnotatedError, LocalizedError, Encod
 
         return "\(explanation)\n\n\(method) \(url.absoluteString)"
     }
+
+    public var failQuietly: Bool { false }
 }

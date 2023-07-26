@@ -51,4 +51,6 @@ public struct AnnotatedAPIError: Error, AnnotatedError, LocalizedError, Encodabl
     public var errorDescription: String? {
         return "\(method) \(url.absoluteString)\n\n\(apiError.error)"
     }
+
+    public var failQuietly: Bool { false }
 }

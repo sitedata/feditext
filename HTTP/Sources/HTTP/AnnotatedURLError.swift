@@ -52,6 +52,21 @@ public struct AnnotatedURLError: Error, AnnotatedError, LocalizedError, Encodabl
         }
     }
 
+    private static var safeMethods: Set<String> = ["GET", "HEAD", "OPTIONS", "TRACE", "PROPFIND"]
+
+    private static var idempotentMethods: Set<String> = safeMethods.union(
+        ["PUT", "DELETE", "PROPPATCH", "MKCOL", "COPY", "MOVE", "UNLOCK"]
+    )
+
+    public var failQuietly: Bool {
+        switch name {
+        case .cancelled, .timedOut:
+            return Self.safeMethods.contains(method)
+        default:
+            return false
+        }
+    }
+
     public enum Name: String, Encodable {
         case unknown
         case cancelled
