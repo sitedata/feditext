@@ -16,6 +16,7 @@
 		942099F52A4E328B00007663 /* AppUrls in Frameworks */ = {isa = PBXBuildFile; productRef = 942099F42A4E328B00007663 /* AppUrls */; };
 		943141D7299AADD900D90FC4 /* AboutInstanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943141D6299AADD900D90FC4 /* AboutInstanceView.swift */; };
 		9460331F2A2D3B8E00F5757E /* NotificationReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9460331E2A2D3B8E00F5757E /* NotificationReportView.swift */; };
+		947B6CEF2A70909300630B24 /* EditDisplayFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947B6CEE2A70909300630B24 /* EditDisplayFilterView.swift */; };
 		947E728F29A9618900155DD2 /* EditNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947E728E29A9618900155DD2 /* EditNoteView.swift */; };
 		947ED41F2A6B1D7700A18AFA /* StatusReactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947ED41E2A6B1D7700A18AFA /* StatusReactionsView.swift */; };
 		9489DAF82A53D01F002ADDA3 /* CardContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9489DAF72A53D01F002ADDA3 /* CardContentView.swift */; };
@@ -368,6 +369,7 @@
 		9432DE2829A1587C0007C2BF /* CODE_OF_CONDUCT.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CODE_OF_CONDUCT.md; sourceTree = "<group>"; };
 		9432DE2929A1587C0007C2BF /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		9460331E2A2D3B8E00F5757E /* NotificationReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationReportView.swift; sourceTree = "<group>"; };
+		947B6CEE2A70909300630B24 /* EditDisplayFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditDisplayFilterView.swift; sourceTree = "<group>"; };
 		947E728E29A9618900155DD2 /* EditNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditNoteView.swift; sourceTree = "<group>"; };
 		947ED41E2A6B1D7700A18AFA /* StatusReactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusReactionsView.swift; sourceTree = "<group>"; };
 		9489DAF72A53D01F002ADDA3 /* CardContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardContentView.swift; sourceTree = "<group>"; };
@@ -670,6 +672,15 @@
 			name = Docs;
 			sourceTree = "<group>";
 		};
+		947B6CED2A70824800630B24 /* Timeline Actions */ = {
+			isa = PBXGroup;
+			children = (
+				94E7B18C2A5A1B1A00A1F1DA /* EditListView.swift */,
+				947B6CEE2A70909300630B24 /* EditDisplayFilterView.swift */,
+			);
+			path = "Timeline Actions";
+			sourceTree = "<group>";
+		};
 		94B2C8C12929617A00087955 /* Action Extension */ = {
 			isa = PBXGroup;
 			children = (
@@ -749,6 +760,7 @@
 		D021A66425C3E170008A0C0D /* SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				947B6CED2A70824800630B24 /* Timeline Actions */,
 				943141D6299AADD900D90FC4 /* AboutInstanceView.swift */,
 				D021A62B25C38570008A0C0D /* AboutView.swift */,
 				D021A63525C38ADB008A0C0D /* AcknowledgmentsView.swift */,
@@ -756,7 +768,6 @@
 				D0D4302C25F0904D00BE5504 /* AppIconPreferencesView.swift */,
 				D08E52602579D2E100FA2C5F /* DomainBlocksView.swift */,
 				D0BEB21024FA2A90001B0F04 /* EditFilterView.swift */,
-				94E7B18C2A5A1B1A00A1F1DA /* EditListView.swift */,
 				947E728E29A9618900155DD2 /* EditNoteView.swift */,
 				D0BEB20424FA1107001B0F04 /* FiltersView.swift */,
 				94E6C2502996E9C7003771D1 /* FollowedTagsView.swift */,
@@ -1488,6 +1499,7 @@
 				D0BEB1F724F9A84B001B0F04 /* LoadingTableFooterView.swift in Sources */,
 				D052DBE325EAFDE800FFB628 /* HTTPError+Extensions.swift in Sources */,
 				D021A61425C36BFB008A0C0D /* IdentityView.swift in Sources */,
+				947B6CEF2A70909300630B24 /* EditDisplayFilterView.swift in Sources */,
 				941F79D02A243499007FCC65 /* MultiNotificationView.swift in Sources */,
 				D06BC5E625202AD90079541D /* ProfileViewController.swift in Sources */,
 				D0D2AC4D25BCD2A9003D5DF2 /* TagTableViewCell.swift in Sources */,

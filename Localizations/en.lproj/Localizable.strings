@@ -494,6 +494,10 @@
 "tag.followed.add" = "Follow hashtag";
 "tag.followed.remove" = "Unfollow hashtag";
 "tag.per-week-%ld" = "%ld per week";
+"timelines.display-filter.edit" = "Change display filters";
+"timelines.display-filter.show.bots" = "Show automated accounts";
+"timelines.display-filter.show.reblogs" = "Show boosts";
+"timelines.display-filter.show.replies" = "Show replies";
 "timelines.home" = "Home";
 "timelines.local" = "Local";
 "timelines.federated" = "Federated";

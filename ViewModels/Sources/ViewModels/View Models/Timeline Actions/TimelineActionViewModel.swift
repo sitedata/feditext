@@ -6,6 +6,7 @@ public enum TimelineActionViewModel {
     case context(ContextTimelineActionViewModel)
     case tag(TagTimelineActionViewModel)
     case list(ListTimelineActionViewModel)
+    case displayFilter(DisplayFilterTimelineActionViewModel)
 
     static func from(
         timeline: Timeline,
@@ -28,6 +29,10 @@ public enum TimelineActionViewModel {
                     identityContext: identityContext,
                     collectionItemsViewModel: collectionItemsViewModel
                 )
+            )
+        case .home, .local, .federated:
+            return .displayFilter(
+                DisplayFilterTimelineActionViewModel()
             )
         default:
             return nil

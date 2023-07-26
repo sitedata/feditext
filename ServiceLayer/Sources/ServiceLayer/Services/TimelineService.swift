@@ -20,6 +20,7 @@ public struct TimelineService {
     private let contentDatabase: ContentDatabase
     private let nextPageMaxIdSubject = PassthroughSubject<String, Never>()
     private let accountIdsForRelationshipsSubject = PassthroughSubject<Set<Account.Id>, Never>()
+    private let displayFilterSubject = CurrentValueSubject<DisplayFilter?, Error>(nil)
 
     init(timeline: Timeline,
          environment: AppEnvironment,
@@ -29,14 +30,27 @@ public struct TimelineService {
         self.mastodonAPIClient = mastodonAPIClient
         self.contentDatabase = contentDatabase
 
+        let unfilteredSections: AnyPublisher<[CollectionSection], Error>
         if case .home = timeline {
-            sections = contentDatabase.cleanHomeTimelinePublisher()
+            unfilteredSections = contentDatabase.cleanHomeTimelinePublisher()
                 .collect()
                 .flatMap { _ in contentDatabase.timelinePublisher(timeline) }
                 .eraseToAnyPublisher()
         } else {
-            sections = contentDatabase.timelinePublisher(timeline)
+            unfilteredSections = contentDatabase.timelinePublisher(timeline)
         }
+        sections = unfilteredSections
+            .combineLatest(displayFilterSubject) { sections, displayFilter in
+                guard let displayFilter else { return sections }
+
+                return sections.map { section in
+                    .init(
+                        items: section.items.filter(displayFilter.allow),
+                        searchScope: section.searchScope
+                    )
+                }
+            }
+            .eraseToAnyPublisher()
 
         navigationService = NavigationService(environment: environment,
                                               mastodonAPIClient: mastodonAPIClient,
@@ -61,6 +75,10 @@ public struct TimelineService {
             title = Empty().eraseToAnyPublisher()
             titleLocalizationComponents = Empty().eraseToAnyPublisher()
         }
+    }
+
+    public func apply(displayFilter: DisplayFilter?) {
+        displayFilterSubject.send(displayFilter)
     }
 }
 

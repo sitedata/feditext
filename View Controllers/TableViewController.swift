@@ -1003,6 +1003,10 @@ private extension TableViewController {
                     present(hostingController, animated: true)
                 }
             )
+
+        case .displayFilter:
+            // Handled in TimelinesViewController
+            return
         }
     }
 }
