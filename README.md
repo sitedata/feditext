@@ -1,4 +1,4 @@
-# Metatext / Feditext<sup>*</sup>
+# Feditext<sup>*</sup>
 
 A free, open-source iOS Mastodon client.
 
@@ -18,7 +18,7 @@ or
 ## Contributing Bug Reports
 
 GitHub is used for bug tracking.
-Search [existing issues](https://github.com/bdube/metatext/issues) and create a new one if the issue is not yet tracked.
+Search [existing issues](https://github.com/feditext/feditext/issues) and create a new one if the issue is not yet tracked.
 Upstream issues can be referenced in the [archived project](https://github.com/metabolist/metatext/issues).
 
 ## Contributing Translations
@@ -29,33 +29,33 @@ project infrastructure is in place for Feditext.
 
 ## Contributing Code
 
-See the [contribution guidelines](https://github.com/bdube/metatext/blob/develop/CONTRIBUTING.md).
+See the [contribution guidelines](CONTRIBUTING.md).
 
 ## Building
 
-To build Metatext:
+To build Feditext:
 
-- Clone the repository (`git clone https://github.com/bdube/metatext.git`)
-- Open `Feditext.xcodeproj` in Xcode
-- Select the top-level "Feditext" item in Xcode and change the team in each target's "Signing & Capabilities" settings to your own
+- Clone the repository (`git clone https://github.com/feditext/feditext.git`)
+- Run `git update-index --skip-worktree Identity.xcconfig` to ignore changes to the ID file so you don't commit them
+- Change the development team ID and bundle ID base in [`Identity.xcconfig`](Identity.xcconfig) to your own
 
 All dependencies are managed using [Swift Package Manager](https://swift.org/package-manager) and will automatically be installed by Xcode.
 
 ### Push Notifications
 
-Push notifications will not work in development builds of Metatext unless you host your own instance of [metatext-apns](https://github.com/metabolist/metatext-apns) and change the `pushSubscriptionEndpointURL` constants in [IdentityService.swift](https://github.com/metabolist/metatext/blob/main/ServiceLayer/Sources/ServiceLayer/Services/IdentityService.swift) to its URL.
+Push notifications will not work in development builds of Feditext unless you host your own instance of [feditext-apns](https://github.com/feditext/feditext-apns) and change the `pushSubscriptionEndpointURL` constants in [`IdentityService.swift`](ServiceLayer/Sources/ServiceLayer/Services/IdentityService.swift) to its URL.
 
 There is an issue to track this bdube/metatext#15.
 
 ## Architecture
 
-- Metatext uses the [Model–view–viewmodel (MVVM) architectural pattern](https://en.wikipedia.org/wiki/Model–view–viewmodel).
+- Feditext uses the [Model–view–viewmodel (MVVM) architectural pattern](https://en.wikipedia.org/wiki/Model–view–viewmodel).
 - View models are clients of a service layer that abstracts network and local database logic.
 - Different levels of the architecture are in different local Swift Packages. `import DB` and `import MastodonAPI` should generally only be done within the `ServiceLayer` package, and `import ServiceLayer` only within the `ViewModels` package.
 
 ## Acknowledgements
 
-Metatext uses the following third-party libraries:
+Feditext uses the following third-party libraries:
 
 - [BlurHash](https://github.com/woltapp/blurhash)
 - [CombineExpectations](https://github.com/groue/CombineExpectations)
@@ -64,6 +64,11 @@ Metatext uses the following third-party libraries:
 - [SQLCipher](https://github.com/sqlcipher/sqlcipher)
 - [SwiftSoup](https://github.com/scinfu/SwiftSoup)
 - [Semver](https://github.com/ddddxxx/Semver)
+
+Feditext uses the following third-party artwork:
+
+- Feditext "ft" logos by Robert George [@rrgeorge](https://raphus.social/@rrgeorge) ([CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/))
+- ActivityPub logo by mray from [activitypub.rocks](https://activitypub.rocks/) ([CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/))
 
 ## Cryptography Notice
 
