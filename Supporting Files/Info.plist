@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>Feditext bundle ID base</key>
-	<string>$(FEDITEXT_BUNDLE_ID_BASE)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -30,15 +28,15 @@
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
-            <key>AppIconTransPaint</key>
-            <dict>
-                <key>CFBundleIconFiles</key>
-                <array>
-                    <string>AppIconTransPaint</string>
-                </array>
-                <key>UIPrerenderedIcon</key>
-                <false/>
-            </dict>
+			<key>AppIconTransPaint</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>AppIconTransPaint</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
 		</dict>
 		<key>CFBundlePrimaryIcon</key>
 		<dict>
@@ -54,33 +52,33 @@
 	<dict>
 		<key>CFBundleAlternateIcons</key>
 		<dict>
-            <key>AppIconClassic</key>
-            <dict>
-                <key>CFBundleIconFiles</key>
-                <array>
-                    <string>AppIconClassic</string>
-                </array>
-                <key>UIPrerenderedIcon</key>
-                <false/>
-            </dict>
-            <key>AppIconRainbow</key>
-            <dict>
-                <key>CFBundleIconFiles</key>
-                <array>
-                    <string>AppIconRainbow</string>
-                </array>
-                <key>UIPrerenderedIcon</key>
-                <false/>
-            </dict>
-            <key>AppIconTransPaint</key>
-            <dict>
-                <key>CFBundleIconFiles</key>
-                <array>
-                    <string>AppIconTransPaint</string>
-                </array>
-                <key>UIPrerenderedIcon</key>
-                <false/>
-            </dict>
+			<key>AppIconClassic</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>AppIconClassic</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>AppIconRainbow</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>AppIconRainbow</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>AppIconTransPaint</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>AppIconTransPaint</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
 		</dict>
 		<key>CFBundlePrimaryIcon</key>
 		<dict>
@@ -106,9 +104,9 @@
 	<array>
 		<dict>
 			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
+			<string>Editor</string>
 			<key>CFBundleURLIconFile</key>
-			<string>AppIconClassic@3x</string>
+			<string>AppIconRainbowPaint@3x</string>
 			<key>CFBundleURLName</key>
 			<string>$(FEDITEXT_BUNDLE_ID_BASE)</string>
 			<key>CFBundleURLSchemes</key>
@@ -116,9 +114,23 @@
 				<string>feditext</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLIconFile</key>
+			<string>ActivityPub@3x</string>
+			<key>CFBundleURLName</key>
+			<string>$(FEDITEXT_BUNDLE_ID_BASE)</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>web+ap</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>Feditext bundle ID base</key>
+	<string>$(FEDITEXT_BUNDLE_ID_BASE)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>

@@ -4,8 +4,10 @@ import Foundation
 
 /// Parse or construct `feditext:` URLs, used by OAuth callbacks, the action extension, and internal navigation.
 /// `feditext:` URLs should never appear in HTML unless we put them there post-HTML-parsing.
+/// Also parse `web+ap://` URLs, which are synonyms for WebFingering the URL as if it were `https://`.
 public enum AppUrl {
     public static let scheme: String = "feditext"
+    public static let webAPScheme: String = "web+ap"
 
     public static let website = URL(string: "https://github.com/feditext/feditext")!
 
@@ -27,8 +29,21 @@ public enum AppUrl {
     private static let mentionUrlParam: String = "url"
 
     public init?(url: URL) {
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
-              components.scheme == Self.scheme,
+        guard var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+            return nil
+        }
+
+        // See https://codeberg.org/fediverse/fediverse-ideas/issues/1#issuecomment-983769
+        if components.scheme == Self.webAPScheme {
+            components.scheme = "https"
+            if let searchUrl = components.url {
+                self = .search(searchUrl)
+                return
+            }
+            return nil
+        }
+
+        guard components.scheme == Self.scheme,
               let queryItems = components.queryItems else {
             return nil
         }

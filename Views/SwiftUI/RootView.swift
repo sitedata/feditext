@@ -34,7 +34,7 @@ struct RootView: View {
         }
     }
 
-    /// Open `metatext:` URLs from the action extension.
+    /// Open `feditext:` URLs from the action extension and `web+ap://` URLs from whereever.
     private func openURL(_ navigationViewModel: NavigationViewModel, _ url: URL) {
         guard let appUrl = AppUrl(url: url) else { return }
         switch appUrl {
