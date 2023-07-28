@@ -543,7 +543,7 @@ public extension StatusViewModel {
     }
 
     /// Emoji reactions.
-    var reactions: [Reaction] { statusService.status.displayStatus.reactions + statusService.status.displayStatus.emojiReactions }
+    var reactions: [Reaction] { statusService.status.displayStatus.unifiedReactions }
 
     var canEditReactions: Bool {
         StatusEndpoint.react(id: "", name: "").canCallWith(identityContext.apiCapabilities)

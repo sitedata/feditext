@@ -45,11 +45,18 @@ public final class Status: Codable, Identifiable {
     @DecodableDefault.False public private(set) var muted: Bool
     @DecodableDefault.False public private(set) var bookmarked: Bool
     public let pinned: Bool?
+
     /// Used by Glitch PR #2221 and future Firefish.
     @DecodableDefault.EmptyList public private(set) var reactions: [Reaction]
-    // TODO: (Vyr) reactions: clean this up after Firefish patch
-    /// Used by 2023-07-22 Firefish.
+    /// Used by 2023-07-22 Firefish and 2023-07-28 Akkoma.
     @DecodableDefault.EmptyList public private(set) var emojiReactions: [Reaction]
+
+    public var unifiedReactions: [Reaction] {
+        if !reactions.isEmpty {
+            return reactions
+        }
+        return emojiReactions
+    }
 
     public init(
         id: Status.Id,
@@ -206,6 +213,7 @@ extension Status: Hashable {
             && lhs.muted == rhs.muted
             && lhs.bookmarked == rhs.bookmarked
             && lhs.pinned == rhs.pinned
+            && lhs.reactions == rhs.reactions
     }
 
     public func hash(into hasher: inout Hasher) {

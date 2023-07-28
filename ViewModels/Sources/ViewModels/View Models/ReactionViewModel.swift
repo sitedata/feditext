@@ -31,10 +31,15 @@ public extension ReactionViewModel {
     var me: Bool { reaction.me }
 
     var url: URL? {
+        let animatedUrl = reaction.url?.url
+            ?? emoji?.url.url
         if identityContext.appPreferences.animateCustomEmojis {
-            return reaction.url?.url ?? emoji?.url.url
+            return animatedUrl
         } else {
-            return reaction.staticUrl?.url ?? emoji?.staticUrl.url
+            // Use `animatedUrl` as fallback because some backends don't have `staticUrl` (Akkoma as of 2023-07-28).
+            return reaction.staticUrl?.url
+                ?? emoji?.staticUrl.url
+                ?? animatedUrl
         }
     }
 }
