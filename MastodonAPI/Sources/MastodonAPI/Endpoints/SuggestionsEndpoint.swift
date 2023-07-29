@@ -23,9 +23,7 @@ extension SuggestionsEndpoint: Endpoint {
     }
 
     public var requires: APICapabilityRequirements? {
-        [
-            .mastodon: "3.4.0",
-            .hometown: "3.4.0",
+        .mastodonForks("3.4.0") | [
             .firefish: "1.0.0"
         ]
     }

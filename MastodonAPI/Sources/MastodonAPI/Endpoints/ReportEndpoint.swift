@@ -79,21 +79,15 @@ extension ReportEndpoint: Endpoint {
             case .unknown:
                 return [:]
             case .other:
-                return [
+                return .mastodonForks("3.5.0") | [
                     .mastodon: "3.5.0",
                     .hometown: "3.5.0",
                     .gotosocial: .assumeAvailable
                 ]
             case .spam, .violation:
-                return [
-                    .mastodon: "3.5.0",
-                    .hometown: "3.5.0"
-                ]
+                return .mastodonForks("3.5.0")
             case .legal:
-                return [
-                    .mastodon: "4.2.0",
-                    .hometown: "4.2.0"
-                ]
+                return .mastodonForks("4.2.0")
             }
         }
     }

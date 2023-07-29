@@ -76,23 +76,17 @@ extension StatusesEndpoint: Endpoint {
     public var requires: APICapabilityRequirements? {
         switch self {
         case .trends:
-            return [
-                .mastodon: "3.5.0",
-                .hometown: "3.5.0",
+            return .mastodonForks("3.5.0") | [
                 .firefish: "1.0.0"
             ]
         case .timelinesTag:
-            return [
-                .mastodon: .assumeAvailable,
-                .hometown: .assumeAvailable,
+            return .mastodonForks(.assumeAvailable) | [
                 .pleroma: .assumeAvailable,
                 .akkoma: .assumeAvailable,
                 .firefish: "1.0.0"
             ]
         case .timelinesList:
-            return [
-                .mastodon: .assumeAvailable,
-                .hometown: .assumeAvailable,
+            return .mastodonForks(.assumeAvailable) | [
                 .pleroma: .assumeAvailable,
                 .akkoma: .assumeAvailable,
                 .gotosocial: "0.10.0-0",

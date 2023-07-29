@@ -62,21 +62,21 @@ extension ListEndpoint: Endpoint {
             return ListsEndpoint.lists.requires
         case .create(title: _, repliesPolicy: _, exclusive: nil),
                 .update(id: _, title: _, repliesPolicy: _, exclusive: nil):
-            return [
-                .mastodon: "3.3.0",
-                .hometown: "3.3.0",
+            return .mastodonForks("3.3.0") | [
                 .gotosocial: "0.10.0-0"
             ]
         case .create(title: _, repliesPolicy: nil, exclusive: _),
                 .update(id: _, title: _, repliesPolicy: nil, exclusive: _):
             return [
                 .mastodon: "4.2.0",
+                .glitch: "4.2.0",
                 /// https://github.com/hometown-fork/hometown/releases/tag/v1.0.0%2B2.9.3
                 .hometown: "2.9.3"
             ]
         case .create, .update:
             return [
                 .mastodon: "4.2.0",
+                .glitch: "4.2.0",
                 .hometown: "3.3.0"
             ]
         }

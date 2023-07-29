@@ -96,9 +96,7 @@ extension RelationshipEndpoint: Endpoint {
     public var requires: APICapabilityRequirements? {
         switch self {
         case .note:
-            return [
-                .mastodon: "3.0.0",
-                .hometown: "3.0.0",
+            return .mastodonForks("3.0.0") | [
                 .pleroma: .assumeAvailable,
                 .akkoma: .assumeAvailable
             ]

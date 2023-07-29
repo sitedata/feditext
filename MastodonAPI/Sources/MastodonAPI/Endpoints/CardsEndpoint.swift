@@ -34,10 +34,7 @@ extension CardsEndpoint: Endpoint {
     public var requires: APICapabilityRequirements? {
         switch self {
         case .trends:
-            return [
-                .mastodon: "3.5.0",
-                .hometown: "3.5.0"
-            ]
+            return .mastodonForks("3.5.0")
         }
     }
 

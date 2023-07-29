@@ -106,6 +106,15 @@ public struct APICapabilityRequirements {
         }
         return version >= minVersion
     }
+
+    /// Set min versions for all Mastodon forks that closely track it.
+    public static func mastodonForks(_ minVersion: Semver) -> Self {
+        return [
+            .mastodon: minVersion,
+            .glitch: minVersion,
+            .hometown: minVersion
+        ]
+    }
 }
 
 extension APICapabilityRequirements: ExpressibleByDictionaryLiteral {

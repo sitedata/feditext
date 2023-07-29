@@ -32,10 +32,7 @@ extension FamiliarFollowersEndpoint: Endpoint {
     }
 
     public var requires: APICapabilityRequirements? {
-        [
-            .mastodon: "3.5.0",
-            .hometown: "3.5.0"
-        ]
+        .mastodonForks("3.5.0")
     }
 
     public var fallback: ResultType? { [] }

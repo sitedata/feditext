@@ -29,9 +29,7 @@ extension StringsEndpoint: Endpoint {
     public var requires: APICapabilityRequirements? {
         switch self {
         case .domainBlocks:
-            return [
-                .mastodon: "1.4.0",
-                .hometown: "1.4.0",
+            return .mastodonForks("1.4.0") | [
                 .pleroma: .assumeAvailable,
                 .akkoma: .assumeAvailable
             ]

@@ -42,21 +42,13 @@ extension TagsEndpoint: Endpoint {
     public var requires: APICapabilityRequirements? {
         switch self {
         case .trends:
-            return [
-                .mastodon: "3.5.0",
-                .hometown: "3.5.0"
-            ]
+            return .mastodonForks("3.5.0")
         case .trendsLegacy:
-            return [
-                .mastodon: "3.0.0",
-                .hometown: "3.0.0",
+            return .mastodonForks("3.0.0") | [
                 .firefish: "1.0.0"
             ]
         case .followed:
-            return [
-                .mastodon: "4.0.0",
-                .hometown: "4.0.0"
-            ]
+            return .mastodonForks("4.0.0")
         }
     }
 

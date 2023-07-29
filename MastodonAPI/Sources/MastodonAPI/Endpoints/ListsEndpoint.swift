@@ -36,9 +36,7 @@ extension ListsEndpoint: Endpoint {
     }
 
     public var requires: APICapabilityRequirements? {
-        [
-            .mastodon: "2.1.0",
-            .hometown: "2.1.0",
+        .mastodonForks("2.1.0") | [
             .pleroma: .assumeAvailable,
             .akkoma: .assumeAvailable,
             .gotosocial: "0.10.0-0"

@@ -18,9 +18,7 @@ extension ConversationsEndpoint: Endpoint {
     public var method: HTTPMethod { .get }
 
     public var requires: APICapabilityRequirements? {
-        [
-            .mastodon: "3.0.0",
-            .hometown: "3.0.0",
+        .mastodonForks("3.0.0") | [
             .pleroma: .assumeAvailable,
             .akkoma: .assumeAvailable,
             .firefish: "1.0.0"
