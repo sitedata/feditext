@@ -43,6 +43,8 @@ public extension Secrets {
         /// - See: `NodeInfo.software.version`
         /// - See: `APICapabilities`
         case softwareVersion
+        /// - See: `APICompatibilityFeature`
+        case apiFeaturesRawValues
         /// - See: `APICompatibilityMode`
         /// A `nil` `APICompatibilityMode?` is stored as the empty string.
         case apiCompatibilityModeRawValue
@@ -208,8 +210,17 @@ public extension Secrets {
         try set(version, forItem: .softwareVersion)
     }
 
+    func getAPIFeaturesRawValues() throws -> [String] {
+        let rawValues: String = try item(.apiFeaturesRawValues)
+        return rawValues.split(separator: ",").map { String($0) }
+    }
+
+    func setAPIFeaturesRawValues(_ rawValues: [String]) throws {
+        try set(rawValues.joined(separator: ","), forItem: .apiFeaturesRawValues)
+    }
+
     func getAPICompatibilityModeRawValue() throws -> String {
-        try item(.apiCompatibilityModeRawValue)
+        try item(.apiFeaturesRawValues)
     }
 
     func setAPICompatibilityModeRawValue(_ rawValue: String) throws {

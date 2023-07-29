@@ -54,8 +54,11 @@ public extension AllIdentitiesService {
         }
 
         // Detect the capabilities of the server we're creating an identity with.
-        let nodeInfoClient = NodeInfoClient(session: environment.session, instanceURL: url)
-        let apiCapabilitiesPublisher = nodeInfoClient.refreshAPICapabilities(secrets: secrets)
+        let apiCapabilitiesPublisher = APICapabilities.refresh(
+            session: environment.session,
+            instanceURL: url,
+            secrets: secrets
+        )
 
         let createIdentityPublisher = database
             .createIdentity(

@@ -58,7 +58,12 @@ public extension IdentityService {
     var apiCapabilities: APICapabilities { secrets.getAPICapabilities() }
 
     func refreshAPICapabilities() -> AnyPublisher<Never, Error> {
-        nodeInfoClient.refreshAPICapabilities(secrets: secrets)
+        APICapabilities
+            .refresh(
+                session: environment.session,
+                instanceURL: mastodonAPIClient.instanceURL,
+                secrets: secrets
+            )
             .ignoreOutput()
             .eraseToAnyPublisher()
     }

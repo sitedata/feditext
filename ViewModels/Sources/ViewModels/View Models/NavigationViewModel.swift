@@ -91,6 +91,7 @@ public extension NavigationViewModel {
             }
         }
 
+        // TODO: (Vyr) perf: this currently also calls the instance API. Merge with refreshInstance below?
         identityContext.service.refreshAPICapabilities()
             .sink { _ in } receiveValue: { _ in }
             .store(in: &cancellables)

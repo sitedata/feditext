@@ -14,6 +14,7 @@ extension Secrets {
                 ),
                 compatibilityMode: getAPICompatibilityMode()
             )
+            .withDetectedFeatures(getAPIFeatures())
         } catch {
             // This should only happen with old versions of the secret store that predate NodeInfo detection.
             // In this case, it's okay to return a default; something will call refreshAPICapabilities soon.
@@ -30,7 +31,22 @@ extension Secrets {
     func setAPICapabilities(_ apiCapabilities: APICapabilities) throws {
         try setSoftwareName(apiCapabilities.flavor?.rawValue ?? "")
         try setSoftwareVersion(apiCapabilities.version?.description ?? "")
+        try setAPIFeatures(apiCapabilities.features)
         try setAPICompatibilityMode(apiCapabilities.compatibilityMode)
+    }
+
+    func getAPIFeatures() -> Set<APIFeature> {
+        do {
+            let rawValues = try getAPIFeaturesRawValues()
+            let z = rawValues.compactMap { APIFeature(rawValue: $0) }
+            return .init(z)
+        } catch {
+            return .init()
+        }
+    }
+
+    func setAPIFeatures(_ features: Set<APIFeature>) throws {
+        try setAPIFeaturesRawValues(features.map(\.rawValue))
     }
 
     func getAPICompatibilityMode() -> APICompatibilityMode? {
