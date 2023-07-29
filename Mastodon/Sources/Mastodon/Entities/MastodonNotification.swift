@@ -36,7 +36,9 @@ extension MastodonNotification: Hashable {
 public extension MastodonNotification {
     typealias Id = String
 
+    // TODO: (Vyr) notifications: investigate additional Glitch, Firefish, Akkoma types, including reactions
     /// https://docs.joinmastodon.org/entities/Notification/#type
+    /// https://docs.akkoma.dev/stable/development/API/differences_in_mastoapi_responses/#notifications
     enum NotificationType: String, Codable, Unknowable {
         case follow
         case mention
