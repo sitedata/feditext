@@ -556,8 +556,6 @@ public extension StatusViewModel {
                 .presentEmojiPicker(
                     sourceViewTag: sourceViewTag,
                     selectionAction: { [weak self] in
-                        // TODO: (Vyr) emoji picker calls our `addReaction` but doesn't display an AlertItem on failure
-                        // The AlertItem is created and set but never actually shows up on screen.
                         self?.addReaction(name: $0)
                     }
                 )

@@ -118,7 +118,6 @@ public extension StatusService {
 
     /// Retrieve the edit history.
     func history() -> AnyPublisher<[StatusEdit], Error> {
-        // TODO: (Vyr) use DB as cache
         mastodonAPIClient.request(StatusEditsEndpoint.history(id: status.displayStatus.id))
     }
 
