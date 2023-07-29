@@ -32,8 +32,16 @@ public struct APICapabilities: Encodable {
             .split(separator: " ", maxSplits: 1)
             .first
             .flatMap { Semver(String($0)) ?? Self.relaxedSemver($0) }
+
+        var flavor = APIFlavor(rawValue: nodeinfoSoftware.name)
+        // Detect known forks of Glitch, which doesn't use its own software name.
+        if flavor == .mastodon,
+           nodeinfoSoftware.version.contains("glitch") || nodeinfoSoftware.version.contains("chuckya") {
+            flavor = .glitch
+        }
+
         self.init(
-            flavor: .init(rawValue: nodeinfoSoftware.name),
+            flavor: flavor,
             version: version,
             compatibilityMode: compatibilityMode,
             nodeinfoSoftware: nodeinfoSoftware

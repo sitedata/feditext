@@ -192,6 +192,7 @@
 "error.alert.copy-text" = "Copy text";
 "favorites" = "Favorites";
 "flavor.mastodon.name" = "Mastodon";
+"flavor.glitch.name" = "Glitch";
 "flavor.hometown.name" = "Hometown";
 "flavor.pleroma.name" = "Pleroma";
 "flavor.akkoma.name" = "Akkoma";

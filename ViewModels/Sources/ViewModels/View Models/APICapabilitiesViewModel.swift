@@ -16,6 +16,8 @@ public struct APICapabilitiesViewModel {
             return nil
         case .mastodon:
             return "flavor.mastodon.name"
+        case .glitch:
+            return "flavor.glitch.name"
         case .hometown:
             return "flavor.hometown.name"
         case .pleroma:
@@ -37,6 +39,8 @@ public struct APICapabilitiesViewModel {
             return nil
         case .mastodon:
             return URL(string: "https://joinmastodon.org/")
+        case .glitch:
+            return URL(string: "https://glitch-soc.github.io/docs/")
         case .hometown:
             return URL(string: "https://github.com/hometown-fork/hometown")
         case .pleroma:

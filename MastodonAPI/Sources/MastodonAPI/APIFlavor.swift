@@ -12,6 +12,7 @@ import Foundation
 /// - https://calckey.social/api-doc (not clear if this lists Mastodon-compatible API methods yet)
 public enum APIFlavor: String, Codable, Hashable, Identifiable, CaseIterable {
     case mastodon
+    case glitch
     case hometown
 
     case pleroma
