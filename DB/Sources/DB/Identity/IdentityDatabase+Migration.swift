@@ -85,6 +85,12 @@ extension IdentityDatabase {
             }
         }
 
+        migrator.registerMigration("1.7.4-instance-maxReactions") { db in
+            try db.alter(table: "instance") { t in
+                t.add(column: "maxReactions", .integer)
+            }
+        }
+
         return migrator
     }
 }

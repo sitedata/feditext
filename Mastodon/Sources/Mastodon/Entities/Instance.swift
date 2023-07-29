@@ -2,6 +2,8 @@
 
 import Foundation
 
+// swiftlint:disable nesting
+
 /// Result of calling the Mastodon v1 instance API, a mix of instance metadata and client configuration.
 /// See also: `DB.Identity.Instance` summary version in identity database.
 public struct Instance: Codable {
@@ -16,7 +18,6 @@ public struct Instance: Codable {
     }
 
     public struct Configuration: Codable, Hashable {
-        // swiftlint:disable:next nesting
         public struct Statuses: Codable, Hashable {
             public let maxCharacters: Int?
 
@@ -25,10 +26,21 @@ public struct Instance: Codable {
             }
         }
 
-        public let statuses: Statuses?
+        /// Present only in Glitch instances running PR #2221.
+        public struct Reactions: Codable, Hashable {
+            public let maxReactions: Int?
 
-        public init(statuses: Statuses?) {
+            public init(maxReactions: Int?) {
+                self.maxReactions = maxReactions
+            }
+        }
+
+        public let statuses: Statuses?
+        public let reactions: Reactions?
+
+        public init(statuses: Statuses?, reactions: Reactions?) {
             self.statuses = statuses
+            self.reactions = reactions
         }
     }
 
@@ -55,10 +67,16 @@ public struct Instance: Codable {
     public let stats: Stats
     public let thumbnail: UnicodeURL?
     public let contactAccount: Account?
-    public var maxTootChars: Int? {
-        configuration?.statuses?.maxCharacters
-    }
+
+    /// Present in everything except vanilla Mastodon and Firefish.
+    public let maxTootChars: Int?
+    /// Not present in Pleroma or Akkoma.
     public let configuration: Configuration?
+
+    public var unifiedMaxTootChars: Int? {
+        configuration?.statuses?.maxCharacters ?? maxTootChars
+    }
+
     @DecodableDefault.EmptyList public private(set) var rules: [Rule]
 
     public init(
@@ -72,6 +90,7 @@ public struct Instance: Codable {
         stats: Instance.Stats,
         thumbnail: UnicodeURL?,
         contactAccount: Account?,
+        maxTootChars: Int?,
         configuration: Configuration?,
         rules: [Rule]
     ) {
@@ -85,6 +104,7 @@ public struct Instance: Codable {
         self.stats = stats
         self.thumbnail = thumbnail
         self.contactAccount = contactAccount
+        self.maxTootChars = maxTootChars
         self.configuration = configuration
         self.rules = rules
     }

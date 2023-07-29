@@ -404,6 +404,12 @@ extension ContentDatabase {
             }
         }
 
+        migrator.registerMigration("1.7.4-instance-configuration") { db in
+            try db.alter(table: "instanceRecord") { t in
+                t.add(column: "configuration", .blob)
+            }
+        }
+
         return migrator
     }
 }
