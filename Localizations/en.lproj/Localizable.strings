@@ -41,6 +41,8 @@
 "account.hide-reblogs.confirm-%@" = "Hide boosts from %@?";
 "account.joined-%@" = "Joined %@";
 "account.locked.accessibility-label" = "Locked account";
+"account.moved" = "Account migrated";
+"account.moved.to-%@" = "Moved to %@";
 "account.mute" = "Mute";
 "account.mute.indefinite" = "Indefinite";
 "account.mute.confirm-%@" = "Are you sure you want to mute %@?";

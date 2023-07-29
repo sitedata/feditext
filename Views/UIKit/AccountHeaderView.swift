@@ -28,6 +28,8 @@ final class AccountHeaderView: UIView {
     let followsYouLabel = CapsuleLabel()
     let mutedLabel = CapsuleLabel()
     let blockedLabel = CapsuleLabel()
+    /// If an account has migrated, tapping this will navigate to their new account.
+    let movedButton = UIButton()
     let accountTypeStatusCountJoinedStackView = UIStackView()
     let accountTypeBotImageView = UIImageView()
     let accountTypeGroupImageView = UIImageView()
@@ -131,6 +133,24 @@ final class AccountHeaderView: UIView {
                 }
 
                 accountLabel.text = accountViewModel.accountName
+
+                if let movedAccountName = accountViewModel.movedAccountName {
+                    var movedButtonConfiguration = UIButton.Configuration.gray()
+                    movedButtonConfiguration.title = NSLocalizedString("account.moved", comment: "")
+                    movedButtonConfiguration.subtitle = String.localizedStringWithFormat(
+                        NSLocalizedString("account.moved.to-%@", comment: ""),
+                        movedAccountName
+                    )
+                    movedButtonConfiguration.titleAlignment = .center
+                    movedButtonConfiguration.image = .init(systemName: "chevron.forward.2")
+                    movedButtonConfiguration.imagePadding = .defaultSpacing
+                    movedButtonConfiguration.imagePlacement = .leading
+                    movedButton.configuration = movedButtonConfiguration
+                    movedButton.isHidden = false
+                } else {
+                    movedButton.isHidden = true
+                }
+
                 lockedImageView.isHidden = !accountViewModel.isLocked
 
                 var accountStackViewAccessibilityLabel = accountViewModel.accountName
@@ -464,6 +484,12 @@ private extension AccountHeaderView {
         blockedLabel.isHidden = true
 
         accountStackView.addArrangedSubview(UIView())
+
+        baseStackView.addArrangedSubview(movedButton)
+        movedButton.addAction(
+            UIAction { [weak self] _ in self?.viewModel.accountViewModel?.movedSelected() },
+            for: .primaryActionTriggered
+        )
 
         baseStackView.addArrangedSubview(accountTypeStatusCountJoinedStackView)
         accountTypeStatusCountJoinedStackView.spacing = .compactSpacing

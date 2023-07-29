@@ -16,6 +16,11 @@ final class AccountView: UIView {
     /// Displays text explanation of account type.
     let accountTypeLabel = UILabel()
 
+    let movedAccountStack = UIStackView()
+    let movedAccountIcon = UIImageView()
+    /// Shows the new account name when an account has migrated.
+    let movedAccountLabel = UILabel()
+
     let verifiedStack = UIStackView()
     /// Displays first verified link in profile, if there is one.
     let verifiedLabel = UILabel()
@@ -210,6 +215,7 @@ private extension AccountView {
         verticalStackView.spacing = .compactSpacing
         verticalStackView.addArrangedSubview(displayNameLabel)
         verticalStackView.addArrangedSubview(accountLabel)
+        verticalStackView.addArrangedSubview(movedAccountStack)
         verticalStackView.addArrangedSubview(verifiedStack)
         verticalStackView.addArrangedSubview(accountTypeStack)
         verticalStackView.addArrangedSubview(visibilityRelationshipStack)
@@ -227,6 +233,23 @@ private extension AccountView {
         accountLabel.font = .preferredFont(forTextStyle: .subheadline)
         accountLabel.adjustsFontForContentSizeCategory = true
         accountLabel.textColor = .secondaryLabel
+
+        movedAccountStack.addArrangedSubview(movedAccountIcon)
+        movedAccountIcon.image = .init(
+            systemName: "chevron.forward.2",
+            withConfiguration: UIImage.SymbolConfiguration(scale: .small)
+        )
+        movedAccountIcon.tintColor = .secondaryLabel
+        movedAccountIcon.contentMode = .scaleAspectFit
+        movedAccountIcon.adjustsImageSizeForAccessibilityContentSizeCategory = true
+        movedAccountIcon.setContentHuggingPriority(.required, for: .horizontal)
+        movedAccountIcon.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        movedAccountStack.addArrangedSubview(movedAccountLabel)
+        movedAccountLabel.numberOfLines = 0
+        movedAccountLabel.font = .preferredFont(forTextStyle: .subheadline)
+        movedAccountLabel.adjustsFontForContentSizeCategory = true
+        movedAccountLabel.textColor = .secondaryLabel
 
         verifiedStack.axis = .horizontal
         verifiedStack.alignment = .center
@@ -424,6 +447,17 @@ private extension AccountView {
         displayNameLabel.isHidden = viewModel.displayName.isEmpty
 
         accountLabel.text = viewModel.accountName
+
+        if let movedAccountName = viewModel.movedAccountName {
+            movedAccountLabel.text = movedAccountName
+            movedAccountLabel.accessibilityLabel = String.localizedStringWithFormat(
+                NSLocalizedString("account.moved.to-%@", comment: ""),
+                movedAccountName
+            )
+            movedAccountStack.isHidden = false
+        } else {
+            movedAccountStack.isHidden = true
+        }
 
         accountTypeStack.isHidden = !(viewModel.isBot || viewModel.isGroup)
         accountTypeBotImageView.isHidden = !viewModel.isBot

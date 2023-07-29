@@ -50,6 +50,12 @@ public extension AccountViewModel {
 
     var accountName: String { "@".appending(accountService.account.acct) }
 
+    var movedAccountName: String? {
+        guard let moved = accountService.account.moved else { return nil }
+
+        return "@".appending(moved.acct)
+    }
+
     var isLocked: Bool { accountService.account.locked }
 
     var statusesCount: Int { accountService.account.statusesCount }
@@ -171,6 +177,26 @@ public extension AccountViewModel {
                             .familiarFollowersService(
                                 familiarFollowers: familiarFollowers
                             )
+                    )
+                )
+            )
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+        )
+    }
+
+    /// If migrated, navigate to the new account.
+    func movedSelected() {
+        guard let moved = accountService.account.moved else { return }
+
+        eventsSubject.send(
+            Just(
+                .navigation(
+                    .profile(
+                        identityContext
+                            .service
+                            .navigationService
+                            .profileService(id: moved.id)
                     )
                 )
             )
