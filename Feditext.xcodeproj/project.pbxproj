@@ -446,7 +446,6 @@
 		D036AA06254B6118009094DF /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
 		D036AA0B254B612B009094DF /* NotificationContentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationContentConfiguration.swift; sourceTree = "<group>"; };
 		D036AA16254CA823009094DF /* StatusBodyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBodyView.swift; sourceTree = "<group>"; };
-		D039410D2615A71900E6E1B3 /* Feditext.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Feditext.xctestplan; sourceTree = "<group>"; };
 		D03D87F325C23C44004DCBB2 /* SecondaryNavigationTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryNavigationTitleView.swift; sourceTree = "<group>"; };
 		D0477F2B25C6EBAD005C5368 /* OpenInDefaultBrowserActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenInDefaultBrowserActivity.swift; sourceTree = "<group>"; };
 		D0477F4525C72E50005C5368 /* CapsuleLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleLabel.swift; sourceTree = "<group>"; };
@@ -904,7 +903,6 @@
 				9432DE2429A158460007C2BF /* Docs */,
 				D0C7D46824F76169001EBDBB /* Extensions */,
 				F168BCBF2966369200306FAF /* Feditext.xctestplan */,
-				D039410D2615A71900E6E1B3 /* Feditext.xctestplan */,
 				D0666A7924C7745A00F3F04B /* Frameworks */,
 				D0BFDAF524FC7C5300C86618 /* HTTP */,
 				947873BB297E0F9000CACEFE /* Identity.xcconfig */,
