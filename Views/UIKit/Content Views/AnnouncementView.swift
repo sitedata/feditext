@@ -4,14 +4,13 @@ import Mastodon
 import UIKit
 import ViewModels
 
-// TODO: (Vyr) reactions: update this to share the new add button used by `StatusReactionsView`
 /// Show an announcment with emoji reactions.
 /// - See: ``StatusReactionsView`` (derived from this)
 final class AnnouncementView: UIView {
     private let contentTextView = TouchFallthroughTextView()
-    private let reactionButton = UIButton()
     private let reactionsCollectionView = ReactionsCollectionView()
     private var announcementConfiguration: AnnouncementContentConfiguration
+    private let addReactionViewTag = UUID().hashValue
 
     init(configuration: AnnouncementContentConfiguration) {
         announcementConfiguration = configuration
@@ -27,20 +26,28 @@ final class AnnouncementView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private lazy var dataSource: UICollectionViewDiffableDataSource<Int, Reaction> = {
+    private lazy var dataSource: UICollectionViewDiffableDataSource<Int, ReactionItem> = {
         let cellRegistration = UICollectionView.CellRegistration
-        <ReactionCollectionViewCell, Reaction> { [weak self] in
+        <ReactionCollectionViewCell, ReactionItem> { [weak self] in
             guard let self = self else { return }
 
-            $0.viewModel = ReactionViewModel(
-                reaction: $2,
-                emojis: self.announcementConfiguration.viewModel.announcement.emojis,
-                identityContext: self.announcementConfiguration.viewModel.identityContext
-            )
+            switch $2 {
+            case let .reaction(reaction):
+                $0.viewModel = ReactionViewModel(
+                    reaction: reaction,
+                    emojis: self.announcementConfiguration.viewModel.announcement.emojis,
+                    identityContext: self.announcementConfiguration.viewModel.identityContext
+                )
+                $0.tag = 0
+
+            case .addReaction:
+                $0.viewModel = nil
+                $0.tag = self.addReactionViewTag
+            }
         }
 
         let dataSource = UICollectionViewDiffableDataSource
-        <Int, Reaction>(collectionView: reactionsCollectionView) {
+        <Int, ReactionItem>(collectionView: reactionsCollectionView) {
             $0.dequeueConfiguredReusableCell(using: cellRegistration, for: $1, item: $2)
         }
 
@@ -92,12 +99,18 @@ extension AnnouncementView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
 
-        guard let reaction = dataSource.itemIdentifier(for: indexPath) else { return }
+        guard let reactionItem = dataSource.itemIdentifier(for: indexPath) else { return }
 
-        if reaction.me {
-            announcementConfiguration.viewModel.removeReaction(name: reaction.name)
-        } else {
-            announcementConfiguration.viewModel.addReaction(name: reaction.name)
+        switch reactionItem {
+        case let .reaction(reaction):
+            if reaction.me {
+                announcementConfiguration.viewModel.removeReaction(name: reaction.name)
+            } else {
+                announcementConfiguration.viewModel.addReaction(name: reaction.name)
+            }
+
+        case .addReaction:
+            announcementConfiguration.viewModel.presentEmojiPicker(sourceViewTag: addReactionViewTag)
         }
 
         UISelectionFeedbackGenerator().selectionChanged()
@@ -118,27 +131,7 @@ private extension AnnouncementView {
         contentTextView.delegate = self
         stackView.addArrangedSubview(contentTextView)
 
-        let reactionStackView = UIStackView()
-
-        stackView.addArrangedSubview(reactionStackView)
-        reactionStackView.spacing = .defaultSpacing
-        reactionStackView.alignment = .top
-
-        reactionStackView.addArrangedSubview(reactionButton)
-        reactionButton.tag = UUID().hashValue
-        reactionButton.accessibilityLabel = NSLocalizedString("announcement.insert-emoji", comment: "")
-        reactionButton.setImage(
-            UIImage(systemName: "plus.circle", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
-            for: .normal)
-        reactionButton.addAction(
-            UIAction { [weak self] _ in
-                guard let self = self else { return }
-
-                self.announcementConfiguration.viewModel.presentEmojiPicker(sourceViewTag: self.reactionButton.tag)
-            },
-            for: .touchUpInside)
-
-        reactionStackView.addArrangedSubview(reactionsCollectionView)
+        stackView.addArrangedSubview(reactionsCollectionView)
         reactionsCollectionView.delegate = self
         reactionsCollectionView.setContentCompressionResistancePriority(.required, for: .vertical)
 
@@ -146,9 +139,7 @@ private extension AnnouncementView {
             stackView.leadingAnchor.constraint(equalTo: readableContentGuide.leadingAnchor),
             stackView.topAnchor.constraint(equalTo: readableContentGuide.topAnchor),
             stackView.trailingAnchor.constraint(equalTo: readableContentGuide.trailingAnchor),
-            stackView.bottomAnchor.constraint(equalTo: readableContentGuide.bottomAnchor),
-            reactionButton.widthAnchor.constraint(equalToConstant: .minimumButtonDimension),
-            reactionButton.heightAnchor.constraint(equalToConstant: .minimumButtonDimension)
+            stackView.bottomAnchor.constraint(equalTo: readableContentGuide.bottomAnchor)
         ])
     }
 
@@ -168,10 +159,14 @@ private extension AnnouncementView {
         mutableContent.resizeAttachments(toLineHeight: contentFont.lineHeight)
         contentTextView.attributedText = mutableContent
 
-        var snapshot = NSDiffableDataSourceSnapshot<Int, Reaction>()
+        var snapshot = NSDiffableDataSourceSnapshot<Int, ReactionItem>()
 
         snapshot.appendSections([0])
-        snapshot.appendItems(viewModel.announcement.reactions, toSection: 0)
+        snapshot.appendItems(
+            viewModel.announcement.reactions.map(ReactionItem.reaction(reaction:)),
+            toSection: 0
+        )
+        snapshot.appendItems([.addReaction], toSection: 0)
 
         if snapshot.itemIdentifiers != dataSource.snapshot().itemIdentifiers {
             dataSource.apply(snapshot, animatingDifferences: false) {

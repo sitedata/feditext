@@ -100,7 +100,7 @@ extension StatusReactionsView: UICollectionViewDelegate {
     }
 }
 
-private enum ReactionItem: Hashable {
+enum ReactionItem: Hashable {
     case reaction(reaction: Reaction)
     case addReaction
 }
