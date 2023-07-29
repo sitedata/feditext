@@ -357,6 +357,7 @@ private extension StatusView {
         }
 
         mainStackView.addArrangedSubview(reactionsDividerView)
+        mainStackView.setCustomSpacing(.defaultSpacing, after: reactionsDividerView)
         mainStackView.addArrangedSubview(reactionsView)
 
         mainStackView.addArrangedSubview(interactionsDividerView)
@@ -660,7 +661,7 @@ private extension StatusView {
         contextParentTimeApplicationStackView.isHidden = !isContextParent
 
         let noReactions = viewModel.reactions.isEmpty
-        reactionsDividerView.isHidden = noReactions
+        reactionsDividerView.isHidden = noReactions || !isContextParent
         reactionsView.isHidden = noReactions
         reactionsView.viewModel = viewModel
 
