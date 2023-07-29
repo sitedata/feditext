@@ -8,16 +8,13 @@ public final class ListTimelineActionViewModel: ObservableObject {
     @Published public private(set) var list: List
 
     private let identityContext: IdentityContext
-    private weak var collectionItemsViewModel: CollectionItemsViewModel?
 
     public init(
         list: List,
-        identityContext: IdentityContext,
-        collectionItemsViewModel: CollectionItemsViewModel
+        identityContext: IdentityContext
     ) {
         self.list = list
         self.identityContext = identityContext
-        self.collectionItemsViewModel = collectionItemsViewModel
     }
 
     public var editListViewModel: EditListViewModel {

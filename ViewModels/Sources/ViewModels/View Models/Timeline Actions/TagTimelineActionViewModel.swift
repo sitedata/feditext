@@ -24,6 +24,7 @@ public final class TagTimelineActionViewModel: ObservableObject {
             following: nil
         )
         self.identityContext = identityContext
+        self.collectionItemsViewModel = collectionItemsViewModel
 
         // Fetch the rest of the tag, including following status.
         getTag()

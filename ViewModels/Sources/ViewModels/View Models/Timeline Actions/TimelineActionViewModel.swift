@@ -26,8 +26,7 @@ public enum TimelineActionViewModel {
             return .list(
                 ListTimelineActionViewModel(
                     list: list,
-                    identityContext: identityContext,
-                    collectionItemsViewModel: collectionItemsViewModel
+                    identityContext: identityContext
                 )
             )
         case .home, .local, .federated:
