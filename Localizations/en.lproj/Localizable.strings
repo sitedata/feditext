@@ -90,7 +90,7 @@
 "account.verified" = "Verified";
 "activity.open-in-default-browser" = "Open in default browser";
 "add" = "Add";
-"announcement.insert-emoji" = "Insert emoji";
+"announcement.insert-emoji" = "React";
 "api-error.api-not-available" = "API not available on this instance";
 "api-error.api-not-available.description" = "Your instance software isn't known to support whatever you just tried to do. If you're using a development instance, try turning on API compatibility mode in the preferences. Otherwise, please report this error to the Feditext developers.";
 "api-error.unable-to-fetch-remote-status" = "Unable to fetch remote status";

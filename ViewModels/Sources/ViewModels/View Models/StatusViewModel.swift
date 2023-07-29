@@ -545,8 +545,17 @@ public extension StatusViewModel {
     /// Emoji reactions.
     var reactions: [Reaction] { statusService.status.displayStatus.unifiedReactions }
 
-    var canEditReactions: Bool {
-        StatusEndpoint.react(id: "", name: "").canCallWith(identityContext.apiCapabilities)
+    var canEditReactions: Bool { statusService.canEditReactions }
+
+    /// Some instances have a cap on the number of reactions you can use.
+    var canAddMoreReactions: Bool {
+        if let maxReactions = identityContext.identity.instance?.maxReactions {
+            let numOwnReactions = reactions.filter { $0.me }.count
+            if numOwnReactions >= maxReactions {
+                return false
+            }
+        }
+        return true
     }
 
     /// Pick an emoji reaction to add.

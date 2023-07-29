@@ -734,15 +734,26 @@ private extension StatusView {
     func menu(viewModel: StatusViewModel) -> UIMenu {
         var sections = [UIMenu]()
 
-        var firstSectionItems = [
-            UIAction(
-                title: viewModel.bookmarked
-                    ? NSLocalizedString("status.unbookmark", comment: "")
-                    : NSLocalizedString("status.bookmark", comment: ""),
-                image: UIImage(systemName: "bookmark")) { _ in
-                viewModel.toggleBookmarked()
-            }
-        ]
+        var firstSectionItems = [UIAction]()
+
+        if viewModel.canEditReactions && viewModel.canAddMoreReactions {
+            firstSectionItems.append(UIAction(
+                title: NSLocalizedString("announcement.insert-emoji", comment: ""),
+                image: UIImage(systemName: "face.smiling.inverse")) { [weak self] _ in
+                guard let self = self else { return }
+                let tag = UUID().hashValue
+                self.menuButton.tag = tag
+                viewModel.presentEmojiPicker(sourceViewTag: tag)
+            })
+        }
+
+        firstSectionItems.append(UIAction(
+            title: viewModel.bookmarked
+                ? NSLocalizedString("status.unbookmark", comment: "")
+                : NSLocalizedString("status.bookmark", comment: ""),
+            image: UIImage(systemName: "bookmark")) { _ in
+            viewModel.toggleBookmarked()
+        })
 
         if viewModel.isMine, let pinned = viewModel.pinned {
             firstSectionItems.append(UIAction(

@@ -178,16 +178,44 @@ public extension StatusService {
             .eraseToAnyPublisher()
     }
 
+    var canEditReactions: Bool { canEditReactionsGlitch || canEditReactionsPleroma }
+
+    private var canEditReactionsGlitch: Bool {
+        StatusEndpoint.react(id: "", name: "").canCallWith(mastodonAPIClient.apiCapabilities)
+    }
+
+    private var canEditReactionsPleroma: Bool {
+        StatusEndpoint.pleromaReact(id: "", name: "").canCallWith(mastodonAPIClient.apiCapabilities)
+    }
+
     func addReaction(name: String) -> AnyPublisher<Never, Error> {
-        return mastodonAPIClient.request(StatusEndpoint.react(id: status.id, name: name))
-            .flatMap(contentDatabase.insert(status:))
-            .eraseToAnyPublisher()
+        if canEditReactionsGlitch {
+            return mastodonAPIClient.request(StatusEndpoint.react(id: status.id, name: name))
+                .flatMap(contentDatabase.insert(status:))
+                .eraseToAnyPublisher()
+        } else if canEditReactionsPleroma {
+            return mastodonAPIClient.request(StatusEndpoint.pleromaReact(id: status.id, name: name))
+                .flatMap(contentDatabase.insert(status:))
+                .eraseToAnyPublisher()
+        } else {
+            assertionFailure("Tried to add a reaction without supporting any of the known methods")
+            return Empty().eraseToAnyPublisher()
+        }
     }
 
     func removeReaction(name: String) -> AnyPublisher<Never, Error> {
-        return mastodonAPIClient.request(StatusEndpoint.unreact(id: status.id, name: name))
-            .flatMap(contentDatabase.insert(status:))
-            .eraseToAnyPublisher()
+        if canEditReactionsGlitch {
+            return mastodonAPIClient.request(StatusEndpoint.unreact(id: status.id, name: name))
+                .flatMap(contentDatabase.insert(status:))
+                .eraseToAnyPublisher()
+        } else if canEditReactionsPleroma {
+            return mastodonAPIClient.request(StatusEndpoint.pleromaUnreact(id: status.id, name: name))
+                .flatMap(contentDatabase.insert(status:))
+                .eraseToAnyPublisher()
+        } else {
+            assertionFailure("Tried to remove a reaction without supporting any of the known methods")
+            return Empty().eraseToAnyPublisher()
+        }
     }
 
     func asIdentity(id: Identity.Id) -> AnyPublisher<Self, Error> {

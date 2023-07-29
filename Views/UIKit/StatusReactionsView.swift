@@ -24,7 +24,7 @@ final class StatusReactionsView: ReactionsCollectionView {
                 viewModel.reactions.map(ReactionItem.reaction(reaction:)),
                 toSection: 0
             )
-            if viewModel.canEditReactions {
+            if viewModel.canEditReactions && viewModel.canAddMoreReactions {
                 snapshot.appendItems([.addReaction], toSection: 0)
             }
 

@@ -21,6 +21,10 @@ public enum StatusEndpoint {
     case put(id: Status.Id, Components)
     case react(id: Status.Id, name: String)
     case unreact(id: Status.Id, name: String)
+
+    // Specific to Pleroma/Akkoma. Might someday be replaced with the Glitch equivalent.
+    case pleromaReact(id: Status.Id, name: String)
+    case pleromaUnreact(id: Status.Id, name: String)
 }
 
 public extension StatusEndpoint {
@@ -104,7 +108,12 @@ extension StatusEndpoint: Endpoint {
     public typealias ResultType = Status
 
     public var context: [String] {
-        defaultContext + ["statuses"]
+        switch self {
+        case.pleromaReact, .pleromaUnreact:
+            return defaultContext + ["pleroma", "statuses"]
+        default:
+            return defaultContext + ["statuses"]
+        }
     }
 
     public var pathComponentsInContext: [String] {
@@ -135,6 +144,8 @@ extension StatusEndpoint: Endpoint {
             return [id, "react", name]
         case let .unreact(id, name):
             return [id, "unreact", name]
+        case let .pleromaReact(id, name), let .pleromaUnreact(id, name):
+            return [id, "reactions", name]
         case .post:
             return []
         }
@@ -153,9 +164,9 @@ extension StatusEndpoint: Endpoint {
         switch self {
         case .status:
             return .get
-        case .delete:
+        case .delete, .pleromaUnreact:
             return .delete
-        case .put:
+        case .put, .pleromaReact:
             return .put
         default:
             return .post
@@ -167,8 +178,15 @@ extension StatusEndpoint: Endpoint {
         case .put:
             return StatusEditsEndpoint.history(id: "").requires
         case .react, .unreact:
-            // TODO: (Vyr) reactions: Glitch PR #2221/Firefish issue #10537 only
-            return [:]
+            // Glitch PR #2221 reaction support must be detected using the instance API.
+            return .features(.emojiReactions) | [
+                .firefish: "1.0.4-0"
+            ]
+        case .pleromaReact, .pleromaUnreact:
+            return [
+                .pleroma: .assumeAvailable,
+                .akkoma: .assumeAvailable
+            ]
         default:
             return nil
         }
