@@ -1,19 +1,12 @@
-# Feditext<sup>*</sup>
+# Feditext
 
-A free, open-source iOS Mastodon client.
+A free, open-source iOS client for [Mastodon](https://joinmastodon.org/), [Glitch](https://glitch-soc.github.io/docs/), [GotoSocial](https://gotosocial.org/), [Firefish](https://joinfirefish.org/), [Akkoma](https://akkoma.social/), and other Mastodon-API-compatible Fediverse instance servers.
 
-<sup>*</sup>Feditext: this name is a placeholder. Suggestions are welcome. I don't know if it's an option to keep the Metatext name.
+Feditext is based on the [Metatext](https://github.com/metabolist/metatext) project, which has concluded and is no longer maintained. Feditext is updated with Mastodon 4 features and better support for non-Mastodon instances.
 
-## Seeking Contributors
+## Testers Wanted
 
-The upstream project [Metatext](https://github.com/metabolist/metatext) is seeking maintainers.
-This fork is an attempt to build community to continue development.
-
-If you are interested in joining the TestFlight group,
-reach out to
-[@bdube](https://gotgoat.com/@bdube)
-or
-[@vyr](https://demon.social/@vyr).
+If you are interested in joining the TestFlight group, please DM our official Fedi account [@Feditext@fedi.software](https://fedi.software/@Feditext), and follow it for announcements and release notes.
 
 ## Contributing Bug Reports
 
@@ -45,7 +38,7 @@ All dependencies are managed using [Swift Package Manager](https://swift.org/pac
 
 Push notifications will not work in development builds of Feditext unless you host your own instance of [feditext-apns](https://github.com/feditext/feditext-apns) and change the `pushSubscriptionEndpointURL` constants in [`IdentityService.swift`](ServiceLayer/Sources/ServiceLayer/Services/IdentityService.swift) to its URL.
 
-There is an issue to track this bdube/metatext#15.
+There is an issue to track this: feditext/feditext#15.
 
 ## Architecture
 
@@ -70,6 +63,13 @@ Feditext uses the following third-party artwork:
 - Feditext "ft" logos by Robert George [@rrgeorge](https://raphus.social/@rrgeorge) ([CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/))
 - ActivityPub logo by mray from [activitypub.rocks](https://activitypub.rocks/) ([CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/))
 
+Feditext is maintained by:
+
+- [@vyr](https://demon.social/@vyr)
+- [@bdube](https://gotgoat.com/@bdube)
+
+And of course, we wouldn't be here without [Metabolist](https://metabolist.org/)'s incredible work on the original Metatext project.
+
 ## Cryptography Notice
 
 This distribution includes cryptographic software. The country in which you currently reside may have restrictions on the import, possession, use, and/or re-export to another country, of encryption software.
@@ -81,7 +81,8 @@ The form and manner of this distribution makes it eligible for export under the 
 
 ## License
 
-Copyright (C) 2021 Metabolist
+Copyright © 2022–2021 Metabolist
+Copyright © 2022–2023 Brian Dube, Vyr Cossont
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
