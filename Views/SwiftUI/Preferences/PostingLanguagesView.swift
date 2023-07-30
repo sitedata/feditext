@@ -19,7 +19,9 @@ struct PostingLanguagesView: View {
         PrefsLanguage.languageTagsAndNames(prefsLanguageTag: nil)
             .filter {
                 !postingLanguages.contains($0.tag)
-                && (availableLanguageFilter.isEmpty || $0.localized.contains(availableLanguageFilter))
+                && (availableLanguageFilter.isEmpty
+                    || $0.localized.localizedCaseInsensitiveContains(availableLanguageFilter)
+                )
             }
     }
 
