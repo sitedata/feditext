@@ -28,9 +28,9 @@ final class StatusBodyView: UIView {
 
             let mutableContent = NSMutableAttributedString(attributedString: viewModel.content)
             mutableContent.adaptHtmlAttributes(style: contentTextStyle)
-            let trailingTagPairs: [(TagViewModel.ID, String)]
+            let trailingTagPairs: [(id: TagViewModel.ID, name: String)]
             if foldTrailingHashtags {
-                trailingTagPairs = dropTrailingHashtags(mutableContent)
+                trailingTagPairs = Self.dropTrailingHashtags(mutableContent)
             } else {
                 trailingTagPairs = []
             }
@@ -83,6 +83,21 @@ final class StatusBodyView: UIView {
                 || (!foldTrailingHashtags && outOfTextTagPairs.isEmpty)
                 || tagViewTagPairs.isEmpty
             tagsView.attributedText = makeLinkedTagViewText(tagViewTagPairs)
+            tagsView.accessibilityValue = NSLocalizedString("search.scope.tags", comment: "")
+            tagsView.accessibilityLabel = Self.makeLinkedTagViewAccessibilityLabel(tagViewTagPairs)
+            tagsView.accessibilityTraits = .staticText
+            tagsView.accessibilityHint = NSLocalizedString("status.accessibility.go-to-hashtags-hint", comment: "")
+            tagsView.accessibilityCustomActions = tagViewTagPairs.map { tagPair in
+                .init(
+                    name: String.localizedStringWithFormat(
+                        NSLocalizedString("status.accessibility.go-to-hashtag-%@", comment: ""),
+                        Self.stripHash(tagPair.name)
+                    )
+                ) { [weak self] _ in
+                    self?.viewModel?.tagSelected(tagPair.id)
+                    return true
+                }
+            }
 
             attachmentsView.isHidden = viewModel.attachmentViewModels.isEmpty
             attachmentsView.viewModel = viewModel
@@ -264,8 +279,6 @@ extension StatusBodyView {
             accessibilityAttributedLabel.append(content)
         }
 
-        // TODO: (Vyr) modify accessibility label for tagsView to read out "hashtags: foo, bar"
-        //  vs. "number foo number bar"
         for view in [tagsView, attachmentsView, pollView, cardView] where !view.isHidden {
             guard let viewAccessibilityLabel = view.accessibilityLabel else { continue }
 
@@ -356,7 +369,7 @@ private extension StatusBodyView {
 
     /// Find any hashtags that are attached to the status but don't appear in the text.
     /// Return their IDs and display text.
-    func findOutOfTextTagPairs() -> [(TagViewModel.ID, String)] {
+    func findOutOfTextTagPairs() -> [(id: TagViewModel.ID, name: String)] {
         guard let viewModel = viewModel else { return [] }
         let tagViewModels = viewModel.tagViewModels
         let content = viewModel.content
@@ -377,7 +390,7 @@ private extension StatusBodyView {
 
     /// Drop trailing hashtags from the string.
     /// Return a list of the tag IDs that were dropped and the original text for each.
-    func dropTrailingHashtags(_ mutableContent: NSMutableAttributedString) -> [(TagViewModel.ID, String)] {
+    static func dropTrailingHashtags(_ mutableContent: NSMutableAttributedString) -> [(id: TagViewModel.ID, name: String)] {
         var tagIds = Set<TagViewModel.ID>()
         var tagPairs = [(TagViewModel.ID, String)]()
         var startOfTrailingHashtags: String.Index = mutableContent.string.endIndex
@@ -461,5 +474,25 @@ private extension StatusBodyView {
         )
 
         return text
+    }
+
+    /// Tag names extracted from links in status content don't necessarily start with a hash.
+    /// Tag names from view models always do.
+    /// Either way, for accessibility, we might need the bare version.
+    static func stripHash(_ name: String) -> String {
+        if name.hasPrefix("#") {
+            return String(name["#".endIndex...])
+        }
+        return name
+    }
+
+    static func makeLinkedTagViewAccessibilityLabel(_ tagPairs: [(id: TagViewModel.ID, name: String)]) -> String? {
+        guard !tagPairs.isEmpty else { return nil }
+
+        return String(
+            tagPairs
+                .map { tagPair in Self.stripHash(tagPair.name) }
+                .joined(separator: ", ")
+        )
     }
 }

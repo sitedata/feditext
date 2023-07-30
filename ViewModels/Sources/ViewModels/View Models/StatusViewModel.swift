@@ -312,23 +312,27 @@ public extension StatusViewModel {
                 .eraseToAnyPublisher())
     }
 
+    func tagSelected(_ id: TagViewModel.ID) {
+        eventsSubject.send(
+            Just(
+                .navigation(
+                    .collection(
+                        statusService.navigationService.timelineService(
+                            timeline: .tag(id)
+                        )
+                    )
+                )
+            )
+                .setFailureType(to: Error.self)
+                .eraseToAnyPublisher()
+        )
+    }
+
     func urlSelected(_ url: URL) {
         if let appUrl = AppUrl(url: url) {
             switch appUrl {
-            case let .tagTimeline(name):
-                 eventsSubject.send(
-                     Just(
-                         .navigation(
-                             .collection(
-                                 statusService.navigationService.timelineService(
-                                     timeline: .tag(name)
-                                 )
-                             )
-                         )
-                     )
-                         .setFailureType(to: Error.self)
-                         .eraseToAnyPublisher()
-                 )
+            case let .tagTimeline(id):
+                 tagSelected(id)
 
             case let .mention(userUrl):
                 eventsSubject.send(
