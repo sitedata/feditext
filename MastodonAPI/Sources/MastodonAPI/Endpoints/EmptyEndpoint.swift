@@ -18,6 +18,8 @@ public enum EmptyEndpoint {
     case addAnnouncementReaction(id: Announcement.Id, name: String)
     case removeAnnouncementReaction(id: Announcement.Id, name: String)
     case removeFollowSuggestion(id: Account.Id)
+    /// https://docs.joinmastodon.org/methods/conversations/#delete
+    case removeConversation(id: Conversation.Id)
 }
 
 extension EmptyEndpoint: Endpoint {
@@ -37,6 +39,8 @@ extension EmptyEndpoint: Endpoint {
             return defaultContext + ["announcements"]
         case .removeFollowSuggestion:
             return defaultContext + ["suggestions"]
+        case .removeConversation:
+            return defaultContext + ["conversations"]
         }
     }
 
@@ -56,6 +60,8 @@ extension EmptyEndpoint: Endpoint {
             return [id, "reactions", name]
         case let .removeFollowSuggestion(id):
             return [id]
+        case let .removeConversation(id):
+            return [id]
         }
     }
 
@@ -70,7 +76,8 @@ extension EmptyEndpoint: Endpoint {
                 .deleteFilter,
                 .unblockDomain,
                 .removeAnnouncementReaction,
-                .removeFollowSuggestion:
+                .removeFollowSuggestion,
+                .removeConversation:
             return .delete
         }
     }
@@ -88,7 +95,8 @@ extension EmptyEndpoint: Endpoint {
                 .dismissAnnouncement,
                 .addAnnouncementReaction,
                 .removeAnnouncementReaction,
-                .removeFollowSuggestion:
+                .removeFollowSuggestion,
+                .removeConversation:
             return nil
         }
     }
@@ -103,6 +111,8 @@ extension EmptyEndpoint: Endpoint {
             return SuggestionsEndpoint.suggestions().requires
         case .addAccountsToList, .removeAccountsFromList, .deleteList:
             return ListsEndpoint.lists.requires
+        case .removeConversation:
+            return ConversationsEndpoint.conversations.requires
         default:
             return nil
         }
