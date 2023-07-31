@@ -171,7 +171,7 @@ public extension StatusViewModel {
         if identityContext.appPreferences.animateAvatars == .everywhere {
             return statusService.status.displayStatus.account.avatar.url
         } else {
-            return statusService.status.displayStatus.account.avatarStatic.url
+            return statusService.status.displayStatus.account.unifiedAvatarStatic.url
         }
     }
 
@@ -179,7 +179,7 @@ public extension StatusViewModel {
         if identityContext.appPreferences.animateAvatars == .everywhere {
             return statusService.status.account.avatar.url
         } else {
-            return statusService.status.account.avatarStatic.url
+            return statusService.status.account.unifiedAvatarStatic.url
         }
     }
 

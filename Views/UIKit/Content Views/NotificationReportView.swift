@@ -149,7 +149,7 @@ class NotificationReportView: UIView {
 
             let avatarUrl = identityContext.appPreferences.animateAvatars == .everywhere
                 ? targetAccount.avatar.url
-                : targetAccount.avatarStatic.url
+                : targetAccount.unifiedAvatarStatic.url
             targetAccountAvatarImageView.sd_setImage(with: avatarUrl)
 
             targetAccountDisplayNameLabel.isHidden = displayName.isEmpty

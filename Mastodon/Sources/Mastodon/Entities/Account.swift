@@ -14,10 +14,21 @@ public final class Account: Codable, Identifiable {
     public let statusesCount: Int
     public let note: HTML
     public let url: String
+
     public let avatar: UnicodeURL
-    public let avatarStatic: UnicodeURL
+    public let avatarStatic: UnicodeURL?
+    /// Hajkey doesn't return URLs for non-animated versions of image assets.
+    public var unifiedAvatarStatic: UnicodeURL {
+        avatarStatic ?? avatar
+    }
+
     public let header: UnicodeURL
-    public let headerStatic: UnicodeURL
+    public let headerStatic: UnicodeURL?
+    /// Hajkey doesn't return URLs for non-animated versions of image assets.
+    public var unifiedHeaderStatic: UnicodeURL {
+        headerStatic ?? header
+    }
+
     @DecodableDefault.EmptyList public private(set) var fields: [Field]
     @DecodableDefault.EmptyList public private(set) var emojis: [Emoji]
     @DecodableDefault.False public private(set) var bot: Bool

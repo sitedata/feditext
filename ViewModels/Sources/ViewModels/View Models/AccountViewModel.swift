@@ -36,7 +36,7 @@ public extension AccountViewModel {
         if identityContext.appPreferences.animateHeaders {
             return accountService.account.header.url
         } else {
-            return accountService.account.headerStatic.url
+            return accountService.account.unifiedHeaderStatic.url
         }
     }
 
@@ -109,7 +109,7 @@ public extension AccountViewModel {
             || (identityContext.appPreferences.animateAvatars == .profiles && profile) {
             return accountService.account.avatar.url
         } else {
-            return accountService.account.avatarStatic.url
+            return accountService.account.unifiedAvatarStatic.url
         }
     }
 

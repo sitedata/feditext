@@ -93,9 +93,9 @@ extension AccountRecord {
         note = account.note
         url = account.url
         avatar = account.avatar
-        avatarStatic = account.avatarStatic
+        avatarStatic = account.unifiedAvatarStatic
         header = account.header
-        headerStatic = account.headerStatic
+        headerStatic = account.unifiedHeaderStatic
         fields = account.fields
         emojis = account.emojis
         bot = account.bot

@@ -88,9 +88,9 @@ public extension IdentityDatabase {
                 displayName: account.displayName,
                 url: account.url,
                 avatar: account.avatar,
-                avatarStatic: account.avatarStatic,
+                avatarStatic: account.unifiedAvatarStatic,
                 header: account.header,
-                headerStatic: account.headerStatic,
+                headerStatic: account.unifiedHeaderStatic,
                 emojis: account.emojis,
                 followRequestCount: account.source?.followRequestsCount ?? 0)
             .save($0)

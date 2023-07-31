@@ -129,7 +129,7 @@ private extension Account {
                 urls.insert(url)
             }
         } else {
-            if let url = avatarStatic.url {
+            if let url = unifiedAvatarStatic.url {
                 urls.insert(url)
             }
         }
