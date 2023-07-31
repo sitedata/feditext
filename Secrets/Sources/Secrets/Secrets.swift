@@ -220,7 +220,7 @@ public extension Secrets {
     }
 
     func getAPICompatibilityModeRawValue() throws -> String {
-        try item(.apiFeaturesRawValues)
+        try item(.apiCompatibilityModeRawValue)
     }
 
     func setAPICompatibilityModeRawValue(_ rawValue: String) throws {
