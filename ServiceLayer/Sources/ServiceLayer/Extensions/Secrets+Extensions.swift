@@ -37,9 +37,7 @@ extension Secrets {
 
     func getAPIFeatures() -> Set<APIFeature> {
         do {
-            let rawValues = try getAPIFeaturesRawValues()
-            let z = rawValues.compactMap { APIFeature(rawValue: $0) }
-            return .init(z)
+            return .init(try getAPIFeaturesRawValues().compactMap { APIFeature(rawValue: $0) })
         } catch {
             return .init()
         }
