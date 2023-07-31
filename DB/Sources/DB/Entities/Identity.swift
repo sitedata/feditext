@@ -22,7 +22,13 @@ public extension Identity {
 
     /// Summary version of `Mastodon.Instance` that should be available anywhere an identity is.
     struct Instance: Codable, Hashable {
+        /// For Mastodon servers, this is the same value as `LOCAL_DOMAIN`,
+        /// not `WEB_DOMAIN`, and should not be used to construct API calls or web GUI URLs.
+        ///
+        /// - See: https://docs.joinmastodon.org/admin/config/#local_domain
+        /// - See: https://docs.joinmastodon.org/admin/config/#web_domain
         public let uri: String
+
         /// Mastodon servers use a bare domain in the `uri` field,
         /// but Akkoma and GotoSocial (at least) use an `https://` URL.
         public var domain: String {

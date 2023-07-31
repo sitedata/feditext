@@ -23,9 +23,9 @@ struct SecondaryNavigationView: View {
                         }
                     }
                 }
-                if let instanceURI = viewModel.identityContext.identity.instance?.uri {
+                if viewModel.hasEditProfile {
                     Button {
-                        viewModel.navigateToEditProfile(instanceURI: instanceURI)
+                        viewModel.navigateToEditProfile()
                     } label: {
                         Label {
                             Text("secondary-navigation.edit-profile").foregroundColor(.primary)
@@ -33,8 +33,10 @@ struct SecondaryNavigationView: View {
                             Image(systemName: "pencil")
                         }
                     }
+                }
+                if viewModel.hasAccountSettings {
                     Button {
-                        viewModel.navigateToAccountSettings(instanceURI: instanceURI)
+                        viewModel.navigateToAccountSettings()
                     } label: {
                         Label {
                             Text("secondary-navigation.account-settings").foregroundColor(.primary)

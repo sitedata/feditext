@@ -107,20 +107,24 @@ public extension NavigationViewModel {
         navigationsSubject.send(.profile(identityContext.service.navigationService.profileService(id: id)))
     }
 
-    func navigateToEditProfile(instanceURI: String) {
-        guard let editProfileURL = editProfileURL(instanceURI: instanceURI) else { return }
-
-        AuthenticatedWebViewService(environment: environment).authenticatedWebViewPublisher(url: editProfileURL)
-            .sink { _ in } receiveValue: { _ in }
-            .store(in: &cancellables)
+    var hasEditProfile: Bool {
+        identityContext.service.navigationService.editProfile() != nil
     }
 
-    func navigateToAccountSettings(instanceURI: String) {
-        guard let accountSettingsURL = accountSettingsURL(instanceURI: instanceURI) else { return }
+    func navigateToEditProfile() {
+        guard let navigation = identityContext.service.navigationService.editProfile() else { return }
 
-        AuthenticatedWebViewService(environment: environment).authenticatedWebViewPublisher(url: accountSettingsURL)
-            .sink { _ in } receiveValue: { _ in }
-            .store(in: &cancellables)
+        navigationsSubject.send(navigation)
+    }
+
+    var hasAccountSettings: Bool {
+        identityContext.service.navigationService.accountSettings() != nil
+    }
+
+    func navigateToAccountSettings() {
+        guard let navigation = identityContext.service.navigationService.accountSettings() else { return }
+
+        navigationsSubject.send(navigation)
     }
 
     func navigate(timeline: Timeline) {
@@ -224,23 +228,5 @@ public extension NavigationViewModel {
         CollectionItemsViewModel(
             collectionService: identityContext.service.announcementsService(),
             identityContext: identityContext)
-    }
-}
-
-private extension NavigationViewModel {
-    func accountSettingsURL(instanceURI: String) -> URL? {
-        if instanceURI.hasPrefix("https://") {
-            return URL(string: "\(instanceURI)/auth/edit")
-        } else {
-            return URL(string: "https://\(instanceURI)/auth/edit")
-        }
-    }
-
-    func editProfileURL(instanceURI: String) -> URL? {
-        if instanceURI.hasPrefix("https://") {
-            return URL(string: "\(instanceURI)/settings/profile")
-        } else {
-            return URL(string: "https://\(instanceURI)/settings/profile")
-        }
     }
 }

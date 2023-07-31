@@ -166,18 +166,55 @@ public extension NavigationService {
 
     /// Open a report in the web interface.
     func report(id: Report.Id) -> Navigation {
-        let reportURL: URL
-        if #available(iOS 16.0, *) {
-            reportURL = mastodonAPIClient.instanceURL.appending(components: "admin", "reports", id)
-        } else {
-            reportURL = mastodonAPIClient.instanceURL
-                .appendingPathComponent("admin")
-                .appendingPathComponent("reports")
-                .appendingPathComponent(id)
-        }
         return .authenticatedWebView(
             AuthenticatedWebViewService(environment: environment),
-            reportURL
+            mastodonAPIClient.instanceURL.appendingPathComponents("admin", "reports", id)
+        )
+    }
+
+    /// Edit the user's public profile in the web interface.
+    func editProfile() -> Navigation? {
+        let url: URL
+        switch mastodonAPIClient.apiCapabilities.flavor {
+        case nil:
+            return nil
+        case .mastodon, .glitch, .hometown:
+            url = mastodonAPIClient.instanceURL.appendingPathComponents("settings", "profile")
+        case .pleroma, .akkoma:
+            // Akkoma's web UI doesn't support deep linking to settings.
+            return nil
+        case .gotosocial:
+            url = mastodonAPIClient.instanceURL.appendingPathComponents("settings", "user", "profile")
+        case .calckey, .firefish:
+            url = mastodonAPIClient.instanceURL.appendingPathComponents("settings", "profile")
+        }
+
+        return .authenticatedWebView(
+            AuthenticatedWebViewService(environment: environment),
+            url
+        )
+    }
+
+    /// Edit the user's account settings (password, etc.) in the web interface.
+    func accountSettings() -> Navigation? {
+        let url: URL
+        switch mastodonAPIClient.apiCapabilities.flavor {
+        case nil:
+            return nil
+        case .mastodon, .glitch, .hometown:
+            url = mastodonAPIClient.instanceURL.appendingPathComponents("auth", "edit")
+        case .pleroma, .akkoma:
+            // Akkoma's web UI doesn't support deep linking to settings.
+            return nil
+        case .gotosocial:
+            url = mastodonAPIClient.instanceURL.appendingPathComponents("settings", "user", "settings")
+        case .calckey, .firefish:
+            url = mastodonAPIClient.instanceURL.appendingPathComponents("settings", "security")
+        }
+
+        return .authenticatedWebView(
+            AuthenticatedWebViewService(environment: environment),
+            url
         )
     }
 }
