@@ -49,6 +49,8 @@ public final class ExploreViewModel: ObservableObject {
                 case let CollectionItemEvent.navigation(nav):
                     return Event.navigation(nav)
                 default:
+                    // TODO: (Vyr) Explore tab: there are a ton of events we need to handle that can actually happen
+                    //  For example, sharing a status, opening the emoji picker to react to a status…
                     assertionFailure("Untranslatable CollectionItemEvent: \($0)")
                     return nil
                 }
