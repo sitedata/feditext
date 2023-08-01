@@ -60,10 +60,23 @@ extension StatusesEndpoint: Endpoint {
         case let .timelinesPublic(local):
             return [URLQueryItem(name: "local", value: String(local))]
         case let .accountsStatuses(_, excludeReplies, excludeReblogs, onlyMedia, pinned):
-            return [URLQueryItem(name: "exclude_replies", value: String(excludeReplies)),
-                    URLQueryItem(name: "exclude_reblogs", value: String(excludeReblogs)),
-                    URLQueryItem(name: "only_media", value: String(onlyMedia)),
-                    URLQueryItem(name: "pinned", value: String(pinned))]
+            // Send boolean params only if true.
+            // Firefish and Hajkey currently (2023-08-01) can't handle the pinned parameter's presence,
+            // and will return an empty list even if pinned=false was requested. See Feditext bug #152.
+            var items = [URLQueryItem]()
+            if excludeReplies {
+                items.append(URLQueryItem(name: "exclude_replies", value: String(excludeReplies)))
+            }
+            if excludeReblogs {
+                items.append(URLQueryItem(name: "exclude_reblogs", value: String(excludeReblogs)))
+            }
+            if onlyMedia {
+                items.append(URLQueryItem(name: "only_media", value: String(onlyMedia)))
+            }
+            if pinned {
+                items.append(URLQueryItem(name: "pinned", value: String(pinned)))
+            }
+            return items
         case let .trends(limit, offset):
             return queryParameters(limit, offset)
         default:
