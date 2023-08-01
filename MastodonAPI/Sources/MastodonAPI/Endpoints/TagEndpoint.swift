@@ -40,10 +40,8 @@ extension TagEndpoint: Endpoint {
 
     public var requires: APICapabilityRequirements? {
         switch self {
-        case .follow, .unfollow:
+        case .get, .follow, .unfollow:
             return TagsEndpoint.followed.requires
-        default:
-            return nil
         }
     }
 }

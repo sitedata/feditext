@@ -3,6 +3,7 @@
 import AppUrls
 import Combine
 import Mastodon
+import MastodonAPI
 
 /// Things we can do to a tag: get the current follow state, and follow or unfollow it.
 public final class TagTimelineActionViewModel: ObservableObject {
@@ -26,8 +27,10 @@ public final class TagTimelineActionViewModel: ObservableObject {
         self.identityContext = identityContext
         self.collectionItemsViewModel = collectionItemsViewModel
 
-        // Fetch the rest of the tag, including following status.
-        getTag()
+        if TagEndpoint.get(name: "").canCallWith(identityContext.apiCapabilities) {
+            // Fetch the rest of the tag, including following status.
+            getTag()
+        }
     }
 
     private func getTag() {
