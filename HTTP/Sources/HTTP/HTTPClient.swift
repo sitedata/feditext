@@ -3,11 +3,6 @@
 import Combine
 import Foundation
 
-public enum HTTPError: Error {
-    case nonHTTPURLResponse(data: Data, response: URLResponse)
-    case invalidStatusCode(data: Data, response: HTTPURLResponse)
-}
-
 open class HTTPClient {
     public let decoder: JSONDecoder
 
@@ -41,11 +36,19 @@ open class HTTPClient {
             }
             .tryMap { data, response in
                 guard let httpResponse = response as? HTTPURLResponse else {
-                    throw HTTPError.nonHTTPURLResponse(data: data, response: response)
+                    throw HTTPError(
+                        target: target,
+                        requestLocation: requestLocation
+                    )
                 }
 
                 guard Self.validStatusCodes.contains(httpResponse.statusCode) else {
-                    throw HTTPError.invalidStatusCode(data: data, response: httpResponse)
+                    throw HTTPError(
+                        target: target,
+                        data: data,
+                        httpResponse: httpResponse,
+                        requestLocation: requestLocation
+                    )
                 }
 
                 return (data, httpResponse)

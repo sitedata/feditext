@@ -24,7 +24,10 @@ public final class MastodonAPIClient: HTTPClient {
         let apiCapabilities = apiCapabilities
         return super.dataTaskPublisher(target, progress: progress, requestLocation: requestLocation)
             .mapError { [weak self] error -> Error in
-                if case let HTTPError.invalidStatusCode(data, response) = error,
+                if let httpError = error as? HTTPError,
+                   httpError.reason == .invalidStatusCode,
+                   let data = httpError.data,
+                   let response = httpError.httpResponse,
                    let apiError = try? self?.decoder.decode(APIError.self, from: data) {
                     return AnnotatedAPIError(
                         apiError: apiError,
