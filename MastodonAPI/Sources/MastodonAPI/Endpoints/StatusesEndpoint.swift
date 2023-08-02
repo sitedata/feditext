@@ -90,14 +90,14 @@ extension StatusesEndpoint: Endpoint {
         switch self {
         case .trends:
             return .mastodonForks("3.5.0") | [
-                .calckey: "14.0.0",
+                .calckey: "14.0.0-0",
                 .firefish: "1.0.0"
             ]
         case .timelinesTag:
             return .mastodonForks(.assumeAvailable) | [
                 .pleroma: .assumeAvailable,
                 .akkoma: .assumeAvailable,
-                .calckey: "14.0.0",
+                .calckey: "14.0.0-0",
                 .firefish: "1.0.0"
             ]
         case .timelinesList:
@@ -105,7 +105,7 @@ extension StatusesEndpoint: Endpoint {
                 .pleroma: .assumeAvailable,
                 .akkoma: .assumeAvailable,
                 .gotosocial: "0.10.0-0",
-                .calckey: "14.0.0",
+                .calckey: "14.0.0-0",
                 .firefish: "1.0.0"
             ]
         default:

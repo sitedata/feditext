@@ -24,6 +24,7 @@ extension AnnouncementsEndpoint: Endpoint {
         .mastodonForks("3.1.0") | [
             .pleroma: .assumeAvailable,
             .akkoma: .assumeAvailable,
+            .calckey: "14.0.0-0",
             .firefish: "1.0.0"
         ]
     }
