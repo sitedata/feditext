@@ -63,6 +63,15 @@ final class AddIdentityViewController: UIViewController {
     }
 }
 
+extension AddIdentityViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        self.viewModel.logInTapped()
+
+        return true
+    }
+}
+
 private extension AddIdentityViewController {
     static let verticalSpacing: CGFloat = 20
     static let whatIsMastodonVideoURL = URL(string: "https://www.youtube.com/embed/IPSbNdBmWKE?playsinline=1")!
@@ -97,6 +106,7 @@ private extension AddIdentityViewController {
         urlTextField.addAction(
             UIAction { [weak self] _ in self?.viewModel.urlFieldText = self?.urlTextField.text ?? "" },
             for: .editingChanged)
+        urlTextField.delegate = self
 
         instanceAndButtonsStackView.spacing = .defaultSpacing
         instanceAndButtonsStackView.distribution = .fillEqually
